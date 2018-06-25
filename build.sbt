@@ -45,9 +45,12 @@ lazy val app = project.in(file("mgmt-app"))
     scalaJSUseMainModuleInitializer := true,
 
     libraryDependencies ++= Seq(
+      "org.akka-js" %%% "akkajsactor" % Versions.akkaJs,
       "org.scala-js" %%% "scalajs-dom" % "0.9.5",
       "com.github.ahnfelt" %%% "react4s" % "0.9.8-SNAPSHOT",
-      "com.github.werk" %%% "router4s" % "0.1.1-SNAPSHOT"
+      "com.github.werk" %%% "router4s" % "0.1.1-SNAPSHOT",
+      "com.github.benhutchison" %%% "prickle" % Versions.prickle,
+      organization.value %%% "blended.updater.config" % Versions.blended
     )
   )
   .settings(noPublish:_*)
