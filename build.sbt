@@ -26,7 +26,12 @@ lazy val noPublish = Seq(
 )
 
 lazy val npmSettings = Seq(
-  useYarn := true
+  useYarn := true,
+  npmDependencies.in(Compile) := Seq(
+    "react" -> Versions.react,
+    "react-dom" -> Versions.react,
+    "jsdom" -> Versions.jsdom
+  )
 )
 
 lazy val root = project.in(file("."))
@@ -37,8 +42,13 @@ lazy val app = project.in(file("mgmt-app"))
     name := "mgmt-app",
     jsEnv := PhantomJSEnv().value,
     webpackBundlingMode := scalajsbundler.BundlingMode.LibraryAndApplication(),
-    scalaJSUseMainModuleInitializer := true
+    scalaJSUseMainModuleInitializer := true,
 
+    libraryDependencies ++= Seq(
+      "org.scala-js" %%% "scalajs-dom" % "0.9.5",
+      "com.github.ahnfelt" %%% "react4s" % "0.9.8-SNAPSHOT",
+      "com.github.werk" %%% "router4s" % "0.1.1-SNAPSHOT"
+    )
   )
   .settings(noPublish:_*)
   .settings(npmSettings:_*)
