@@ -31,7 +31,7 @@ case class MainComponent() extends Component[NoEmit] {
     E.div(
       E.div(
         TopBarCss,
-        E.a(Text("Blended Management Console"), A.href("/"), BrandTitleCss, LinkCss)
+        E.a(Text("Blended Management Console"), A.href(href(HomePage)), BrandTitleCss, LinkCss)
       ),
       E.div(
         ColumnContainerCss,
@@ -41,6 +41,13 @@ case class MainComponent() extends Component[NoEmit] {
             E.div(MenuEntryCss, E.a(Text("Overview"), LinkCss, A.href(href(HomePage)))),
             E.div(MenuEntryCss, E.a(Text("Container"), LinkCss, A.href(href(ContainerPage()))))
           )
+        ),
+        E.div(
+          ContentColumnCss,
+          get(page) match {
+            case Some(p) => E.div(Component(p.component))
+            case None => E.div(E.p(Text("Not found")))
+          }
         )
       )
     )

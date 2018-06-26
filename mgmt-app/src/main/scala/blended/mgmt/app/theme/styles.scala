@@ -51,6 +51,12 @@ object ColumnContainerCss extends CssClass(
   S.right.px(0),
 )
 
+object ContentColumnCss extends CssClass(
+  ColumnCss,
+  S.left.px(200),
+  S.right.px(0)
+)
+
 object MenuColumnCss extends CssClass(
   ColumnCss,
   S.left.px(0),
