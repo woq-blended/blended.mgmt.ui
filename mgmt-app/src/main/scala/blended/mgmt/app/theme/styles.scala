@@ -14,6 +14,17 @@ object TopBarCss extends CssClass(
   S.height.px(50)
 )
 
+object BottomBarCss extends CssClass(
+  S.backgroundColor(Palette.background),
+  S.boxShadow("0 2px 5px rgba(0, 0, 0, 0.3)"),
+  S.boxSizing.borderBox(),
+  S.position.absolute(),
+  S.left.px(0),
+  S.bottom.px(0),
+  S.right.px(0),
+  S.height.px(50)
+)
+
 object BrandTextCss extends CssClass(
   S.display.inlineBlock(),
   S.paddingTop.px(8),
@@ -46,7 +57,7 @@ object ColumnCss extends CssClass(
 object ColumnContainerCss extends CssClass(
   S.position.absolute(),
   S.top.px(50),
-  S.bottom.px(0),
+  S.bottom.px(50),
   S.left.px(0),
   S.right.px(0),
 )

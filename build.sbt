@@ -36,7 +36,7 @@ lazy val npmSettings = Seq(
 
 lazy val root = project.in(file("."))
   .settings(noPublish)
-  .aggregate(router,app)
+  .aggregate(utils,router,app)
 
 lazy val router = project.in(file("router"))
   .settings(
@@ -45,6 +45,12 @@ lazy val router = project.in(file("router"))
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % Versions.scalaTest % "test"
     )
+  ).enablePlugins(ScalaJSBundlerPlugin)
+
+lazy val utils = project.in(file("utils"))
+  .settings(
+    name := "utils",
+    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly()
   ).enablePlugins(ScalaJSBundlerPlugin)
 
 lazy val app = project.in(file("mgmt-app"))
@@ -67,4 +73,4 @@ lazy val app = project.in(file("mgmt-app"))
   .settings(noPublish:_*)
   .settings(npmSettings:_*)
   .enablePlugins(ScalaJSBundlerPlugin)
-  .dependsOn(router)
+  .dependsOn(router, utils)
