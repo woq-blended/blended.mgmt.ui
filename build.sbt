@@ -36,7 +36,13 @@ lazy val npmSettings = Seq(
 
 lazy val root = project.in(file("."))
   .settings(noPublish)
-  .aggregate(app)
+  .aggregate(router,app)
+
+lazy val router = project.in(file("router"))
+  .settings(
+    name := "router",
+    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly()
+  ).enablePlugins(ScalaJSBundlerPlugin)
 
 lazy val app = project.in(file("mgmt-app"))
   .settings(
@@ -49,7 +55,6 @@ lazy val app = project.in(file("mgmt-app"))
       "org.akka-js" %%% "akkajsactor" % Versions.akkaJs,
       "org.scala-js" %%% "scalajs-dom" % "0.9.5",
       "com.github.ahnfelt" %%% "react4s" % "0.9.8-SNAPSHOT",
-      "com.github.werk" %%% "router4s" % "0.1.1-SNAPSHOT",
       "com.github.benhutchison" %%% "prickle" % Versions.prickle,
       organization.value %%% "blended.updater.config" % Versions.blended
     )
@@ -57,3 +62,4 @@ lazy val app = project.in(file("mgmt-app"))
   .settings(noPublish:_*)
   .settings(npmSettings:_*)
   .enablePlugins(ScalaJSBundlerPlugin)
+  .dependsOn(router)

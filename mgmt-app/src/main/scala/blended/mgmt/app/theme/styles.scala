@@ -35,3 +35,43 @@ object LinkCss extends CssClass(
     S.textDecoration("underline")
   )
 )
+
+object ColumnCss extends CssClass(
+  S.position.absolute(),
+  S.boxSizing.borderBox(),
+  S.top.px(0),
+  S.bottom.px(0)
+)
+
+object ColumnContainerCss extends CssClass(
+  S.position.absolute(),
+  S.top.px(50),
+  S.bottom.px(0),
+  S.left.px(0),
+  S.right.px(0),
+)
+
+object MenuColumnCss extends CssClass(
+  ColumnCss,
+  S.left.px(0),
+  S.width.px(200)
+)
+
+object MenuCategoryCss extends CssClass(
+  S.paddingTop.px(20),
+  S.paddingLeft.px(20),
+  S.textTransform("uppercase"),
+  S.fontFamily("Verdana"),
+  S.fontSize.px(14),
+  S.color(Palette.text)
+)
+
+object MenuEntryCss extends CssClass(
+  S.paddingTop.px(10),
+  S.paddingLeft.px(20),
+  S.fontFamily("Verdana"),
+  S.fontSize.px(16),
+  S.color(Palette.primary)
+)
+
+

@@ -26,7 +26,5 @@ clean:
 prepare: clean
 	mkdir -p $(THIRD_PTY_DIR) 
 	cd $(THIRD_PTY_DIR) && git clone https://github.com/woq-blended/react4s.git 
-	cd $(THIRD_PTY_DIR) && git clone https://github.com/woq-blended/router4s.git 
-	cd $(THIRD_PTY_DIR)/react4s && sbt publishLocal 
-	cd $(THIRD_PTY_DIR)/router4s && sbt publishLocal
+	cd $(THIRD_PTY_DIR)/react4s && sbt publishLocal
 
