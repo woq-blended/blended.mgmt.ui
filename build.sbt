@@ -41,7 +41,10 @@ lazy val root = project.in(file("."))
 lazy val router = project.in(file("router"))
   .settings(
     name := "router",
-    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly()
+    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
+    libraryDependencies ++= Seq(
+      "org.scalatest" %%% "scalatest" % Versions.scalaTest % "test"
+    )
   ).enablePlugins(ScalaJSBundlerPlugin)
 
 lazy val app = project.in(file("mgmt-app"))
@@ -56,7 +59,9 @@ lazy val app = project.in(file("mgmt-app"))
       "org.scala-js" %%% "scalajs-dom" % "0.9.5",
       "com.github.ahnfelt" %%% "react4s" % "0.9.8-SNAPSHOT",
       "com.github.benhutchison" %%% "prickle" % Versions.prickle,
-      organization.value %%% "blended.updater.config" % Versions.blended
+      organization.value %%% "blended.updater.config" % Versions.blended,
+
+      "org.scalatest" %%% "scalatest" % Versions.scalaTest % "test"
     )
   )
   .settings(noPublish:_*)

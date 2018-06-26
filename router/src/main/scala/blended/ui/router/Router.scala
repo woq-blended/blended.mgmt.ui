@@ -57,6 +57,12 @@ object Router {
     name: String
   )
 
+  val string = Node[String](
+    fromPath = { path : String => Some(path) },
+    toPath = { s => Some(s) },
+    name = "string"
+  )
+
   val long = Node[Long](
     fromPath = { path : String =>
       for {
@@ -78,7 +84,6 @@ object Router {
     toPath = { i => Some(i.toString) },
     name = "int"
   )
-
 }
 
 class Router[S] {

@@ -1,6 +1,6 @@
 package blended.mgmt.app.components
 
-import blended.mgmt.app.{HomePage, Page, Routes}
+import blended.mgmt.app.{ContainerPage, HomePage, Page, Routes}
 import blended.mgmt.app.theme._
 import com.github.ahnfelt.react4s._
 import org.scalajs.dom
@@ -38,8 +38,8 @@ case class MainComponent() extends Component[NoEmit] {
         E.div(
           MenuColumnCss,
           E.div(
-            E.div(Text("Usage"), MenuCategoryCss),
-            E.div(MenuEntryCss, E.a(Text("Overview"), LinkCss, A.href(href(HomePage))))
+            E.div(MenuEntryCss, E.a(Text("Overview"), LinkCss, A.href(href(HomePage)))),
+            E.div(MenuEntryCss, E.a(Text("Container"), LinkCss, A.href(href(ContainerPage()))))
           )
         )
       )

@@ -10,4 +10,6 @@ object Versions {
 
   val react = "16.4.1"
 
+  val scalaTest = "3.0.5"
+
 }
