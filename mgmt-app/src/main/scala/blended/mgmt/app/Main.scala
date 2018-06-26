@@ -3,6 +3,7 @@ package blended.mgmt.app
 import akka.actor.{ActorRef, ActorSystem}
 import blended.mgmt.app.backend.WSClientActor
 import blended.mgmt.app.components.ContainerCollectionComponent
+import blended.mgmt.app.theme._
 import blended.updater.config.ContainerInfo
 import blended.updater.config.json.PrickleProtocol._
 import com.github.ahnfelt.react4s._
@@ -34,6 +35,12 @@ case class Main() extends Component[NoEmit] {
     }
 
   override def render(get: Get): Element = {
-    E.div(Component(ContainerCollectionComponent, get(container)))
+    E.div(
+      E.div(
+        TopBarCss,
+        E.a(Text("Blended Management Console"), A.href("/"), BrandTitleCss, LinkCss)
+      ),
+      E.div(Component(ContainerCollectionComponent, get(container)))
+    )
   }
 }

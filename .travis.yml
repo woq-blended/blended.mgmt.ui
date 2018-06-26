@@ -1,0 +1,14 @@
+language: scala
+
+scala: 2.11.11
+  
+jdk: oraclejdk8
+
+script: 
+  - ./travis_build.sh
+
+cache:
+  directories:
+  - $HOME/.sbt
+  - $HOME/.m2
+  - $HOME/.ivy2

@@ -36,11 +36,12 @@ lazy val npmSettings = Seq(
 
 lazy val root = project.in(file("."))
   .settings(noPublish)
+  .aggregate(app)
 
 lazy val app = project.in(file("mgmt-app"))
   .settings(
     name := "mgmt-app",
-    jsEnv := PhantomJSEnv().value,
+    //jsEnv := PhantomJSEnv().value,
     webpackBundlingMode := scalajsbundler.BundlingMode.LibraryAndApplication(),
     scalaJSUseMainModuleInitializer := true,
 
