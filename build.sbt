@@ -36,7 +36,7 @@ lazy val npmSettings = Seq(
 
 lazy val root = project.in(file("."))
   .settings(noPublish)
-  .aggregate(utils,router,app)
+  .aggregate(utils,router,components, app)
 
 lazy val router = project.in(file("router"))
   .settings(
@@ -47,10 +47,25 @@ lazy val router = project.in(file("router"))
     )
   ).enablePlugins(ScalaJSBundlerPlugin)
 
-lazy val utils = project.in(file("utils"))
+lazy val utils = project.in(file("common"))
   .settings(
-    name := "utils",
-    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly()
+    name := "common",
+    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
+    libraryDependencies ++= Seq(
+      "org.scala-js" %%% "scalajs-dom" % "0.9.5",
+      "com.github.ahnfelt" %%% "react4s" % Versions.react4s
+    )
+  )
+  .dependsOn(router)
+  .enablePlugins(ScalaJSBundlerPlugin)
+
+lazy val components = project.in(file("components"))
+  .settings(
+    name := "components",
+    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
+    libraryDependencies ++= Seq(
+      "com.github.ahnfelt" %%% "react4s" % Versions.react4s
+    )
   ).enablePlugins(ScalaJSBundlerPlugin)
 
 lazy val app = project.in(file("mgmt-app"))
@@ -63,7 +78,7 @@ lazy val app = project.in(file("mgmt-app"))
     libraryDependencies ++= Seq(
       "org.akka-js" %%% "akkajsactor" % Versions.akkaJs,
       "org.scala-js" %%% "scalajs-dom" % "0.9.5",
-      "com.github.ahnfelt" %%% "react4s" % "0.9.8-SNAPSHOT",
+      "com.github.ahnfelt" %%% "react4s" % Versions.react4s,
       "com.github.benhutchison" %%% "prickle" % Versions.prickle,
       organization.value %%% "blended.updater.config" % Versions.blended,
 
@@ -73,4 +88,4 @@ lazy val app = project.in(file("mgmt-app"))
   .settings(noPublish:_*)
   .settings(npmSettings:_*)
   .enablePlugins(ScalaJSBundlerPlugin)
-  .dependsOn(router, utils)
+  .dependsOn(router, utils, components)

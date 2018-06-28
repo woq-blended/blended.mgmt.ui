@@ -2,36 +2,21 @@ package blended.mgmt.app.components
 
 import akka.actor.{ActorRef, ActorSystem}
 import blended.mgmt.app.backend.WSClientActor
-import blended.mgmt.app.state.{AppState, UpdateContainerInfo, UpdateCurrentPage}
+import blended.mgmt.app.state.{AppEvent, MgmtAppState, UpdateContainerInfo}
 import blended.mgmt.app._
-import blended.mgmt.app.theme._
+import blended.ui.common.MainComponent
+import blended.ui.router.Router
 import blended.updater.config.ContainerInfo
-import org.scalajs.dom
-import blended.updater.config.json.PrickleProtocol._
 import com.github.ahnfelt.react4s._
-import prickle._
+import prickle.Unpickle
+import blended.updater.config.json.PrickleProtocol._
+import blended.ui.themes.SidebarMenuTheme._
 
-case class MainComponent() extends Component[NoEmit] {
+case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEvent] {
 
-  private[this] def href(page : Page): String =
-    if(dom.window.location.href.contains("?"))
-      "#" + Routes.router.path(page)
-    else
-      Routes.router.path(page)
-
-  private[this] def path(): String =
-    if(dom.window.location.href.contains("?"))
-      dom.window.location.hash.drop(1)
-    else
-      dom.window.location.pathname
-
-  val state = State(AppState())
-
-  if(dom.window.location.href.contains("?")) {
-    dom.window.onhashchange = { _ =>
-      state.modify(AppState.redux(UpdateCurrentPage(Routes.router.data(path()))))
-    }
-  }
+  override lazy val initialPage: Page = HomePage
+  override lazy val initialState: MgmtAppState = MgmtAppState()
+  override lazy val routes: Router.Tree[Page, Page] = Routes.routes
 
   val system : ActorSystem = ActorSystem("MgmtApp")
   private[this] val ctListener = State[Option[ActorRef]](None)
@@ -44,7 +29,7 @@ case class MainComponent() extends Component[NoEmit] {
       val handleCtInfo : PartialFunction[Any, Unit] = {
         case s : String =>
           Unpickle[ContainerInfo].fromString(s).map { ctInfo =>
-            state.modify(AppState.redux(UpdateContainerInfo(ctInfo)))
+            appState.modify(MgmtAppState.redux(UpdateContainerInfo(ctInfo)))
           }
       }
 
@@ -54,7 +39,15 @@ case class MainComponent() extends Component[NoEmit] {
       ))))
     }
 
-  override def render(get: Get): Element = {
+  private[this] lazy val menu: Node = E.div(
+    MenuColumnCss,
+    E.div(
+      menuEntry(MenuEntryCss, LinkCss, "Overview", HomePage),
+      menuEntry(MenuEntryCss, LinkCss, "Container", ContainerPage())
+    )
+  )
+
+  override lazy val layout: (Option[Page], MgmtAppState) => Element = { (p, s) =>
     E.div(
       E.div(
         TopBarCss,
@@ -62,16 +55,10 @@ case class MainComponent() extends Component[NoEmit] {
       ),
       E.div(
         ColumnContainerCss,
-        E.div(
-          MenuColumnCss,
-          E.div(
-            E.div(MenuEntryCss, E.a(Text("Overview"), LinkCss, A.href(href(HomePage)))),
-            E.div(MenuEntryCss, E.a(Text("Container"), LinkCss, A.href(href(ContainerPage()))))
-          )
-        ),
+        menu,
         E.div(
           ContentColumnCss,
-          TopLevelPageResolver.topLevelPage(get(state))
+          TopLevelPageResolver.topLevelPage(p, s)
         )
       ),
       E.div(

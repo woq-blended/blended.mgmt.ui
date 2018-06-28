@@ -1,7 +1,7 @@
 package blended.mgmt.app
 
 import blended.mgmt.app.components.{ContainerPageComponent, HelpPageComponent, HomePageComponent}
-import blended.mgmt.app.state.AppState
+import blended.mgmt.app.state.MgmtAppState
 import blended.ui.router.Router
 import com.github.ahnfelt.react4s._
 
@@ -12,18 +12,19 @@ final case class HelpPage(parent: HomePage.type = HomePage) extends Page
 
 object Routes {
 
-  val path = new Router[Page]
+  val path : Router[Page] = new Router[Page]
 
-  val router = path(HomePage,
+  val routes : Router.Tree[Page,Page] = path(
+    HomePage,
     path("container", ContainerPage),
-    path("help" , HelpPage)
+    path("help", HelpPage)
   )
 }
 
 object TopLevelPageResolver {
 
-  def topLevelPage(state: AppState) : Node = {
-    state.currentPage match {
+  def topLevelPage(p: Option[Page], state: MgmtAppState) : Node = {
+    p match {
       case Some(p) => p match {
         case HomePage => Component(HomePageComponent, state)
         case ContainerPage(_) => Component(ContainerPageComponent, state)
