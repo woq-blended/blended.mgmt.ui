@@ -1,3 +1,5 @@
+import org.scalajs.jsenv.selenium.SeleniumJSEnv
+
 inThisBuild(Seq(
   organization := "de.wayofquality.blended",
   version := "0.1.1-SNAPSHOT",
@@ -71,7 +73,7 @@ lazy val components = project.in(file("components"))
 lazy val app = project.in(file("mgmt-app"))
   .settings(
     name := "mgmt-app",
-    //jsEnv := PhantomJSEnv().value,
+
     webpackBundlingMode := scalajsbundler.BundlingMode.LibraryAndApplication(),
     scalaJSUseMainModuleInitializer := true,
 
@@ -83,6 +85,13 @@ lazy val app = project.in(file("mgmt-app"))
       organization.value %%% "blended.updater.config" % Versions.blended,
 
       "org.scalatest" %%% "scalatest" % Versions.scalaTest % "test"
+    ),
+
+    javaOptions in Test += "-Dwebdriver.chrome.driver=/opt/chromedriver",
+
+    jsEnv in Test := new SeleniumJSEnv(
+      org.openqa.selenium.remote.DesiredCapabilities.chrome(),
+      SeleniumJSEnv.Config().withKeepAlive(true)
     )
   )
   .settings(noPublish:_*)

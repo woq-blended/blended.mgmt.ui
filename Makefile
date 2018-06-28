@@ -17,6 +17,14 @@ webpack:
 	sbt app/fastOptJS::webpack
 	cp mgmt-app/index-dev.html mgmt-app/target/scala-2.12/scalajs-bundler/main
 
+.PHONY: package # Package the web application into target/app
+package: webpack
+	mkdir -p mgmt-app/target/app/assets
+	cp mgmt-app/index.html mgmt-app/target/app
+	cp mgmt-app/target/scala-2.12/scalajs-bundler/main/node_modules/react/umd/react.production.min.js mgmt-app/target/app/assets
+	cp mgmt-app/target/scala-2.12/scalajs-bundler/main/node_modules/react-dom/umd/react-dom.production.min.js mgmt-app/target/app/assets
+	cp mgmt-app/target/scala-2.12/scalajs-bundler/main/mgmt-app-* mgmt-app/target/app/assets
+
 .PHONY: clean # Run mvn clean
 clean:
 	rm -Rf $(THIRD_PTY_DIR) 
