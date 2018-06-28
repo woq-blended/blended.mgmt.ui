@@ -1,14 +1,14 @@
 language: scala
 
-scala: 2.11.11
-  
+scala: 2.12.6
+
 jdk: oraclejdk8
 
-script: 
-  - ./travis_build.sh
+script:
+  - make travis
 
 cache:
   directories:
-  - $HOME/.sbt
   - $HOME/.m2
   - $HOME/.ivy2
+  - $HOME/.sbt
