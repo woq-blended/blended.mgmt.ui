@@ -28,3 +28,4 @@ prepare: clean
 	cd $(THIRD_PTY_DIR) && git clone https://github.com/woq-blended/react4s.git 
 	cd $(THIRD_PTY_DIR)/react4s && sbt publishLocal
 
+travis: all
