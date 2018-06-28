@@ -5,12 +5,8 @@ THIRD_PTY_DIR=$(BUILD_DIR)/target/3rdparty
 help:
 	@grep '^.PHONY: .* #' Makefile | sed 's/\.PHONY: \(.*\) # \(.*\)/\1\t\2/' | expand -t20
 
-.PHONY: all # Build the webapp 
-all: prepare test webpack
-
-.PHONY: test # Run the tests
-test: 
-	sbt test
+.PHONY: all # Build the webapp and run all tests 
+all: prepare test
 
 .PHONY: webpack # Package the Webapplication for testing 
 webpack: 
@@ -25,13 +21,13 @@ package: webpack
 	cp mgmt-app/target/scala-2.12/scalajs-bundler/main/node_modules/react-dom/umd/react-dom.production.min.js mgmt-app/target/app/assets
 	cp mgmt-app/target/scala-2.12/scalajs-bundler/main/mgmt-app-* mgmt-app/target/app/assets
 
-.PHONY: uitest # Run the Selenium tests on the web ui 
-uitest: package
-	sbt uitest/test
+.PHONY: test # Run all unit tests and UI tests
+test:	package
+	sbt test
 
 .PHONY: clean # Run mvn clean
 clean:
-	rm -Rf $(THIRD_PTY_DIR) 
+	rm -Rf target
 	sbt clean
 
 .PHONY: prepare # Prepare the UI build and build the dependencies

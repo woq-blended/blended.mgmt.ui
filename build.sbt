@@ -99,4 +99,5 @@ lazy val uitest = project.in(file("mgmt-app-test"))
       "com.typesafe.akka" %% "akka-http" % Versions.akkaHttp % "test",
       "com.typesafe.akka" %% "akka-http-testkit" % Versions.akkaHttp
     )
-  ).settings(noPublish)
+  )
+  .settings(noPublish)
