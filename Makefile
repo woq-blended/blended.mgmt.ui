@@ -25,6 +25,10 @@ package: webpack
 	cp mgmt-app/target/scala-2.12/scalajs-bundler/main/node_modules/react-dom/umd/react-dom.production.min.js mgmt-app/target/app/assets
 	cp mgmt-app/target/scala-2.12/scalajs-bundler/main/mgmt-app-* mgmt-app/target/app/assets
 
+.PHONY: uitest # Run the Selenium tests on the web ui 
+uitest: package
+	sbt uitest/test
+
 .PHONY: clean # Run mvn clean
 clean:
 	rm -Rf $(THIRD_PTY_DIR) 

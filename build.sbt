@@ -1,5 +1,3 @@
-import org.scalajs.jsenv.selenium.SeleniumJSEnv
-
 inThisBuild(Seq(
   organization := "de.wayofquality.blended",
   version := "0.1.1-SNAPSHOT",
@@ -38,7 +36,7 @@ lazy val npmSettings = Seq(
 
 lazy val root = project.in(file("."))
   .settings(noPublish)
-  .aggregate(utils,router,components, app)
+  .aggregate(utils,router,components, app, uitest)
 
 lazy val router = project.in(file("router"))
   .settings(
@@ -85,16 +83,20 @@ lazy val app = project.in(file("mgmt-app"))
       organization.value %%% "blended.updater.config" % Versions.blended,
 
       "org.scalatest" %%% "scalatest" % Versions.scalaTest % "test"
-    ),
-
-    javaOptions in Test += "-Dwebdriver.chrome.driver=/opt/chromedriver",
-
-    jsEnv in Test := new SeleniumJSEnv(
-      org.openqa.selenium.remote.DesiredCapabilities.chrome(),
-      SeleniumJSEnv.Config().withKeepAlive(true)
     )
   )
   .settings(noPublish:_*)
   .settings(npmSettings:_*)
   .enablePlugins(ScalaJSBundlerPlugin)
   .dependsOn(router, utils, components)
+
+lazy val uitest = project.in(file("mgmt-app-test"))
+  .settings(
+    name := "uitest",
+    libraryDependencies ++= Seq(
+      "org.scalatest" %% "scalatest" % Versions.scalaTest % "test",
+      "org.seleniumhq.selenium" % "selenium-java" % Versions.selenium % "test",
+      "com.typesafe.akka" %% "akka-http" % Versions.akkaHttp % "test",
+      "com.typesafe.akka" %% "akka-http-testkit" % Versions.akkaHttp
+    )
+  ).settings(noPublish)
