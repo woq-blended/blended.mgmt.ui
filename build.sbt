@@ -1,3 +1,5 @@
+import java.nio.file.Files
+
 inThisBuild(Seq(
   organization := "de.wayofquality.blended",
   version := "0.1.1-SNAPSHOT",
@@ -74,6 +76,16 @@ lazy val app = project.in(file("mgmt-app"))
 
     webpackBundlingMode := scalajsbundler.BundlingMode.LibraryAndApplication(),
     scalaJSUseMainModuleInitializer := true,
+
+    Compile/fastOptJS/webpack := {
+      val result = (Compile/fastOptJS/webpack).toTask.value
+      val dir = baseDirectory.value / "index-dev.html"
+      val t = target.value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "index-dev.html"
+
+      Files.copy(dir.toPath(), t.toPath() )
+      result
+    },
+
 
     libraryDependencies ++= Seq(
       "org.akka-js" %%% "akkajsactor" % Versions.akkaJs,
