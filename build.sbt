@@ -19,10 +19,23 @@ inThisBuild(Seq(
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),
     "Local Maven Repository" at m2Repo
-  )
+  ) 
 ))
 
 lazy val m2Repo = "file://" + System.getProperty("maven.repo.local", System.getProperty("user.home") + "/.m2/repository")
+
+lazy val publish = Seq(
+  publishMavenStyle := true
+  publishArtifact in Test := false
+  credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
+  publishTo := {
+    val nexus = "https://oss.sonatype.org/"
+  if(isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+  }
+)
 
 lazy val noPublish = Seq(
   publishArtifact := false,
