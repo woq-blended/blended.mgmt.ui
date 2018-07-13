@@ -24,10 +24,10 @@ inThisBuild(Seq(
 
 lazy val m2Repo = "file://" + System.getProperty("maven.repo.local", System.getProperty("user.home") + "/.m2/repository")
 
-lazy val publish = Seq(
-  publishMavenStyle := true
-  publishArtifact in Test := false
-  credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
+lazy val doPublish = Seq(
+  publishMavenStyle := true,
+  publishArtifact in Test := false,
+  credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
   if(isSnapshot.value)
