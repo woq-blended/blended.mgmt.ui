@@ -52,10 +52,12 @@ lazy val npmSettings = Seq(
   )
 )
 
+// The root project
 lazy val root = project.in(file("."))
   .settings(noPublish)
-  .aggregate(utils,router,components, app, uitest)
+  .aggregate(utils,router,components, app, uitest, sampleApp)
 
+// The subproject defining the router
 lazy val router = project.in(file("router"))
   .settings(
     name := "router",
@@ -65,6 +67,7 @@ lazy val router = project.in(file("router"))
     )
   ).enablePlugins(ScalaJSBundlerPlugin)
 
+// Some common utilities
 lazy val utils = project.in(file("common"))
   .settings(
     name := "common",
@@ -77,6 +80,7 @@ lazy val utils = project.in(file("common"))
   .dependsOn(router)
   .enablePlugins(ScalaJSBundlerPlugin)
 
+// Reusable React4s components
 lazy val components = project.in(file("components"))
   .settings(
     name := "components",
@@ -85,6 +89,30 @@ lazy val components = project.in(file("components"))
       "com.github.ahnfelt" %%% "react4s" % Versions.react4s
     )
   ).enablePlugins(ScalaJSBundlerPlugin)
+
+lazy val sampleApp = project.in(file("sampleApp"))
+  .settings(
+    name := "sampleApp",
+    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
+    scalaJSUseMainModuleInitializer := true,
+
+    libraryDependencies ++= Seq(
+      "com.github.ahnfelt" %%% "react4s" % Versions.react4s
+    ),
+
+    Compile/fastOptJS/webpack := {
+      val result = (Compile/fastOptJS/webpack).toTask.value
+      val dir = baseDirectory.value / "index-dev.html"
+      val t = target.value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "index-dev.html"
+
+      Files.copy(dir.toPath(), t.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
+      result
+    }
+  )
+  .settings(noPublish:_*)
+  .settings(npmSettings:_*)
+  .enablePlugins(ScalaJSBundlerPlugin)
+  .dependsOn(router, utils, components)
 
 lazy val app = project.in(file("mgmt-app"))
   .settings(
@@ -101,7 +129,6 @@ lazy val app = project.in(file("mgmt-app"))
       Files.copy(dir.toPath(), t.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
       result
     },
-
 
     libraryDependencies ++= Seq(
       "org.akka-js" %%% "akkajsactor" % Versions.akkaJs,
