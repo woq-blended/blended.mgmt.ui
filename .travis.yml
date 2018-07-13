@@ -10,7 +10,6 @@ install:
   - sudo mkdir -p /opt
   - sudo mv -f ~/chromedriver /opt
   - sudo chmod +x /opt/chromedriver
-  - sudo ln -s /usr/local/share/chromedriver /opt/chromedriver
 
 language: scala
 
