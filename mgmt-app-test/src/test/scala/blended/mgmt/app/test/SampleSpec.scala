@@ -9,7 +9,8 @@ import akka.http.scaladsl.server.directives.LoggingMagnet
 import akka.stream.ActorMaterializer
 import akka.testkit.TestKit
 import org.openqa.selenium.WebDriver
-import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
+import org.openqa.selenium.remote.DesiredCapabilities
 import org.scalatest.selenium.WebBrowser
 import org.scalatest.{BeforeAndAfterAll, FreeSpecLike}
 
@@ -28,9 +29,12 @@ class SampleSpec extends TestKit(ActorSystem("uitest"))
   private[this] var svrBinding : Option[ServerBinding] = None
   private[this] val port = 9999
 
-  implicit val driver : WebDriver = new ChromeDriver()
 
-  println(System.getProperty("appUnderTest"))
+  val chromeOptions = new ChromeOptions()
+  chromeOptions.addArguments("--headless", "--disable-gpu")
+
+  implicit val driver : WebDriver = new ChromeDriver(chromeOptions)
+
   val route : Route = getFromBrowseableDirectory(System.getProperty("appUnderTest"))
 
   override protected def beforeAll(): Unit = {
