@@ -6,7 +6,7 @@ help:
 	@grep '^.PHONY: .* #' Makefile | sed 's/\.PHONY: \(.*\) # \(.*\)/\1\t\2/' | expand -t20
 
 .PHONY: all # Build the webapp and run all tests 
-all: test
+all: test package
 
 .PHONY: webpack # Package the Webapplication for testing 
 webpack: 
@@ -22,7 +22,7 @@ package: webpack
 
 .PHONY: test # Run all unit tests and UI tests
 test:
-	sbt uitest/test
+	sbt test
 
 .PHONY: clean # Run mvn clean
 clean:
