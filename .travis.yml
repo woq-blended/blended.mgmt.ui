@@ -1,3 +1,9 @@
+dist: trusty
+sudo: false
+
+addons:
+  chrome: stable
+
 language: scala
 
 scala: 2.12.6
