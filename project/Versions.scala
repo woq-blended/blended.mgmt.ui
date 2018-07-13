@@ -6,7 +6,7 @@ object Versions {
 
   val akkaJs = "1.2.5.13"
 
-  val blended = "2.5.0-M6-SNAPSHOT"
+  val blended = "2.5.0-M8-SNAPSHOT"
 
   val jsdom = "11.8.0"
 
@@ -14,7 +14,7 @@ object Versions {
 
   val react = "16.4.1"
 
-  val react4s = "0.9.8-SNAPSHOT"
+  val react4s = "0.9.14-SNAPSHOT"
 
   val scalaTest = "3.0.5"
 

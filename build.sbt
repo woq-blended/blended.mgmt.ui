@@ -1,4 +1,4 @@
-import java.nio.file.Files
+import java.nio.file.{Files, StandardCopyOption}
 
 inThisBuild(Seq(
   organization := "de.wayofquality.blended",
@@ -16,7 +16,10 @@ inThisBuild(Seq(
   licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
   publishArtifact in Test := false,
 
-  resolvers += "Local Maven Repository" at m2Repo
+  resolvers ++= Seq(
+    Resolver.sonatypeRepo("snapshots"),
+    "Local Maven Repository" at m2Repo
+  )
 ))
 
 lazy val m2Repo = "file://" + System.getProperty("maven.repo.local", System.getProperty("user.home") + "/.m2/repository")
@@ -82,7 +85,7 @@ lazy val app = project.in(file("mgmt-app"))
       val dir = baseDirectory.value / "index-dev.html"
       val t = target.value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "index-dev.html"
 
-      Files.copy(dir.toPath(), t.toPath() )
+      Files.copy(dir.toPath(), t.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
       result
     },
 
@@ -105,11 +108,22 @@ lazy val app = project.in(file("mgmt-app"))
 lazy val uitest = project.in(file("mgmt-app-test"))
   .settings(
     name := "uitest",
+
+    Test/fork := true,
+    Test/javaOptions ++= Seq(
+      "-DappUnderTest=" + ((app/target).value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main"),
+      "-Dwebdriver.chrome.driver=/opt/chromedriver"
+    ),
+
+    Test/test := {
+      ((Test/test).dependsOn((app/Compile/fastOptJS/webpack).toTask)).value
+    },
+
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % Versions.scalaTest % "test",
       "org.seleniumhq.selenium" % "selenium-java" % Versions.selenium % "test",
       "com.typesafe.akka" %% "akka-http" % Versions.akkaHttp % "test",
-      "com.typesafe.akka" %% "akka-http-testkit" % Versions.akkaHttp
+      "com.typesafe.akka" %% "akka-http-testkit" % Versions.akkaHttp % "test"
     )
   )
   .settings(noPublish)

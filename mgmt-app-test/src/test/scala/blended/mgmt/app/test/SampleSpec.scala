@@ -28,10 +28,10 @@ class SampleSpec extends TestKit(ActorSystem("uitest"))
   private[this] var svrBinding : Option[ServerBinding] = None
   private[this] val port = 9999
 
-  System.setProperty("webdriver.chrome.driver", "/opt/chromedriver")
   implicit val driver : WebDriver = new ChromeDriver()
 
-  val route : Route = getFromBrowseableDirectory("./mgmt-app/target/app")
+  println(System.getProperty("appUnderTest"))
+  val route : Route = getFromBrowseableDirectory(System.getProperty("appUnderTest"))
 
   override protected def beforeAll(): Unit = {
     val binding = Http().bindAndHandle(route, "localhost", port)
@@ -42,7 +42,7 @@ class SampleSpec extends TestKit(ActorSystem("uitest"))
 
   "The Mgmt App should" - {
 
-    val url = s"http://localhost:$port/index.html"
+    val url = s"http://localhost:$port/index-dev.html"
 
     "show up" in {
       go.to(url)
