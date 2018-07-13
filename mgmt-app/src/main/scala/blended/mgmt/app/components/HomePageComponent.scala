@@ -8,6 +8,5 @@ case class HomePageComponent(state: P[MgmtAppState]) extends Component[AppEvent]
 
   override def render(get: Get): Node = E.div(
     E.h1(Text("Home")),
-    Component(ReactTable)
   )
 }
