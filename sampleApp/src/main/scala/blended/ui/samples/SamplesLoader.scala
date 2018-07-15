@@ -1,7 +1,7 @@
 package blended.mgmt.app
 
 import blended.ui.components.reacttable.ReactTable
-import blended.ui.components.reacttable.ReactTable.{ColumnConfig, TableRow}
+import blended.ui.components.reacttable.ReactTable._
 import com.github.ahnfelt.react4s._
 
 case class Person(
@@ -13,41 +13,31 @@ case class Person(
 
 object SamplesLoader {
 
-  def tableRow(p: Person, cols: Seq[ColumnConfig]) : TableRow = {
-    TableRow(cols.map { c =>
+  def main(args: Array[String]) : Unit = {
+
+    val persons :Seq[Person] = Seq(
+      Person("Andreas", "Gies", 50, "andreas@wayofquality.de"),
+      Person("Karin", "Gies", 52, "kgies@godea-life.de"),
+      Person("Tatjana", "Gies", 28, "gies_tat@yahoo.com")
+    )
+
+    val props = TableProperties(
+      configs = Seq(
+        ColumnConfig(name = "first"),
+        ColumnConfig(name = "last"),
+        ColumnConfig(name = "age")
+      )
+    )
+
+    val main = ReactTable.createTable[Person](persons, props){ (p, c) =>
       c.name match {
         case "first" => Some(p.first)
         case "last" => Some(p.last)
         case "age" => Some(p.age)
-        case "eMail" => Some(p.eMail)
         case _ => None
       }
-    })
-  }
+    }
 
-  def main(args: Array[String]) : Unit = {
-
-    val persons :Seq[Person] = Seq(
-      Person("Andreas", "Gies", 50, "andreas@wayofquality.de")
-    )
-
-    val cols = Seq(
-      ReactTable.ColumnConfig(
-        name = "first",
-        cellRenderer = ReactTable.DefaultCellRenderer[Person, String]{ p => p.first }
-      ),
-      ReactTable.ColumnConfig(
-        name = "last",
-        cellRenderer = ReactTable.DefaultCellRenderer[Person, String]{ p => p.last }
-      )
-    )
-
-    val props : ReactTable.TableProperties = ReactTable.TableProperties(
-      data = persons.map(p => tableRow(p, cols)),
-      configs = cols
-    )
-
-    val main = Component(ReactTable, props)
     ReactBridge.renderToDomById(main, "content")
   }
 }

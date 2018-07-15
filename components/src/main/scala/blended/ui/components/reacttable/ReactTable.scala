@@ -1,46 +1,74 @@
 package blended.ui.components.reacttable
 
+import blended.ui.components.reacttable.ReactTable.ColumnConfig
 import com.github.ahnfelt.react4s._
-
-import scala.reflect.ClassTag
 
 object ReactTable {
 
-  type CellRenderer[T] = T => Node
+  def createTable[T](
+    data: Seq[T],
+    props: TableProperties
+  )(
+    extract : (T, ColumnConfig) => Option[Any]
+  ) = {
 
-  def DefaultCellRenderer[T,C](fn : T => C)(implicit tag : ClassTag[C]) : CellRenderer[C] = { c => E.span(Text(c.toString())) }
+    val rows = data.map{ d =>
+      val cells = props.configs.map(c => extract(d,c)).map(_.getOrElse(""))
+      TableRow(cells)
+    }
+
+    Component(ReactTable, rows, props)
+  }
+
+  type CellRenderer = Any => Node
+
+  def DefaultCellRenderer(fn : Any => String) : CellRenderer = { data: Any =>
+    E.span(Text(fn(data)))
+  }
 
   case class ColumnConfig(
     name : String,
-    cellRenderer : CellRenderer[String]
+    cellRenderer : CellRenderer = DefaultCellRenderer(_.toString)
   )
 
-  case class TableRow(
-    cells: Seq[Option[Any]] = Seq.empty
-  )
+  case class TableRow(cells: Seq[Any])
 
   case class TableProperties(
-    // The table data to be displayed
-    data: Seq[TableRow],
     // The configuration of the table columns
     configs: Seq[ReactTable.ColumnConfig] = Seq.empty
   )
+
 }
 
-case class ReactTableHeader(tableData: P[ReactTable.TableRow]) extends Component[NoEmit] {
+case class ReactTableHeader(tableData: P[Seq[ReactTable.ColumnConfig]]) extends Component[NoEmit] {
   override def render(get: Get): Node = {
     E.div(Tags(
-      get(tableData).cells.map { c =>
-        E.div(E.p(Text(c.map(_.toString()).getOrElse(""))))
+      get(tableData).map { c =>
+        E.span(Text(c.name))
       }
     ))
   }
 }
 
-case class ReactTable(tableData : P[ReactTable.TableProperties]) extends Component[NoEmit]{
+case class ReactTableRow(data: P[ReactTable.TableRow], configs: P[Seq[ColumnConfig]]) extends Component[NoEmit] {
+  override def render(get: Get): Node = {
+    E.div(Tags(get(data).cells.map(ReactTable.DefaultCellRenderer(_.toString))))
+  }
+}
+
+case class ReactTable(data : P[Seq[ReactTable.TableRow]], props : P[ReactTable.TableProperties]) extends Component[NoEmit]{
 
   override def render(get: Get): Node = {
-    val row = ReactTable.TableRow(get(tableData).configs.map(c => Some(c.name)))
-    Component(ReactTableHeader, row)
+
+    val configs = get(props).configs
+
+    val rows : Tag = Tags(get(data).map { r =>
+      Component(ReactTableRow, r, configs)
+    })
+
+    E.div(
+      Component(ReactTableHeader, configs),
+      rows
+    )
   }
 }
