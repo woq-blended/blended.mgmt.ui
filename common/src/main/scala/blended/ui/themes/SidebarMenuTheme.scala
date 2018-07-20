@@ -2,11 +2,13 @@ package blended.ui.themes
 
 import com.github.ahnfelt.react4s.{Css, CssClass, S}
 
-object SidebarMenuTheme {
+trait SidebarMenuTheme {
+
+  val palette : BlendedPalette
 
   object TopBarCss extends CssClass(
-    S.borderTop("2px solid " + BlendedPalette.primary),
-    S.backgroundColor(BlendedPalette.background),
+    S.borderTop("2px solid " + palette.primary),
+    S.backgroundColor(palette.background),
     S.boxShadow("0 2px 5px rgba(0, 0, 0, 0.3)"),
     S.boxSizing.borderBox(),
     S.position.absolute(),
@@ -17,7 +19,7 @@ object SidebarMenuTheme {
   )
 
   object BottomBarCss extends CssClass(
-    S.backgroundColor(BlendedPalette.background),
+    S.backgroundColor(palette.background),
     S.boxShadow("0 2px 5px rgba(0, 0, 0, 0.3)"),
     S.boxSizing.borderBox(),
     S.position.absolute(),
@@ -35,13 +37,13 @@ object SidebarMenuTheme {
 
   object BrandTitleCss extends CssClass(
     BrandTextCss,
-    S.color(BlendedPalette.primary),
+    S.color(palette.primary),
     S.paddingLeft.px(50),
     S.fontSize.px(20),
   )
 
   object LinkCss extends CssClass(
-    S.color(BlendedPalette.primary),
+    S.color(palette.primary),
     S.textDecoration.none(),
     S.cursor.pointer(),
     Css.hover(
@@ -82,7 +84,7 @@ object SidebarMenuTheme {
     S.textTransform("uppercase"),
     S.fontFamily("Verdana"),
     S.fontSize.px(14),
-    S.color(BlendedPalette.text)
+    S.color(palette.text)
   )
 
   object MenuEntryCss extends CssClass(
@@ -90,8 +92,6 @@ object SidebarMenuTheme {
     S.paddingLeft.px(20),
     S.fontFamily("Verdana"),
     S.fontSize.px(16),
-    S.color(BlendedPalette.primary)
+    S.color(palette.primary)
   )
-
-
 }

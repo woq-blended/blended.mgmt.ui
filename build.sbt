@@ -62,6 +62,7 @@ lazy val router = project.in(file("router"))
   .settings(
     name := "router",
     webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
+    emitSourceMaps := true,
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % Versions.scalaTest % "test"
     )
@@ -72,6 +73,7 @@ lazy val utils = project.in(file("common"))
   .settings(
     name := "common",
     webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
+    emitSourceMaps := true,
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.5",
       "com.github.ahnfelt" %%% "react4s" % Versions.react4s
@@ -85,6 +87,7 @@ lazy val components = project.in(file("components"))
   .settings(
     name := "components",
     webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
+    emitSourceMaps := true,
     libraryDependencies ++= Seq(
       "com.github.ahnfelt" %%% "react4s" % Versions.react4s
     )
@@ -94,6 +97,7 @@ lazy val sampleApp = project.in(file("sampleApp"))
   .settings(
     name := "sampleApp",
     webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
+    emitSourceMaps := true,
     scalaJSUseMainModuleInitializer := true,
 
     libraryDependencies ++= Seq(
@@ -119,6 +123,7 @@ lazy val app = project.in(file("mgmt-app"))
     name := "mgmt-app",
 
     webpackBundlingMode := scalajsbundler.BundlingMode.LibraryAndApplication(),
+    emitSourceMaps := true,
     scalaJSUseMainModuleInitializer := true,
 
     Compile/fastOptJS/webpack := {

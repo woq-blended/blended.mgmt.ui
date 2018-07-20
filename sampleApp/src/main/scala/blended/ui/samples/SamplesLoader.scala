@@ -18,14 +18,16 @@ object SamplesLoader {
     val persons :Seq[Person] = Seq(
       Person("Andreas", "Gies", 50, "andreas@wayofquality.de"),
       Person("Karin", "Gies", 52, "kgies@godea-life.de"),
-      Person("Tatjana", "Gies", 28, "gies_tat@yahoo.com")
+      Person("Tatjana", "Gies", 28, "gies_tat@yahoo.com"),
+      Person("Sabrina", "Gies", 24, "sabrina@godea-life.de")
     )
 
     val props = TableProperties(
       configs = Seq(
         ColumnConfig(name = "first"),
         ColumnConfig(name = "last"),
-        ColumnConfig(name = "age")
+        ColumnConfig(name = "age"),
+        ColumnConfig(name = "mail")
       )
     )
 
@@ -34,6 +36,7 @@ object SamplesLoader {
         case "first" => Some(p.first)
         case "last" => Some(p.last)
         case "age" => Some(p.age)
+        case "mail" => Some(p.eMail)
         case _ => None
       }
     }

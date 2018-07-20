@@ -10,7 +10,8 @@ import blended.updater.config.ContainerInfo
 import com.github.ahnfelt.react4s._
 import prickle.Unpickle
 import blended.updater.config.json.PrickleProtocol._
-import blended.ui.themes.SidebarMenuTheme._
+
+import blended.mgmt.app.theme.BlendedMgmtTheme._
 
 case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEvent] {
 
