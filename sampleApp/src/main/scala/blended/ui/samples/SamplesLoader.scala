@@ -1,7 +1,6 @@
 package blended.mgmt.app
 
 import blended.ui.components.reacttable.ReactTable
-import blended.ui.components.reacttable.ReactTable._
 import blended.ui.samples.theme.BlendedSamplesTableStyle
 import com.github.ahnfelt.react4s._
 
@@ -12,35 +11,30 @@ case class Person(
   eMail: String
 )
 
+object PersonTable extends ReactTable {
+
+  override type TableData = Person
+
+  val props = TableProperties(
+    configs = Seq(
+      ColumnConfig(name = "first", renderer = defaultCellRenderer(_.first)),
+      ColumnConfig(name = "last", renderer = defaultCellRenderer(_.last))
+    )
+  )
+}
+
 object SamplesLoader {
 
   def main(args: Array[String]) : Unit = {
 
-    val persons :Seq[Person] = Seq(
+    val persons :Seq[PersonTable.TableData] = Seq(
       Person("Andreas", "Gies", 50, "andreas@wayofquality.de"),
       Person("Karin", "Gies", 52, "kgies@godea-life.de"),
       Person("Tatjana", "Gies", 28, "gies_tat@yahoo.com"),
       Person("Sabrina", "Gies", 24, "sabrina@godea-life.de")
     )
 
-    val props = TableProperties(
-      configs = Seq(
-        ColumnConfig(name = "first"),
-        ColumnConfig(name = "last"),
-        ColumnConfig(name = "age"),
-        ColumnConfig(name = "mail")
-      )
-    )
-
-    val main = ReactTable.createTable[Person](persons, props, BlendedSamplesTableStyle){ (p, c) =>
-      c.name match {
-        case "first" => Some(p.first)
-        case "last" => Some(p.last)
-        case "age" => Some(p.age)
-        case "mail" => Some(p.eMail)
-        case _ => None
-      }
-    }
+    val main = Component(PersonTable.ReactTable, persons, PersonTable.props, BlendedSamplesTableStyle)
 
     ReactBridge.renderToDomById(main, "content")
   }

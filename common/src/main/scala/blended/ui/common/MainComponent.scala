@@ -13,7 +13,7 @@ abstract class MainComponent[P,S,E]() extends Component[NoEmit] {
 
   val theme : SidebarMenuTheme
 
-  val currentPage : State[Option[P]] = State(Some(initialPage))
+  protected val currentPage : State[Option[P]] = State(Some(initialPage))
 
   protected[this] def href(page : P): String =
     if(dom.window.location.href.contains("?"))
