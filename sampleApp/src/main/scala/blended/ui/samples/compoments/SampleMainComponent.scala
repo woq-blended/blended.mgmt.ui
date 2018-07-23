@@ -19,7 +19,8 @@ case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppStat
   private[this] lazy val menu: Node = E.div(
     theme.menuColumnCss,
     E.div(
-      menuEntry(theme.menuEntryCss, theme.linkCss, "Overview", HomePage),
+      E.div(theme.menuCategoryCss, E.p(Text("ReactTable"))),
+      menuEntry(theme.menuEntryCss, theme.menuLinkCss, "Basic Table", HomePage),
     )
   )
 

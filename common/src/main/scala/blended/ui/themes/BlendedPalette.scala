@@ -10,6 +10,7 @@ trait BlendedPalette {
   val warning    : String
   val danger     : String
   val shadow     : String
+  val mainMenuText : String
 }
 
 trait BlendedDefaultPalette extends BlendedPalette {
@@ -22,4 +23,5 @@ trait BlendedDefaultPalette extends BlendedPalette {
   val warning    : String = "#f0ad4e"
   val danger     : String = "#d9534f"
   val shadow     : String = "grey"
+  val mainMenuText: String = "white"
 }

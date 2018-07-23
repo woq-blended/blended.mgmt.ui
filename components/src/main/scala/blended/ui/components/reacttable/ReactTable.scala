@@ -25,7 +25,9 @@ trait ReactTable {
 
   case class TableProperties(
     // The configuration of the table columns
-    configs: Seq[ColumnConfig] = Seq.empty
+    configs: Seq[ColumnConfig] = Seq.empty,
+    searchExtractor : TableData => String = { _.toString() },
+    keyExtractor : TableData => String = { _.hashCode().toString() }
   )
 
   case class ReactTableRow(row: P[TableData], props: P[TableProperties], style: P[ReactTableStyle]) extends Component[NoEmit] {
@@ -62,9 +64,15 @@ trait ReactTable {
   case class ReactTable(data: P[Seq[TableData]], props: P[TableProperties], style: P[ReactTableStyle]) extends Component[NoEmit] {
 
     override def render(get: Get): Node = {
+
+      val p = get(props)
+      val s = get(style)
+
       E.div(
-        Component(ReactTableHeader, get(props), get(style)),
-        Tags(get(data).map(r => Component(ReactTableRow, r, get(props), get(style))))
+        Component(ReactTableHeader, p, s),
+        Tags(get(data).map { r =>
+          Component(ReactTableRow, r, p, s).withKey(p.keyExtractor(r))
+        })
       )
     }
   }

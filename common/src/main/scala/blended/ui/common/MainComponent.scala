@@ -27,8 +27,8 @@ abstract class MainComponent[P,S,E]() extends Component[NoEmit] {
     else
       dom.window.location.pathname
 
-  protected def menuEntry(entryCss: CssClass, linkCss: CssClass, title: String, target: P): Node =
-    E.div(entryCss, E.a(Text(title), linkCss, A.href(href(target))))
+  protected def menuEntry(entryCss: CssClass, menuLinkCss: CssClass, title: String, target: P): Node =
+    E.div(entryCss, E.a(menuLinkCss, Text(title), A.href(href(target))))
 
   val layout : (Option[P], S) => Element
 

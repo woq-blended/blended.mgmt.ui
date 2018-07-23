@@ -25,17 +25,21 @@ trait DefaultReactTableStyle extends ReactTableStyle {
     S.display("flex"),
     S.flexDirection("row"),
     S.verticalAlign("middle"),
-    S.padding.rem(0.8),
-    S.boxShadow("0 1px 3px " + palette.shadow),
+    S.padding.px(8),
     S.margin.px(5)
   )
 
   private[this] object ReactTableHeader extends CssClass (
-    reactTableRowBase
+    reactTableRowBase,
+    S.boxShadow("0 1px 3px " + palette.shadow),
+    S.backgroundColor(palette.primary),
+    S.color("white"),
+    S.fontWeight("bold")
   )
 
   private[this] object ReactTableRow extends CssClass(
     reactTableRowBase,
+    S.borderBottom(s"solid 1px ${palette.primary}"),
     Css.hover(
       S.backgroundColor(hoverRow)
     )

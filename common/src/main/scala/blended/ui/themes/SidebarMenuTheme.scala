@@ -17,6 +17,7 @@ trait SidebarMenuTheme {
   def menuColumnCss : CssClass
   def menuCategoryCss : CssClass
   def menuEntryCss : CssClass
+  def menuLinkCss : CssClass
 }
 
 trait DefaultSideBarMenuTheme extends SidebarMenuTheme {
@@ -32,6 +33,7 @@ trait DefaultSideBarMenuTheme extends SidebarMenuTheme {
   override def menuColumnCss: CssClass = MenuColumnCss
   override def menuCategoryCss: CssClass = MenuCategoryCss
   override def menuEntryCss: CssClass = MenuEntryCss
+  override def menuLinkCss : CssClass = MenuLinkCss
 
   private[this] object TopBarCss extends CssClass(
     S.borderTop("2px solid " + palette.primary),
@@ -71,12 +73,16 @@ trait DefaultSideBarMenuTheme extends SidebarMenuTheme {
   )
 
   private[this] object LinkCss extends CssClass(
-    S.color(palette.primary),
     S.textDecoration.none(),
     S.cursor.pointer(),
     Css.hover(
       S.textDecoration("underline")
     )
+  )
+
+  private[this] object MenuLinkCss extends CssClass (
+    linkCss,
+    S.color("white")
   )
 
   private[this] object ColumnCss extends CssClass(
@@ -103,23 +109,25 @@ trait DefaultSideBarMenuTheme extends SidebarMenuTheme {
   private[this] object MenuColumnCss extends CssClass(
     ColumnCss,
     S.left.px(0),
-    S.width.px(200)
+    S.width.px(200),
+    S.backgroundColor(palette.primary)
   )
 
   private[this] object MenuCategoryCss extends CssClass(
-    S.paddingTop.px(20),
-    S.paddingLeft.px(20),
-    S.textTransform("uppercase"),
+    S.paddingTop.px(15),
+    S.paddingLeft.px(15),
     S.fontFamily("Verdana"),
-    S.fontSize.px(14),
-    S.color(palette.text)
+    S.fontSize.px(20),
+    S.fontWeight("bold"),
+    S.color(palette.mainMenuText)
   )
 
   private[this] object MenuEntryCss extends CssClass(
+    linkCss,
     S.paddingTop.px(10),
     S.paddingLeft.px(20),
     S.fontFamily("Verdana"),
-    S.fontSize.px(16),
-    S.color(palette.primary)
+    S.fontSize.px(18),
+    S.color(palette.mainMenuText)
   )
 }
