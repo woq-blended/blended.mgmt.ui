@@ -2,6 +2,7 @@ package blended.mgmt.app
 
 import blended.ui.components.reacttable.ReactTable
 import blended.ui.components.reacttable.ReactTable._
+import blended.ui.samples.theme.BlendedSamplesTableStyle
 import com.github.ahnfelt.react4s._
 
 case class Person(
@@ -31,7 +32,7 @@ object SamplesLoader {
       )
     )
 
-    val main = ReactTable.createTable[Person](persons, props){ (p, c) =>
+    val main = ReactTable.createTable[Person](persons, props, BlendedSamplesTableStyle){ (p, c) =>
       c.name match {
         case "first" => Some(p.first)
         case "last" => Some(p.last)

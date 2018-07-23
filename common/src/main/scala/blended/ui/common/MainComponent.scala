@@ -1,6 +1,7 @@
 package blended.ui.common
 
 import blended.ui.router.Router
+import blended.ui.themes.SidebarMenuTheme
 import com.github.ahnfelt.react4s._
 import org.scalajs.dom
 
@@ -9,6 +10,8 @@ abstract class MainComponent[P,S,E]() extends Component[NoEmit] {
   val initialPage : P
   val initialState : S
   val routes : Router.Tree[P,P]
+
+  val theme : SidebarMenuTheme
 
   val currentPage : State[Option[P]] = State(Some(initialPage))
 

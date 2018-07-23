@@ -9,7 +9,9 @@ object MgmtAppState {
   def redux(event: AppEvent)(old: MgmtAppState) : MgmtAppState = event match {
 
     case UpdateContainerInfo(info) =>
-      old.copy( containerInfo = old.containerInfo.filterKeys(_ != info.containerId) + (info.containerId -> info))
+      old.copy(
+        containerInfo = old.containerInfo.filterKeys(_ != info.containerId) + (info.containerId -> info)
+      )
   }
 }
 

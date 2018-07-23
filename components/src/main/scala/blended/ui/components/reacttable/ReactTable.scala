@@ -6,8 +6,9 @@ import com.github.ahnfelt.react4s._
 object ReactTable {
 
   def createTable[T](
-    data: Seq[T],
-    props: TableProperties
+    data  : Seq[T],
+    props : TableProperties,
+    style : ReactTableStyle
   )(
     extract : (T, ColumnConfig) => Option[Any]
   ) = {
@@ -17,7 +18,7 @@ object ReactTable {
       TableRow(cells)
     }
 
-    Component(ReactTable, rows, props)
+    Component(ReactTable, rows, props, style)
   }
 
   type CellRenderer = Any => Node
@@ -40,23 +41,36 @@ object ReactTable {
 
 }
 
-case class ReactTableHeader(tableData: P[Seq[ReactTable.ColumnConfig]]) extends Component[NoEmit] {
+case class ReactTableHeader(
+  tableData: P[Seq[ReactTable.ColumnConfig]],
+  style : P[ReactTableStyle]
+) extends Component[NoEmit] {
+
   override def render(get: Get): Node = {
-    E.div(Tags(
-      get(tableData).map { c =>
-        E.span(Text(c.name))
-      }
-    ))
+    E.div(
+      get(style).reactTableRow,
+      Tags(
+        get(tableData).map { c =>
+          E.span(Text(c.name))
+        }
+      )
+    )
   }
 }
 
-case class ReactTableRow(data: P[ReactTable.TableRow], configs: P[Seq[ColumnConfig]]) extends Component[NoEmit] {
+case class ReactTableRow(
+  data: P[ReactTable.TableRow], configs: P[Seq[ColumnConfig]]
+) extends Component[NoEmit] {
   override def render(get: Get): Node = {
     E.div(Tags(get(data).cells.map(ReactTable.DefaultCellRenderer(_.toString))))
   }
 }
 
-case class ReactTable(data : P[Seq[ReactTable.TableRow]], props : P[ReactTable.TableProperties]) extends Component[NoEmit]{
+case class ReactTable(
+  data  : P[Seq[ReactTable.TableRow]],
+  props : P[ReactTable.TableProperties],
+  style : P[ReactTableStyle]
+) extends Component[NoEmit]{
 
   override def render(get: Get): Node = {
 
@@ -67,7 +81,7 @@ case class ReactTable(data : P[Seq[ReactTable.TableRow]], props : P[ReactTable.T
     })
 
     E.div(
-      Component(ReactTableHeader, configs),
+      Component(ReactTableHeader, configs, get(style)),
       rows
     )
   }

@@ -1,0 +1,8 @@
+package blended.ui.samples.theme
+
+import blended.ui.components.reacttable.DefaultReactTableStyle
+import blended.ui.themes.DefaultSideBarMenuTheme
+
+object BlendedSamplesTheme extends DefaultSideBarMenuTheme
+
+object BlendedSamplesTableStyle extends DefaultReactTableStyle

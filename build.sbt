@@ -55,7 +55,7 @@ lazy val npmSettings = Seq(
 // The root project
 lazy val root = project.in(file("."))
   .settings(noPublish)
-  .aggregate(utils,router,components, app, uitest, sampleApp)
+  .aggregate(common,router,components, app, uitest, sampleApp)
 
 // The subproject defining the router
 lazy val router = project.in(file("router"))
@@ -69,7 +69,7 @@ lazy val router = project.in(file("router"))
   ).enablePlugins(ScalaJSBundlerPlugin)
 
 // Some common utilities
-lazy val utils = project.in(file("common"))
+lazy val common = project.in(file("common"))
   .settings(
     name := "common",
     webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
@@ -91,7 +91,9 @@ lazy val components = project.in(file("components"))
     libraryDependencies ++= Seq(
       "com.github.ahnfelt" %%% "react4s" % Versions.react4s
     )
-  ).enablePlugins(ScalaJSBundlerPlugin)
+  )
+  .enablePlugins(ScalaJSBundlerPlugin)
+  .dependsOn(common)
 
 lazy val sampleApp = project.in(file("sampleApp"))
   .settings(
@@ -116,7 +118,7 @@ lazy val sampleApp = project.in(file("sampleApp"))
   .settings(noPublish:_*)
   .settings(npmSettings:_*)
   .enablePlugins(ScalaJSBundlerPlugin)
-  .dependsOn(router, utils, components)
+  .dependsOn(router, common, components)
 
 lazy val app = project.in(file("mgmt-app"))
   .settings(
@@ -148,7 +150,7 @@ lazy val app = project.in(file("mgmt-app"))
   .settings(noPublish:_*)
   .settings(npmSettings:_*)
   .enablePlugins(ScalaJSBundlerPlugin)
-  .dependsOn(router, utils, components)
+  .dependsOn(router, common, components)
 
 lazy val uitest = project.in(file("mgmt-app-test"))
   .settings(
