@@ -9,22 +9,33 @@ trait ReactTableStyle {
   val hoverRow : String = "rgba(244,244,244,0.77) "
 
   def reactTable : CssClass
+  def reactTableHeader : CssClass
   def reactTableRow : CssClass
 }
 
 trait DefaultReactTableStyle extends ReactTableStyle {
 
+  override def reactTable: CssClass = ReactTableCss
+  override def reactTableHeader: CssClass = ReactTableHeader
   override def reactTableRow: CssClass = ReactTableRow
 
-  override def reactTable: CssClass = ReactTableCss
+  def reactTableRowBase : CssClass = ReactTableRowBase
 
-  private[this] object ReactTableRow extends CssClass(
+  private[this] object ReactTableRowBase extends CssClass (
     S.display("flex"),
     S.flexDirection("row"),
     S.verticalAlign("middle"),
     S.padding.rem(0.8),
     S.boxShadow("0 1px 3px " + palette.shadow),
-    S.margin.px(5),
+    S.margin.px(5)
+  )
+
+  private[this] object ReactTableHeader extends CssClass (
+    reactTableRowBase
+  )
+
+  private[this] object ReactTableRow extends CssClass(
+    reactTableRowBase,
     Css.hover(
       S.backgroundColor(hoverRow)
     )
