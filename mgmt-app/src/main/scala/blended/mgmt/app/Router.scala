@@ -1,7 +1,7 @@
 package blended.mgmt.app
 
 import blended.mgmt.app.components._
-import blended.mgmt.app.state.MgmtAppState
+import blended.mgmt.app.state.{AppEvent, MgmtAppState}
 import blended.ui.router.Router
 import com.github.ahnfelt.react4s._
 
@@ -32,22 +32,4 @@ object Routes {
     path("rollout", RolloutPage),
     path("help", HelpPage)
   )
-}
-
-object TopLevelPageResolver {
-
-  def topLevelPage(p: Option[Page], state: MgmtAppState) : Node = {
-    p match {
-      case Some(p) => p match {
-        case HomePage => Component(HomePageComponent, state)
-        case ContainerPage(_) => Component(ContainerPageComponent, state)
-        case ServicePage(_) => Component(ServicePageComponent, state)
-        case ProfilePage(_) => Component(ProfilePageComponent, state)
-        case OverlayPage(_) => Component(OverlayPageComponent, state)
-        case RolloutPage(_) => Component(RolloutPageComponent, state)
-        case HelpPage(_) => Component(HelpPageComponent, state)
-      }
-      case None => E.div(E.p(Text("Not found")))
-    }
-  }
 }

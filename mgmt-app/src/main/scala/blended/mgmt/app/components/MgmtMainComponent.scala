@@ -57,11 +57,40 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
       theme.menuColumnCss,
       Tags(entries.map { case (k, v) =>
         menuEntry(theme.menuEntryCss, theme.menuLinkCss, k, v)
-      }.toSeq)
+      })
     )
   }
 
-  override lazy val layout: (Option[Page], MgmtAppState) => Element = { (p, s) =>
+  override lazy val layout: Get => Element = { get =>
+
+    val p = get(currentPage)
+    val state = get(appState)
+
+    def topLevelPage : Node = {
+
+      def pageOrLogin(p: Page, n: Node, state: MgmtAppState) : Node = {
+        if (!p.loginRequired || state.currentUser.isDefined){
+          n
+        } else {
+          Component(MgmtLoginComponent, state).withHandler(event => appState.modify(MgmtAppState.redux(event)))
+        }
+      }
+
+      p match {
+        case Some(p) => p match {
+          case p @ HomePage         => pageOrLogin(p, Component(HomePageComponent, state), state)
+          case p @ ContainerPage(_) => pageOrLogin(p, Component(ContainerPageComponent, state), state)
+          case p @ ServicePage(_)   => pageOrLogin(p, Component(ServicePageComponent, state), state)
+          case p @ ProfilePage(_)   => pageOrLogin(p, Component(ProfilePageComponent, state), state)
+          case p @ OverlayPage(_)   => pageOrLogin(p, Component(OverlayPageComponent, state), state)
+          case p @ RolloutPage(_)   => pageOrLogin(p, Component(RolloutPageComponent, state), state)
+          case p @ HelpPage(_)      => pageOrLogin(p, Component(HelpPageComponent, state), state)
+        }
+        case None => E.div(E.p(Text("Not found")))
+      }
+    }
+
+
     E.div(
       E.div(
         theme.topBarCss,
@@ -72,7 +101,7 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
         menu,
         E.div(
           theme.contentColumnCss,
-          TopLevelPageResolver.topLevelPage(p, s)
+          topLevelPage
         )
       ),
       E.div(

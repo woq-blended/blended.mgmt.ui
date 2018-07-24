@@ -5,15 +5,16 @@ import blended.ui.themes.SidebarMenuTheme
 import com.github.ahnfelt.react4s._
 import org.scalajs.dom
 
-abstract class MainComponent[P,S,E]() extends Component[NoEmit] {
+abstract class MainComponent[P,AS,E]() extends Component[NoEmit] {
 
   val initialPage : P
-  val initialState : S
+  val initialState : AS
   val routes : Router.Tree[P,P]
 
   val theme : SidebarMenuTheme
 
   protected val currentPage : State[Option[P]] = State(Some(initialPage))
+  protected[this] val appState = State(initialState)
 
   protected[this] def href(page : P): String =
     if(dom.window.location.href.contains("?"))
@@ -30,9 +31,7 @@ abstract class MainComponent[P,S,E]() extends Component[NoEmit] {
   protected def menuEntry(entryCss: CssClass, menuLinkCss: CssClass, title: String, target: P): Node =
     E.div(entryCss, E.a(menuLinkCss, Text(title), A.href(href(target))))
 
-  val layout : (Option[P], S) => Element
-
-  protected[this] val appState = State(initialState)
+  val layout : Get => Element
 
   if(dom.window.location.href.contains("?")) {
     dom.window.onhashchange = { _ =>
@@ -40,5 +39,5 @@ abstract class MainComponent[P,S,E]() extends Component[NoEmit] {
     }
   }
 
-  override def render(get: Get): Element = layout(get(currentPage), get(appState))
+  override def render(get: Get): Element = layout(get)
 }
