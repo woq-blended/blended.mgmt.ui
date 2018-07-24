@@ -3,7 +3,7 @@ package blended.mgmt.app.components
 import akka.actor.{ActorRef, ActorSystem}
 import blended.mgmt.app._
 import blended.mgmt.app.backend.WSClientActor
-import blended.mgmt.app.state.{AppEvent, MgmtAppState, UpdateContainerInfo}
+import blended.mgmt.app.state.{AppEvent, LoggedOut, MgmtAppState, UpdateContainerInfo}
 import blended.mgmt.app.theme.BlendedMgmtTheme
 import blended.ui.common.MainComponent
 import blended.ui.router.Router
@@ -94,7 +94,11 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
     E.div(
       E.div(
         theme.topBarCss,
-        E.a(Text("Blended Management Console"), A.href(href(HomePage)), theme.brandTitleCss, theme.linkCss)
+        E.a(Text("Blended Management Console"), A.href(href(HomePage)), theme.brandTitleCss, theme.linkCss),
+        E.a(Text("Logout"), A.onClick { _ =>
+            state.currentUser.foreach{ u => appState.modify(MgmtAppState.redux(LoggedOut(u))) }
+          }
+        ).when(state.currentUser.isDefined)
       ),
       E.div(
         theme.columnContainerCss,
