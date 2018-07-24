@@ -4,19 +4,51 @@ import com.github.ahnfelt.react4s._
 
 import scala.reflect.ClassTag
 
-trait ReactTable {
+/**
+  * The trait ReactTable helps to define a component that displays a sequence of items of a given datatype.
+  * To achieve this, the trait uses an abstract type variable TableData.
+  *
+  * Users of the ReactTable need to instantiate the trait with a concrete TableData type and should define
+  * a TableProperties instance to configure the table.
+  */
+trait ReactTable[TableData] {
 
-  type TableData
+  /**
+    * A cell renderer takes an instance of TableData and renders it as a Tag. Each ColumnConfig has a cell renderer to
+    * determine the rendered item.
+    */
   type CellRenderer[C] = (TableData => Tag)
 
+  /**
+    *
+    * @param f is an extractor method to extract an element of type C from the TableData instance
+    * @param ft is a rendering function to map the extracted element of type C to a Tag
+    * @param cTag is an implicit class tag to determine C from f
+    * @tparam C Is the type of the elemented to be extracted from TableData for rendering
+    * @return A rendering function that can be applied to an instance of TableData resulting in a Tag
+    */
   def cellRenderer[C](f : TableData => C)(ft : C => Tag)(implicit cTag : ClassTag[C]) : CellRenderer[C] = { data : TableData =>
      ft(f(data))
   }
 
+  /**
+    * A convenience method to define a string renderer.
+    */
   def defaultCellRenderer(f: TableData => String) : CellRenderer[String] = cellRenderer(f)(s => E.span(Text(s)))
 
+  /**
+    * A convenience method to render eMails as a mailto:-link.
+    */
   def eMailRenderer(f : TableData => String) : CellRenderer[String] = cellRenderer(f)(s => E.a(A.href(s"mailto:$s"), Text(s)))
 
+  /**
+    * A ColumnConfig defines the display properties for a single column.
+    * @param name is the name of the column and also dtermines the header of the column displayed.
+    * @param renderer is the cell renderer used for this column.
+    * @param width is an optional width. By default all columns have the same width.
+    *
+    * @see [[CellRenderer]]
+    */
   case class ColumnConfig(
     name : String,
     renderer : CellRenderer[_],
@@ -25,18 +57,25 @@ trait ReactTable {
 
   case class TableProperties(
     // The configuration of the table columns
-    configs: Seq[ColumnConfig] = Seq.empty,
+    columns: Seq[ColumnConfig] = Seq.empty,
     searchExtractor : TableData => String = { _.toString() },
     keyExtractor : TableData => String = { _.hashCode().toString() }
   )
 
+  /**
+    * @param row is the instance of TableData to be displayed in this row
+    * @param props are the table properties determining the display parameters
+    * @param style is an instance of [[ReactTableStyle]]
+    */
   case class ReactTableRow(row: P[TableData], props: P[TableProperties], style: P[ReactTableStyle]) extends Component[NoEmit] {
     override def render(get: Get): Node = {
 
-      val cells : Seq[Tag] = get(props).configs.map { cfg =>
-        E.div(S.flex(cfg.width.map(w => s"0 1 $w").getOrElse("1")), cfg.renderer(get(row)))
+      // determine the sequence of Tags to be displayed in this row
+      val cells : Seq[Tag] = get(props).columns.map { col =>
+        E.div(S.flex(col.width.map(w => s"0 1 $w").getOrElse("1")), col.renderer(get(row)))
       }
 
+      // bundle the entire row into a div with the appropriate style
       E.div(
         get(style).reactTableRow,
         Tags(cells)
@@ -44,6 +83,11 @@ trait ReactTable {
     }
   }
 
+  /**
+    * Defines the table header
+    * @param props are the table properties defining the table display
+    * @param style is an instance of [[ReactTableStyle]]
+    */
   case class ReactTableHeader(
     props: P[TableProperties],
     style : P[ReactTableStyle]
@@ -53,7 +97,7 @@ trait ReactTable {
       E.div(
         get(style).reactTableHeader,
         Tags(
-          get(props).configs.map { cfg =>
+          get(props).columns.map { cfg =>
             E.span(S.flex(cfg.width.map(w => s"0 1 $w").getOrElse("1")), Text(cfg.name.capitalize))
           }
         )

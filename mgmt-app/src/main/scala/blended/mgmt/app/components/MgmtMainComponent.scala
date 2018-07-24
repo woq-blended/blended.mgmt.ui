@@ -42,13 +42,23 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
       ))))
     }
 
-  private[this] lazy val menu: Node = E.div(
-    theme.menuColumnCss,
-    E.div(
-      menuEntry(theme.menuEntryCss, theme.linkCss, "Overview", HomePage),
-      menuEntry(theme.menuEntryCss, theme.linkCss, "Container", ContainerPage())
+  private[this] lazy val menu: Node = {
+    val entries : Seq[(String, Page)] = Seq(
+      "Overview" -> HomePage,
+      "Container" -> ContainerPage(),
+      "Services" -> ServicePage(),
+      "Profiles" -> ProfilePage(),
+      "Overlays" -> OverlayPage(),
+      "Help" -> HelpPage()
     )
-  )
+
+    E.div(
+      theme.menuColumnCss,
+      Tags(entries.map { case (k, v) =>
+        menuEntry(theme.menuEntryCss, theme.menuLinkCss, k, v)
+      }.toSeq)
+    )
+  }
 
   override lazy val layout: (Option[Page], MgmtAppState) => Element = { (p, s) =>
     E.div(
