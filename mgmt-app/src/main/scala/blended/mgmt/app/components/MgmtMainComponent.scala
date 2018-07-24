@@ -49,6 +49,7 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
       "Services" -> ServicePage(),
       "Profiles" -> ProfilePage(),
       "Overlays" -> OverlayPage(),
+      "Rollout" -> RolloutPage(),
       "Help" -> HelpPage()
     )
 
