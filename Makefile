@@ -29,4 +29,9 @@ clean:
 	rm -Rf target
 	sbt clean
 
+gettext:
+	mkdir -p target/po
+	find -type f -name "*.scala" | grep -v target > target/po/files.txt
+	xgettext -f target/po/files.txt -L java -ktr -kmarktr --output target/po/messages.pot
+
 travis: all
