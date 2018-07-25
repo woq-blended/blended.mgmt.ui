@@ -5,7 +5,7 @@ import blended.mgmt.app._
 import blended.mgmt.app.backend.WSClientActor
 import blended.mgmt.app.state.{AppEvent, LoggedOut, MgmtAppState, UpdateContainerInfo}
 import blended.mgmt.app.theme.BlendedMgmtTheme
-import blended.ui.common.MainComponent
+import blended.ui.common.{I18n, MainComponent}
 import blended.ui.router.Router
 import blended.ui.themes.SidebarMenuTheme
 import blended.updater.config.ContainerInfo
@@ -14,6 +14,8 @@ import com.github.ahnfelt.react4s._
 import prickle.Unpickle
 
 case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEvent] {
+
+  private[this] val i18n = I18n()
 
   override lazy val initialPage: Page = HomePage
   override lazy val initialState: MgmtAppState = MgmtAppState()
@@ -44,26 +46,26 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
 
   private[this] lazy val menu: Node = {
     val entries : Seq[(String, Page)] = Seq(
-      "Overview" -> HomePage,
-      "Container" -> ContainerPage(),
-      "Services" -> ServicePage(),
-      "Profiles" -> ProfilePage(),
-      "Overlays" -> OverlayPage(),
-      "Rollout" -> RolloutPage(),
-      "Help" -> HelpPage()
+      i18n.marktr("Overview") -> HomePage,
+      i18n.marktr("Container") -> ContainerPage(),
+      i18n.marktr("Services") -> ServicePage(),
+      i18n.marktr("Profiles") -> ProfilePage(),
+      i18n.marktr("Overlays") -> OverlayPage(),
+      i18n.marktr("Rollout") -> RolloutPage(),
+      i18n.marktr("Help") -> HelpPage()
     )
 
     E.div(
       theme.menuColumnCss,
       Tags(entries.map { case (k, v) =>
-        menuEntry(theme.menuEntryCss, theme.menuLinkCss, k, v)
+        menuEntry(theme.menuEntryCss, theme.menuLinkCss, i18n.tr(k), v)
       })
     )
   }
 
   override lazy val layout: Get => Element = { get =>
 
-    val p = get(currentPage)
+    val page = get(currentPage)
     val state = get(appState)
 
     def topLevelPage : Node = {
@@ -76,20 +78,16 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
         }
       }
 
-      p match {
-        case Some(p) => p match {
-          case p @ HomePage         => pageOrLogin(p, Component(HomePageComponent, state), state)
-          case p @ ContainerPage(_) => pageOrLogin(p, Component(ContainerPageComponent, state), state)
-          case p @ ServicePage(_)   => pageOrLogin(p, Component(ServicePageComponent, state), state)
-          case p @ ProfilePage(_)   => pageOrLogin(p, Component(ProfilePageComponent, state), state)
-          case p @ OverlayPage(_)   => pageOrLogin(p, Component(OverlayPageComponent, state), state)
-          case p @ RolloutPage(_)   => pageOrLogin(p, Component(RolloutPageComponent, state), state)
-          case p @ HelpPage(_)      => pageOrLogin(p, Component(HelpPageComponent, state), state)
-        }
-        case None => E.div(E.p(Text("Not found")))
-      }
+      page.map{
+        case p @ HomePage         => pageOrLogin(p, Component(HomePageComponent, state), state)
+        case p @ ContainerPage(_) => pageOrLogin(p, Component(ContainerPageComponent, state), state)
+        case p @ ServicePage(_)   => pageOrLogin(p, Component(ServicePageComponent, state), state)
+        case p @ ProfilePage(_)   => pageOrLogin(p, Component(ProfilePageComponent, state), state)
+        case p @ OverlayPage(_)   => pageOrLogin(p, Component(OverlayPageComponent, state), state)
+        case p @ RolloutPage(_)   => pageOrLogin(p, Component(RolloutPageComponent, state), state)
+        case p @ HelpPage(_)      => pageOrLogin(p, Component(HelpPageComponent, state), state)
+      }.getOrElse(E.div(E.p(Text("Not found"))))
     }
-
 
     E.div(
       E.div(

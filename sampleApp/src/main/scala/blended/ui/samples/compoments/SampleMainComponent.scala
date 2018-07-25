@@ -24,7 +24,10 @@ case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppStat
     )
   )
 
-  override lazy val layout: (Option[SamplePage], SampleAppState) => Element = { (p, s) =>
+  override lazy val layout: Get => Element = { get =>
+
+    val (p,s) = (get(currentPage), get(appState))
+
     E.div(
       E.div(
         theme.topBarCss,

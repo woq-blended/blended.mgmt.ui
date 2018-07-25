@@ -107,5 +107,4 @@ class I18nImpl(override val locale: String, missingTranslationDecorator: Option[
     override def tr: String = I18nImpl.this.tr(msgid, params: _*)
     override def notr: String = I18nImpl.this.notr(msgid, params: _*)
   }
-
 }

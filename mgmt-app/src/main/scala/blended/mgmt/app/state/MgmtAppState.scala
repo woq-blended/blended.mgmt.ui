@@ -1,6 +1,5 @@
 package blended.mgmt.app.state
 
-import blended.mgmt.ui.util.Logger
 import blended.updater.config.ContainerInfo
 
 sealed trait AppEvent
@@ -9,8 +8,6 @@ final case class LoggedIn(user: String) extends AppEvent
 final case class LoggedOut(user: String) extends AppEvent
 
 object MgmtAppState {
-
-  private[this] val log = Logger[MgmtAppState]
 
   def redux(event: AppEvent)(old: MgmtAppState) : MgmtAppState = {
 
@@ -21,7 +18,6 @@ object MgmtAppState {
         )
 
       case LoggedIn(user: String) =>
-        log.info(s"Logging in [$user]")
         old.copy(currentUser = Some(user))
 
       case LoggedOut(user: String) =>
