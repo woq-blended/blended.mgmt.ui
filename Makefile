@@ -29,9 +29,11 @@ clean:
 	rm -Rf target
 	sbt clean
 
+.PHONY: gettext # extract translation string and update translation files
 gettext:
 	mkdir -p target/po
 	find -type f -name "*.scala" | grep -v target > target/po/files.txt
 	xgettext -f target/po/files.txt -L java -ktr -kmarktr --output target/po/messages.pot
+	cd i18n && find . -name *.po -exec msgmerge -U {} ../target/po/messages.pot \; 
 
 travis: all
