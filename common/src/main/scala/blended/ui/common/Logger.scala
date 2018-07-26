@@ -3,31 +3,31 @@ package blended.ui.common
 import scala.reflect.{ClassTag, classTag}
 
 trait Logger extends Serializable {
-  def error(msg: => String, t: Throwable) : Unit = error(msg, Some(t))
-  def warn(msg: => String, t: Throwable) : Unit = warn(msg, Some(t))
-  def info(msg: => String, t: Throwable) : Unit = info(msg, Some(t))
-  def debug(msg: => String, t: Throwable) : Unit = debug(msg, Some(t))
-  def trace(msg: => String, t: Throwable) : Unit = trace(msg, Some(t))
+  def error(t: Throwable)(msg: => String) : Unit = error(Some(t))(msg)
+  def warn(t: Throwable)(msg: => String) : Unit = warn(Some(t))(msg)
+  def info(t: Throwable)(msg: => String) : Unit = info(Some(t))(msg)
+  def debug(t: Throwable)(msg: => String) : Unit = debug(Some(t))(msg)
+  def trace(t: Throwable)(msg: => String) : Unit = trace(Some(t))(msg)
 
-  def error(msg: => String): Unit = error(msg, None)
-  def warn(msg: => String) : Unit = warn(msg, None)
-  def info(msg: => String) : Unit = info(msg, None)
-  def debug(msg: => String) : Unit = debug(msg, None)
-  def trace(msg: => String) : Unit = trace(msg, None)
+  def error(msg: => String): Unit = error(None)(msg)
+  def warn(msg: => String) : Unit = warn(None)(msg)
+  def info(msg: => String) : Unit = info(None)(msg)
+  def debug(msg: => String) : Unit = debug(None)(msg)
+  def trace(msg: => String) : Unit = trace(None)(msg)
 
-  def error(msg: => String, t: Option[Throwable])
-  def warn(msg: => String, t: Option[Throwable])
-  def info(msg: => String, t: Option[Throwable])
-  def debug(msg: => String, t: Option[Throwable])
-  def trace(msg: => String, t: Option[Throwable])
+  def error(t: Option[Throwable])(msg: => String)
+  def warn(t: Option[Throwable])(msg: => String)
+  def info(t: Option[Throwable])(msg: => String)
+  def debug(t: Option[Throwable])(msg: => String)
+  def trace(t: Option[Throwable])(msg: => String)
 }
 
 class PrintlnLogger(className: String) extends Logger {
-  override def error(msg: => String, t: Option[Throwable]) : Unit = log("ERROR", t, msg)
-  override def warn(msg: => String, t: Option[Throwable]) : Unit = log("WARN", t, msg)
-  override def info(msg: => String, t: Option[Throwable]) : Unit = log("INFO", t, msg)
-  override def debug(msg: => String, t: Option[Throwable]) : Unit = log("DEBUG", t, msg)
-  override def trace(msg: => String, t: Option[Throwable]) : Unit = log("TRACE", t, msg)
+  override def error(t: Option[Throwable])(msg: => String) : Unit = log("ERROR", t, msg)
+  override def warn(t: Option[Throwable])(msg: => String) : Unit = log("WARN", t, msg)
+  override def info(t: Option[Throwable])(msg: => String) : Unit = log("INFO", t, msg)
+  override def debug(t: Option[Throwable])(msg: => String) : Unit = log("DEBUG", t, msg)
+  override def trace(t: Option[Throwable])(msg: => String) : Unit = log("TRACE", t, msg)
 
   private[this] def log(level: String, t: Option[Throwable], msg: => String) : Unit = {
     // scalastyle:off regex
@@ -40,11 +40,11 @@ class PrintlnLogger(className: String) extends Logger {
 }
 
 class NoopLogger extends Logger {
-  override def error(msg: => String, t: Option[Throwable]) : Unit = {}
-  override def warn(msg: => String, t: Option[Throwable]) : Unit = {}
-  override def info(msg: => String, t: Option[Throwable]) : Unit = {}
-  override def debug(msg: => String, t: Option[Throwable]) : Unit = {}
-  override def trace(msg: => String, t: Option[Throwable]) : Unit = {}
+  override def error(t: Option[Throwable])(msg: => String) : Unit = {}
+  override def warn(t: Option[Throwable])(msg: => String) : Unit = {}
+  override def info(t: Option[Throwable])(msg: => String) : Unit = {}
+  override def debug(t: Option[Throwable])(msg: => String) : Unit = {}
+  override def trace(t: Option[Throwable])(msg: => String) : Unit = {}
 }
 
 object Logger {
