@@ -1,7 +1,6 @@
 package blended.ui.common
 
 import java.util.regex.Matcher
-import blended.mgmt.ui.util.Logger
 
 trait I18nMarker {
 

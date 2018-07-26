@@ -1,7 +1,7 @@
 package blended.mgmt.app.components
 
 import blended.mgmt.app.state.{AppEvent, LoggedIn, MgmtAppState}
-import blended.mgmt.ui.util.Logger
+import blended.ui.common.Logger
 import blended.ui.components.login.{LoginRequest, ReactLogin}
 import com.github.ahnfelt.react4s._
 
