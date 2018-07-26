@@ -17,16 +17,18 @@ abstract class MainComponent[P,AS,E]() extends Component[NoEmit] {
   protected[this] val appState = State(initialState)
 
   protected[this] def href(page : P): String =
-    if(dom.window.location.href.contains("?"))
+    if(dom.window.location.href.contains("?")) {
       "#" + routes.path(page)
-    else
+    }  else {
       routes.path(page)
+    }
 
   protected[this] def path(): String =
-    if(dom.window.location.href.contains("?"))
+    if(dom.window.location.href.contains("?")) {
       dom.window.location.hash.drop(1)
-    else
+    } else {
       dom.window.location.pathname
+    }
 
   protected def menuEntry(entryCss: CssClass, menuLinkCss: CssClass, title: String, target: P): Node =
     E.div(entryCss, E.a(menuLinkCss, Text(title), A.href(href(target))))

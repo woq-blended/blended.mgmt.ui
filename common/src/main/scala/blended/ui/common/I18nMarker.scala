@@ -20,13 +20,9 @@ trait I18nMarker {
   @inline def notr(msgid: String, params: Any*): String = params match {
     case Seq() => msgid
     case _ =>
-      var idx = 0
-      var msg = msgid
-      val args = params.map(_.toString).foreach { arg =>
-        msg = msg.replaceAll("\\{" + idx + "\\}", Matcher.quoteReplacement(arg))
-        idx += 1
+      params.zipWithIndex.foldLeft(msgid){ case (s, (p, i)) =>
+        s.replaceAll("\\{" + i + "\\}", Matcher.quoteReplacement(p.toString))
       }
-      msg
   }
 }
 
@@ -80,7 +76,7 @@ class I18nImpl(override val locale: String, missingTranslationDecorator: Option[
 
   private[this] lazy val log = Logger[I18nImpl]
 
-  override def toString = "I18nImpl(locale=" + locale + ")"
+  override def toString : String = "I18nImpl(locale=" + locale + ")"
 
   private[this] def translate(msgid: String): String = {
     // TODO: make a message lookup

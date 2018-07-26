@@ -24,7 +24,10 @@ class SampleSpec extends TestKit(ActorSystem("uitest"))
   implicit val materializer : ActorMaterializer = ActorMaterializer()
   implicit val executionContext : ExecutionContext = system.dispatcher
 
-  private[this] var svrBinding : Option[ServerBinding] = None
+  private[this] lazy val svrBinding : ServerBinding = {
+    val binding = Http().bindAndHandle(route, interface = "localhost", port=0)
+    Await.result(binding, 10.seconds)
+  }
 
   val chromeOptions = new ChromeOptions()
   chromeOptions.addArguments("--headless", "--disable-gpu")
@@ -33,17 +36,11 @@ class SampleSpec extends TestKit(ActorSystem("uitest"))
 
   val route : Route = getFromBrowseableDirectory(System.getProperty("appUnderTest"))
 
-  override protected def beforeAll(): Unit = {
-    val binding = Http().bindAndHandle(route, interface = "localhost", port=0)
-    svrBinding = Some(Await.result(binding, 10.seconds))
-  }
+  override protected def beforeAll(): Unit = port()
 
-  override protected def afterAll(): Unit = svrBinding.foreach(_.unbind().flatMap(_ => system.terminate()))
+  override protected def afterAll(): Unit = svrBinding.unbind().flatMap(_ => system.terminate())
 
-  private[this] def port() : Int = {
-    require(svrBinding.isDefined)
-    svrBinding.get.localAddress.getPort()
-  }
+  private[this] def port() : Int = svrBinding.localAddress.getPort
 
   "The Mgmt App should" - {
 

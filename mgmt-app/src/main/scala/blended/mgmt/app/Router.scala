@@ -1,9 +1,6 @@
 package blended.mgmt.app
 
-import blended.mgmt.app.components._
-import blended.mgmt.app.state.{AppEvent, MgmtAppState}
 import blended.ui.router.Router
-import com.github.ahnfelt.react4s._
 
 sealed trait Page {
   val loginRequired : Boolean = true
