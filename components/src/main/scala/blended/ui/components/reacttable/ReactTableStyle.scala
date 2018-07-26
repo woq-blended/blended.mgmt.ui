@@ -25,8 +25,10 @@ trait DefaultReactTableStyle extends ReactTableStyle {
     S.display("flex"),
     S.flexDirection("row"),
     S.verticalAlign("middle"),
+    // scalastyle:off magic.number
     S.padding.px(8),
     S.margin.px(5)
+    // scalastyle:on magic.number
   )
 
   private[this] object ReactTableHeader extends CssClass (

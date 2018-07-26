@@ -1,3 +1,4 @@
+<!--suppress CheckTagEmptyBody -->
 <scalastyle>
  <name>Blended Management UI</name>
  <check level="warning" class="org.scalastyle.file.FileTabChecker" enabled="true"></check>

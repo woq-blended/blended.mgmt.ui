@@ -20,7 +20,7 @@ case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppStat
     theme.menuColumnCss,
     E.div(
       E.div(theme.menuCategoryCss, E.p(Text("ReactTable"))),
-      menuEntry(theme.menuEntryCss, theme.menuLinkCss, "Basic Table", HomePage),
+      menuEntry(theme.menuEntryCss, theme.menuLinkCss, "Basic Table", HomePage)
     )
   )
 

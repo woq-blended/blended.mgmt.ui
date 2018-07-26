@@ -19,7 +19,7 @@ inThisBuild(Seq(
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),
     "Local Maven Repository" at m2Repo
-  ) 
+  )
 ))
 
 lazy val m2Repo = "file://" + System.getProperty("maven.repo.local", System.getProperty("user.home") + "/.m2/repository")
@@ -30,10 +30,11 @@ lazy val doPublish = Seq(
   credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
-  if(isSnapshot.value)
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
-    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+    if(isSnapshot.value) {
+      Some("snapshots" at nexus + "content/repositories/snapshots")
+    } else {
+      Some("releases" at nexus + "service/local/staging/deploy/maven2")
+    }
   }
 )
 
@@ -112,7 +113,7 @@ lazy val sampleApp = project.in(file("sampleApp"))
       val dir = baseDirectory.value / "index-dev.html"
       val t = target.value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "index-dev.html"
 
-      Files.copy(dir.toPath(), t.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
+      Files.copy(dir.toPath, t.toPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
       result
     }
   )
@@ -134,7 +135,7 @@ lazy val app = project.in(file("mgmt-app"))
       val dir = baseDirectory.value / "index-dev.html"
       val t = target.value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "index-dev.html"
 
-      Files.copy(dir.toPath(), t.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
+      Files.copy(dir.toPath, t.toPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
       result
     },
 
@@ -164,7 +165,7 @@ lazy val uitest = project.in(file("mgmt-app-test"))
     ),
 
     Test/test := {
-      ((Test/test).dependsOn((app/Compile/fastOptJS/webpack).toTask)).value
+      (Test/test).dependsOn((app/Compile/fastOptJS/webpack).toTask).value
     },
 
     libraryDependencies ++= Seq(

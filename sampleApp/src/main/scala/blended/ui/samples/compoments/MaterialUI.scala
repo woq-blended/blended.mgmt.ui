@@ -16,4 +16,3 @@ object MaterialUI {
 
   object MatButton extends JsComponent(Button)
 }
-

@@ -20,7 +20,7 @@ object MgmtAppState {
       case LoggedIn(user: String) =>
         old.copy(currentUser = Some(user))
 
-      case LoggedOut(user: String) =>
+      case LoggedOut(_: String) =>
         old.copy(currentUser = None)
     }
   }

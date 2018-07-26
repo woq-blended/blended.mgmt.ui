@@ -35,6 +35,7 @@ trait DefaultSideBarMenuTheme extends SidebarMenuTheme {
   override def menuEntryCss: CssClass = MenuEntryCss
   override def menuLinkCss : CssClass = MenuLinkCss
 
+  // scalastyle:off magic.number
   private[this] object TopBarCss extends CssClass(
     S.borderTop("2px solid " + palette.primary),
     S.backgroundColor(palette.background),
@@ -69,7 +70,7 @@ trait DefaultSideBarMenuTheme extends SidebarMenuTheme {
     brandTextCss,
     S.color(palette.primary),
     S.paddingLeft.px(50),
-    S.fontSize.px(20),
+    S.fontSize.px(20)
   )
 
   private[this] object LinkCss extends CssClass(
@@ -97,7 +98,7 @@ trait DefaultSideBarMenuTheme extends SidebarMenuTheme {
     S.top.px(50),
     S.bottom.px(50),
     S.left.px(0),
-    S.right.px(0),
+    S.right.px(0)
   )
 
   private[this] object ContentColumnCss extends CssClass(
@@ -130,4 +131,5 @@ trait DefaultSideBarMenuTheme extends SidebarMenuTheme {
     S.fontSize.px(18),
     S.color(palette.mainMenuText)
   )
+  // scalastyle:on magic.number
 }

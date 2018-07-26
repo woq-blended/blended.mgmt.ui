@@ -2,6 +2,7 @@ package blended.mgmt.app.backend
 
 import akka.actor.{Actor, ActorLogging, Props}
 import org.scalajs.dom.raw.WebSocket
+import scala.concurrent.duration._
 
 object WSClientActor {
 
@@ -12,37 +13,36 @@ object WSClientActor {
 
 class WSClientActor(url: String, onMessage: PartialFunction[Any, Unit]) extends Actor with ActorLogging {
 
-  private[this] var webSocket : Option[WebSocket] = None
-
-  case object Initialize
-  case class Closed(reason: String)
+  private case object Initialize
+  private case class Closed(reason: String)
 
   override def preStart(): Unit = self ! Initialize
 
-  override def receive: Receive = {
+  override def receive: Receive = initializing
+
+  def initializing : Receive = {
     case Initialize =>
-      if (webSocket.isEmpty) {
-        val socket = new WebSocket(url)
+      val socket = new WebSocket(url)
 
-        socket.onopen = {_ =>  log.info(s"Connected to [$url].") }
+      socket.onopen = {_ =>  log.info(s"Connected to [$url].") }
 
-        socket.onclose = { e =>
-          self ! Closed(e.reason)
-        }
-
-        socket.onerror = { e =>
-          webSocket.foreach(_.close())
-          self ! Closed("Closed upon error in Web Socket!")
-          webSocket = None
-        }
-        socket.onmessage = { e =>
-          onMessage(e.data)
-        }
-
-        webSocket = Some(socket)
+      socket.onclose = { e =>
+        self ! Closed(e.reason)
       }
+
+      socket.onerror = { _ =>
+        socket.close()
+        self ! Closed(s"Closed upon error in Web Socket!")
+      }
+      socket.onmessage = { e =>
+        onMessage(e.data)
+      }
+  }
+
+  def active(socket: WebSocket) : Receive = {
     case Closed(reason) =>
       log.info(s"Web Socket connection to [$url] closed: [$reason]")
-      webSocket = None
+      context.become(initializing)
+      context.system.scheduler.scheduleOnce(1.second, self, Initialize)(context.dispatcher)
   }
 }

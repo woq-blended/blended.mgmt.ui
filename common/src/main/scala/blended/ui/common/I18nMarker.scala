@@ -62,9 +62,7 @@ trait PreparedI18n {
 
 object I18n extends I18nMarker {
 
-  private[this] val log = Logger[I18n.type]
-
-  var missingTranslationDecorator: Option[String => String] = None
+  val missingTranslationDecorator: Option[String => String] = None
 
   def apply(): I18n = apply("")
   def apply(locale: String): I18n = {
