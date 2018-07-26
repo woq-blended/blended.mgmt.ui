@@ -57,13 +57,13 @@ object Router {
     name: String
   )
 
-  val string = Node[String](
+  val string : Node[String] = Node[String](
     fromPath = { path : String => Some(path) },
     toPath = { s => Some(s) },
     name = "string"
   )
 
-  val long = Node[Long](
+  val long : Node[Long] = Node[Long](
     fromPath = { path : String =>
       for {
         l <- Try(path.toLong).toOption
@@ -74,7 +74,7 @@ object Router {
     name = "long"
   )
 
-  val int = Node[Int](
+  val int : Node[Int] = Node[Int](
     fromPath = { path : String =>
       for {
         l <- Try(path.toInt).toOption
@@ -91,7 +91,7 @@ class Router[S] {
   import Router._
 
   /** Root */
-  def apply[A <: S : ClassTag](a : A, branches : Branch[A, S, S]*) = {
+  def apply[A <: S : ClassTag](a : A, branches : Branch[A, S, S]*): Tree[S,S]  = {
     val tree = Tree[A, S](
       fromPath = { path =>
         Some(a).filter(_ => path == List())
@@ -109,7 +109,7 @@ class Router[S] {
     name : String,
     f : A => B,
     subBranches: Branch[B, S, S]*
-  ) = {
+  ): Branch[A,S,S] = {
     val branch = Branch[A, B, S]({ parentTree: Tree[A, S] =>
       Tree[B, S](
         fromPath = { path: List[String] =>
@@ -140,7 +140,7 @@ class Router[S] {
     node : Node[N],
     f : (N, A) => B,
     subBranches: Branch[B, S, S]*
-  ) = {
+  ): Branch[A,S,S] = {
     val branch = Branch[A, B, S]({ parentTree: Tree[A, S] =>
       Tree[B, S](
         fromPath = { path =>
