@@ -48,7 +48,8 @@ lazy val npmSettings = Seq(
   npmDependencies.in(Compile) := Seq(
     "react" -> Versions.react,
     "react-dom" -> Versions.react,
-    "jsdom" -> Versions.jsdom
+    "jsdom" -> Versions.jsdom,
+    "@material-ui/core" -> "1.4.1"
   )
 )
 

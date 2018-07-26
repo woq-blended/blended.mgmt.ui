@@ -6,7 +6,7 @@ import blended.ui.samples.state.SampleAppState
 import com.github.ahnfelt.react4s._
 
 sealed trait SamplePage
-final object HomePage extends SamplePage
+object HomePage extends SamplePage
 
 object Routes {
 
@@ -19,8 +19,8 @@ object Routes {
 
 object TopLevelPageResolver {
 
-  def topLevelPage(p: Option[SamplePage], state: SampleAppState) : Node = {
-    p match {
+  def topLevelPage(page: Option[SamplePage], state: SampleAppState) : Node = {
+    page match {
       case Some(p) => p match {
         case HomePage => Component(HomePageComponent, state)
       }

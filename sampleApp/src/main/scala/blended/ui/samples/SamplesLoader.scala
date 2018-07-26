@@ -1,4 +1,4 @@
-package blended.mgmt.app
+package blended.ui.samples
 
 import blended.ui.samples.compoments.SampleMainComponent
 import com.github.ahnfelt.react4s._
