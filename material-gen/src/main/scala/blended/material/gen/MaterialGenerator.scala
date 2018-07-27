@@ -25,9 +25,11 @@ object MaterialGenerator {
   }
 
   private[this] def reportError(msg: String): Unit = {
+    //scalastyle:off regex
     log.error(msg)
     Console.err.println(msg)
     sys.error(msg)
+    //scalastyle:on regex
   }
 
   private[this] def parseArgs(args: Array[String]): Try[CmdLine] = Try {

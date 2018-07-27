@@ -13,10 +13,10 @@ object SamplesLoader {
   def main(args: Array[String]) : Unit = {
 
     object Palette {
-      val palette = js.Dynamic.literal(
+      val palette : js.Dynamic  = js.Dynamic.literal(
         "palette" -> js.Dynamic.literal (
           "primary" -> js.Dynamic.literal (
-            "main" -> Colors.green("500")
+            "main" -> Colors.deepOrange("500")
           )
         )
       )

@@ -4,7 +4,7 @@ import java.util.regex.Pattern
 
 class ColorGenerator(fileName: String) extends AbstractGenerator(fileName) {
 
-  val colorNames = {
+  private[this] val colorNames = {
 
     val pattern : Pattern = Pattern.compile("var _([^=].*)=.*")
 

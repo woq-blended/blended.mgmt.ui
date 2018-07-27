@@ -123,7 +123,7 @@ lazy val material = project.in(file("material"))
     ),
     generateMui := {
 
-      val res = runner.value.run(
+      runner.value.run(
         "blended.material.gen.MaterialGenerator",
         (materialGen/Runtime/fullClasspath).value.files,
         Seq(
@@ -133,7 +133,7 @@ lazy val material = project.in(file("material"))
         streams.value.log
       )
 
-      val pathFinder : PathFinder = (sourceManaged.value) ** "*.scala"
+      val pathFinder : PathFinder = sourceManaged.value ** "*.scala"
       pathFinder.get.filter(_.getAbsolutePath().endsWith("scala")).map(_.getAbsoluteFile())
     },
 

@@ -31,12 +31,6 @@ case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppStat
 
     val (p,s) = (get(currentPage), get(appState))
 
-    val styles = js.Dynamic.literal(
-      "root" -> js.Dynamic.literal(
-        "flewGrow" -> "1"
-      )
-    )
-
     E.div(
       AppBar(
         Toolbar(
