@@ -1,19 +1,8 @@
 package blended.material.gen
 
-import java.io.File
 import java.util.regex.Pattern
 
-import org.slf4j.LoggerFactory
-
-class ComponentGenerator(fileName: String) {
-
-  private[this] val log = LoggerFactory.getLogger(classOf[ComponentGenerator])
-
-  private[this] val content : Seq[String] = {
-    val bufferedSource = io.Source.fromFile(new File(fileName))
-    val lines = (for (line <- bufferedSource.getLines()) yield line).toSeq
-    lines
-  }
+class ComponentGenerator(fileName: String) extends AbstractGenerator(fileName) {
 
   private[this] val componentNames : Seq[String] = {
 
