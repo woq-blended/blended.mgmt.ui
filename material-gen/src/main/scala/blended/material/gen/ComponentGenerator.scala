@@ -25,20 +25,22 @@ class ComponentGenerator(fileName: String) extends AbstractGenerator(fileName) {
        |import scala.scalajs.js
        |import scala.scalajs.js.annotation.JSImport
        |
-       |@js.native
-       |@JSImport("@material-ui/core", JSImport.Namespace)
-       |object MaterialUI extends js.Object {
+       |object MaterialUI {
+       |
+       |  @js.native
+       |  @JSImport("@material-ui/core", JSImport.Namespace)
+       |  private[this] object MatComponents extends js.Object {
        |""".stripMargin
 
-  private[this] val toComponent : String => String = { s => s"  val $s : js.Dynamic = js.native" }
-  private[this] val toObject : String => String = { s => s"object $s extends JsComponent(MaterialUI.$s)"}
+  private[this] val toComponent : String => String = { s => s"    val $s : js.Dynamic = js.native" }
+  private[this] val toObject : String => String = { s => s"  object $s extends JsComponent(MatComponents.$s)"}
 
   def generate() : String = {
 
     prelude +
       componentNames.map(toComponent).mkString("\n") +
-      "\n}\n\n" +
+      "\n  }\n\n" +
       componentNames.map(toObject).mkString("\n") +
-      "\n"
+      "\n}\n"
   }
 }

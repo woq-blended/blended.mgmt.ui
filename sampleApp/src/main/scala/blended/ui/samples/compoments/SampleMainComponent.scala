@@ -1,7 +1,7 @@
 package blended.ui.samples.compoments
 
 import blended.ui.common.MainComponent
-import blended.ui.material._
+import blended.ui.material.MaterialUI._
 import blended.ui.router.Router
 import blended.ui.samples.{HomePage, Routes, SamplePage, TopLevelPageResolver}
 import blended.ui.samples.state.{SampleAppEvent, SampleAppState}

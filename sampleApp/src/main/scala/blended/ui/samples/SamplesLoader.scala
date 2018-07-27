@@ -1,7 +1,8 @@
 package blended.ui.samples
 
 import blended.material.ui.Colors
-import blended.ui.material._
+import blended.ui.material.{MaterialUI, MuiThemeProvider, Styles}
+import MaterialUI._
 import blended.ui.samples.compoments.SampleMainComponent
 import com.github.ahnfelt.react4s._
 
