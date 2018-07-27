@@ -10,6 +10,8 @@ object Versions {
 
   val jsdom = "11.8.0"
 
+  val logback = "1.2.3"
+
   val prickle = "1.1.14"
 
   val react = "16.4.1"
@@ -19,5 +21,7 @@ object Versions {
   val scalaTest = "3.0.5"
 
   val selenium = "3.13.0"
+
+  val slf4j = "1.7.25"
 
 }

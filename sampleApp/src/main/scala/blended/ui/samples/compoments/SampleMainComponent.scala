@@ -1,12 +1,15 @@
 package blended.ui.samples.compoments
 
 import blended.ui.common.MainComponent
+import blended.ui.material._
 import blended.ui.router.Router
 import blended.ui.samples.{HomePage, Routes, SamplePage, TopLevelPageResolver}
 import blended.ui.samples.state.{SampleAppEvent, SampleAppState}
 import blended.ui.samples.theme.BlendedSamplesTheme
 import blended.ui.themes.SidebarMenuTheme
 import com.github.ahnfelt.react4s._
+
+import scala.scalajs.js
 
 case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppState, SampleAppEvent] {
 
@@ -28,10 +31,20 @@ case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppStat
 
     val (p,s) = (get(currentPage), get(appState))
 
+    val styles = js.Dynamic.literal(
+      "root" -> js.Dynamic.literal(
+        "flewGrow" -> "1"
+      )
+    )
+
     E.div(
-      E.div(
-        theme.topBarCss,
-        E.a(Text("Blended Component Samples"), A.href(href(HomePage)), theme.brandTitleCss, theme.linkCss)
+      AppBar(
+        Toolbar(
+          Typography(
+            J("variant", "title"), J("color", "inherit"),
+            Text("Blended Component Samples")
+          )
+        )
       ),
       E.div(
         theme.columnContainerCss,

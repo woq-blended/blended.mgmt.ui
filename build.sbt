@@ -57,7 +57,7 @@ lazy val npmSettings = Seq(
 // The root project
 lazy val root = project.in(file("."))
   .settings(noPublish)
-  .aggregate(common,router,components, app, uitest, sampleApp)
+  .aggregate(common, router, components, materialGen, material, app, uitest, sampleApp)
 
 // The subproject defining the router
 lazy val router = project.in(file("router"))
@@ -97,6 +97,52 @@ lazy val components = project.in(file("components"))
   .enablePlugins(ScalaJSBundlerPlugin)
   .dependsOn(common)
 
+lazy val materialGen = project.in(file("material-gen"))
+  .settings(
+    name := "merial-gen",
+    libraryDependencies ++= Seq(
+      "de.tototec" % "de.tototec.cmdoption" % "0.6.0",
+      "org.slf4j" % "slf4j-api" % Versions.slf4j,
+      "ch.qos.logback" % "logback-core" % Versions.logback,
+      "ch.qos.logback" % "logback-classic" % Versions.logback
+    )
+  )
+  .settings(npmSettings)
+  .settings(noPublish)
+  .enablePlugins(ScalaJSBundlerPlugin)
+
+lazy val generateMui = TaskKey[Seq[File]]("generateMui")
+
+lazy val material = project.in(file("material"))
+  .settings(
+    name := "material",
+    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
+    emitSourceMaps := true,
+    libraryDependencies ++= Seq(
+      "com.github.ahnfelt" %%% "react4s" % Versions.react4s
+    ),
+    generateMui := {
+
+      val res = runner.value.run(
+        "blended.material.gen.MaterialGenerator",
+        (materialGen/Runtime/fullClasspath).value.files,
+        Seq(
+          "-d", ((materialGen/Compile/npmUpdate).value / "node_modules" / "@material-ui").getAbsolutePath(),
+          "-o", (sourceManaged.value / "main").getAbsolutePath()
+        ),
+        streams.value.log
+      )
+
+      val pathFinder : PathFinder = (sourceManaged.value) ** "*.scala"
+      pathFinder.get.filter(_.getAbsolutePath().endsWith("scala")).map(_.getAbsoluteFile())
+    },
+
+    Compile/sourceGenerators += generateMui
+  )
+  .settings(npmSettings)
+  .settings(noPublish)
+  .enablePlugins(ScalaJSPlugin)
+
 lazy val sampleApp = project.in(file("sampleApp"))
   .settings(
     name := "sampleApp",
@@ -120,7 +166,7 @@ lazy val sampleApp = project.in(file("sampleApp"))
   .settings(noPublish:_*)
   .settings(npmSettings:_*)
   .enablePlugins(ScalaJSBundlerPlugin)
-  .dependsOn(router, common, components)
+  .dependsOn(router, common, components, material)
 
 lazy val app = project.in(file("mgmt-app"))
   .settings(
