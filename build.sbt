@@ -142,6 +142,7 @@ lazy val material = project.in(file("material"))
   .settings(npmSettings)
   .settings(noPublish)
   .enablePlugins(ScalaJSPlugin)
+  .dependsOn(common)
 
 lazy val sampleApp = project.in(file("sampleApp"))
   .settings(

@@ -1,7 +1,7 @@
 package blended.ui.samples
 
 import blended.material.ui.Colors
-import blended.ui.material.{MaterialUI, MuiThemeProvider, Styles}
+import blended.ui.material.{MaterialUI, Styles}
 import MaterialUI._
 import blended.ui.samples.compoments.SampleMainComponent
 import com.github.ahnfelt.react4s._
@@ -16,7 +16,7 @@ object SamplesLoader {
       val palette : js.Dynamic  = js.Dynamic.literal(
         "palette" -> js.Dynamic.literal (
           "primary" -> js.Dynamic.literal (
-            "main" -> Colors.deepOrange("500")
+            "main" -> Colors.teal("500")
           )
         )
       )
@@ -26,7 +26,7 @@ object SamplesLoader {
 
     val main = E.div(
       CssBaseline(),
-      MuiThemeProvider(J("theme", theme), Component(SampleMainComponent))
+      Styles.MuiThemeProvider(J("theme", theme), Component(SampleMainComponent))
     )
 
     ReactBridge.renderToDomById(main, "content")
