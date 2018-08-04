@@ -50,7 +50,8 @@ lazy val npmSettings = Seq(
     "react" -> Versions.react,
     "react-dom" -> Versions.react,
     "jsdom" -> Versions.jsdom,
-    "@material-ui/core" -> "1.4.1"
+    "@material-ui/core" -> "1.4.1",
+    "@material-ui/icons" -> "2.0.0"
   )
 )
 

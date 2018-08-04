@@ -16,7 +16,14 @@ object Styles {
     val MuiThemeProvider : js.Dynamic = js.native
     val createMuiTheme : js.Dynamic = js.native
     val withStyles : js.Function1[js.Any, js.Function1[Any, js.Any]] = js.native
+    val withTheme : js.Function1[js.Any, js.Function1[Any, js.Any]] = js.native
   }
+
+  def withStyles(s : Styles) : (JsComponentConstructor => JsComponentConstructor) =
+    withStyles(Map("root" -> s))
+
+  def withStyles(s : Style*) : (JsComponentConstructor => JsComponentConstructor) =
+    withStyles(Map("root" -> Styles(s:_*)))
 
   def withStyles(s : Map[String, Styles]) : (JsComponentConstructor => JsComponentConstructor) = { c =>
 
@@ -29,6 +36,19 @@ object Styles {
 
     JsComponentConstructor(
       componentClass = styledComponent,
+      c.children,
+      c.key,
+      c.ref
+    )
+  }
+
+  def withTheme(theme: js.Any) : JsComponentConstructor => JsComponentConstructor = { c =>
+
+    val innerComponent = c.componentClass
+    val themedComponent = StylesImpl.withTheme(theme)(innerComponent)
+
+    JsComponentConstructor(
+      componentClass = themedComponent,
       c.children,
       c.key,
       c.ref

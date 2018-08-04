@@ -1,8 +1,10 @@
 package blended.ui.samples.compoments
 
+import blended.material.ui.Icons.MenuIcon
 import blended.ui.common.{Logger, MainComponent}
 import blended.ui.material.MaterialUI._
 import blended.ui.material.Styles
+import Styles.withStyles
 import blended.ui.router.Router
 import blended.ui.samples.{HomePage, Routes, SamplePage, TopLevelPageResolver}
 import blended.ui.samples.state.{SampleAppEvent, SampleAppState}
@@ -20,9 +22,10 @@ case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppStat
 
   override val theme: SidebarMenuTheme = BlendedSamplesTheme
 
-  val appBarStyles : Map[String, Styles] = Map(
-    "root" -> Styles(S.flexGrow("1"))
-  )
+  object AppBarStyles {
+    val flex = Styles(S.flexGrow("1"))
+    val menuButton = Styles(S.marginLeft.pt(-12), S.marginRight.pt(20))
+  }
 
   private[this] lazy val menu: Node = E.div(
     theme.menuColumnCss,
@@ -32,21 +35,29 @@ case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppStat
     )
   )
 
-  val appBar = AppBar(
-    Toolbar(
-      Typography(
-        J("variant", "title"), J("color", "inherit"),
-        Text("Blended Component Samples")
+  val appBar : JsComponentConstructor = {
+    AppBar(
+      Toolbar(
+        withStyles(AppBarStyles.menuButton)(IconButton(
+          J("color", "inherit"),
+          J("aria-label", "Menu"),
+          MenuIcon()
+        )),
+        Styles.withStyles(AppBarStyles.flex)(Typography(
+          J("variant", "title"), J("color", "inherit"),
+          Text("Blended Component Samples")
+        )),
+        Button(J("color", "inherit"), Text("Login"))
       )
     )
-  )
+  }
 
   override lazy val layout: Get => Element = { get =>
 
     val (p,s) = (get(currentPage), get(appState))
 
     E.div(
-      Styles.withStyles(appBarStyles)(appBar),
+      withStyles(AppBarStyles.flex)(appBar),
       E.div(
         theme.columnContainerCss,
         menu,
