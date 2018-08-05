@@ -15,3 +15,5 @@ object BlendedSamplesTheme extends DefaultSideBarMenuTheme {
 object BlendedSamplesTableStyle extends DefaultReactTableStyle {
   override val palette: BlendedPalette = SamplesPalette
 }
+
+

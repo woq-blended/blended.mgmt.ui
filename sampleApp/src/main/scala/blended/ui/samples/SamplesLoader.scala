@@ -1,8 +1,8 @@
 package blended.ui.samples
 
 import blended.material.ui.Colors
-import blended.ui.material.{MaterialUI, Styles}
-import MaterialUI._
+import blended.ui.material.MaterialUI.CssBaseline
+import blended.ui.material.Styles
 import blended.ui.samples.compoments.SampleMainComponent
 import com.github.ahnfelt.react4s._
 
@@ -16,7 +16,7 @@ object SamplesLoader {
       val palette : js.Dynamic  = js.Dynamic.literal(
         "palette" -> js.Dynamic.literal (
           "primary" -> js.Dynamic.literal (
-            "main" -> Colors.teal("500")
+            "main" -> Colors.yellow("500")
           )
         )
       )
