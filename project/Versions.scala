@@ -8,7 +8,7 @@ object Versions {
 
   val blended = "2.5.0-M10-SNAPSHOT"
 
-  val jsdom = "11.8.0"
+  val jsdom = "11.12.0"
 
   val logback = "1.2.3"
 
