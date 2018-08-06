@@ -14,7 +14,7 @@ object Versions {
 
   val prickle = "1.1.14"
 
-  val react = "16.4.1"
+  val react = "16.4.2"
 
   val react4s = "0.9.14-SNAPSHOT"
 
