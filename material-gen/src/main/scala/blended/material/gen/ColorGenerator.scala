@@ -2,13 +2,13 @@ package blended.material.gen
 
 import java.util.regex.Pattern
 
-class ColorGenerator(fileName: String) extends AbstractGenerator(fileName) {
+class ColorGenerator(sourceFile : String, targetFile: String) extends AbstractGenerator(sourceFile, targetFile) {
 
   private[this] val colorNames = {
 
     val pattern : Pattern = Pattern.compile("var _([^=].*)=.*")
 
-    content.filter { line =>
+    source.filter { line =>
       val matcher = pattern.matcher(line)
       matcher.matches()
     }.map { line =>
@@ -32,7 +32,7 @@ class ColorGenerator(fileName: String) extends AbstractGenerator(fileName) {
        |  private object MatColors extends js.Object {
        |""".stripMargin
 
-  override def generate(): String = {
+  override def doGenerate(): String = {
 
     val colors = colorNames.map(s => s"    val $s : js.Dynamic = js.native")
     val objects = colorNames.map(s => s"  object $s { def apply(s : String) : js.Dynamic = MatColors.$s.selectDynamic(s) }")

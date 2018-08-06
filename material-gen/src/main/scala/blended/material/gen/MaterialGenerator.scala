@@ -63,23 +63,21 @@ object MaterialGenerator {
 
 class MaterialGenerator(options: MaterialGenerator.CmdLine) {
 
-  def writeFile(dir: File, fileName: String, content: String) : Unit = {
-    val f = new File(dir, fileName).toPath()
-    Files.write(f, content.getBytes())
-  }
-
   def run() : Unit = {
 
     val targetDir = new File(options.out + "/blended/ui/material")
+
+    def targetFile(f : String) : String = new File(targetDir, f).getAbsolutePath()
+
     Files.createDirectories(targetDir.toPath())
 
     val componentIndex = options.dir + "/core/index.js"
-    writeFile(targetDir, "MaterialUI.scala", new ComponentGenerator(componentIndex).generate())
+    new ComponentGenerator(componentIndex, targetFile("MaterialUI.scala")).generate()
 
     val colorIndex = options.dir + "/core/colors/index.js"
-    writeFile(targetDir, "Colors.scala", new ColorGenerator(colorIndex).generate())
+    new ColorGenerator(colorIndex, targetFile("Colors.scala")).generate()
 
     val iconIndex = options.dir + "/icons/index.js"
-    writeFile(targetDir, "Icons.scala", new IconGenerator(iconIndex).generate())
+    new IconGenerator(iconIndex, targetFile("Icons.scala")).generate()
   }
 }

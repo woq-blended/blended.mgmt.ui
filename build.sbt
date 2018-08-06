@@ -50,7 +50,7 @@ lazy val npmSettings = Seq(
     "react" -> Versions.react,
     "react-dom" -> Versions.react,
     "jsdom" -> Versions.jsdom,
-    "@material-ui/core" -> "1.4.1",
+    "@material-ui/core" -> "1.4.3",
     "@material-ui/icons" -> "2.0.0"
   )
 )
@@ -148,7 +148,7 @@ lazy val material = project.in(file("material"))
 lazy val sampleApp = project.in(file("sampleApp"))
   .settings(
     name := "sampleApp",
-    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
+    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryAndApplication(),
     emitSourceMaps := true,
     scalaJSUseMainModuleInitializer := true,
 

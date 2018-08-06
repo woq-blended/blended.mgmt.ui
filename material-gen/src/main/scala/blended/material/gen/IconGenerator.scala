@@ -2,13 +2,13 @@ package blended.material.gen
 
 import java.util.regex.Pattern
 
-class IconGenerator(fileName: String) extends AbstractGenerator(fileName) {
+class IconGenerator(sourceFile: String, targetFile: String) extends AbstractGenerator(sourceFile, targetFile) {
 
   private[this] val colorNames = {
 
     val pattern : Pattern = Pattern.compile("var _([A-Z][^=].*)=.*")
 
-    content.filter { line =>
+    source.filter { line =>
       val matcher = pattern.matcher(line)
       matcher.matches()
     }.map { line =>
@@ -32,7 +32,7 @@ class IconGenerator(fileName: String) extends AbstractGenerator(fileName) {
        |  private object MatIcons extends js.Object {
        |""".stripMargin
 
-  override def generate(): String = {
+  override def doGenerate(): String = {
 
     val icons = colorNames.map(s => s"    val $s : js.Dynamic = js.native")
     val objects = colorNames.map(s => s"  object ${s}Icon extends JsComponent(MatIcons.$s)")

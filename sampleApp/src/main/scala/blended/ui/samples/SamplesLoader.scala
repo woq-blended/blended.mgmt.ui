@@ -16,7 +16,7 @@ object SamplesLoader {
       val palette : js.Dynamic  = js.Dynamic.literal(
         "palette" -> js.Dynamic.literal (
           "primary" -> js.Dynamic.literal (
-            "main" -> Colors.yellow("500")
+            "main" -> Colors.green("900")
           )
         )
       )

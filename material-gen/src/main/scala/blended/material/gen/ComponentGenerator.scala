@@ -2,13 +2,13 @@ package blended.material.gen
 
 import java.util.regex.Pattern
 
-class ComponentGenerator(fileName: String) extends AbstractGenerator(fileName) {
+class ComponentGenerator(sourceFile : String, targetFile: String) extends AbstractGenerator(sourceFile, targetFile) {
 
   private[this] val componentNames : Seq[String] = {
 
     val pattern : Pattern = Pattern.compile("var _([A-Z][^=].*)=.*")
 
-    content.filter { line =>
+    source.filter { line =>
       val matcher = pattern.matcher(line)
       matcher.matches()
     }.map { line =>
@@ -35,7 +35,7 @@ class ComponentGenerator(fileName: String) extends AbstractGenerator(fileName) {
   private[this] val toComponent : String => String = { s => s"    val $s : js.Dynamic = js.native" }
   private[this] val toObject : String => String = { s => s"  object $s extends JsComponent(MatComponents.$s)"}
 
-  def generate() : String = {
+  def doGenerate() : String = {
 
     prelude +
       componentNames.map(toComponent).mkString("\n") +
