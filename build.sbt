@@ -51,7 +51,8 @@ lazy val npmSettings = Seq(
     "react-dom" -> Versions.react,
     "jsdom" -> Versions.jsdom,
     "@material-ui/core" -> "1.4.3",
-    "@material-ui/icons" -> "2.0.0"
+    "@material-ui/icons" -> "2.0.0",
+    "jsonwebtoken" -> "8.3.0"
   )
 )
 
@@ -153,7 +154,8 @@ lazy val sampleApp = project.in(file("sampleApp"))
     scalaJSUseMainModuleInitializer := true,
 
     libraryDependencies ++= Seq(
-      "com.github.ahnfelt" %%% "react4s" % Versions.react4s
+      "com.github.ahnfelt" %%% "react4s" % Versions.react4s,
+      "org.scalatest" %%% "scalatest" % Versions.scalaTest % "test"
     ),
 
     Compile/fastOptJS/webpack := {
