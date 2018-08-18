@@ -59,7 +59,6 @@ trait DefaultSideBarMenuTheme extends SidebarMenuTheme {
     S.height.px(50)
   )
 
-
   private[this] object BrandTextCss extends CssClass(
     S.display.inlineBlock(),
     S.paddingTop.px(8),

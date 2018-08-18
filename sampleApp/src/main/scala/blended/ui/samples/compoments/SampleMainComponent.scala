@@ -1,10 +1,11 @@
 package blended.ui.samples.compoments
 
 import blended.ui.common.{Logger, MainComponent}
+import blended.ui.material.MaterialUI._
 import blended.ui.router.Router
 import blended.ui.samples.state.{SampleAppEvent, SampleAppState}
-import blended.ui.samples.theme.BlendedSamplesTheme
-import blended.ui.samples.{HomePage, Routes, SamplePage, TopLevelPageResolver}
+import blended.ui.samples.theme.{BlendedSamplesTheme, ContentStyles, Theme}
+import blended.ui.samples.{HomePage, Routes, SamplePage}
 import blended.ui.themes.SidebarMenuTheme
 import com.github.ahnfelt.react4s._
 
@@ -32,19 +33,28 @@ case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppStat
 
     E.div(
       Component(AppBarComponent, s),
-      E.div(
-        theme.columnContainerCss,
-        menu,
-        E.div(
-          theme.contentColumnCss,
-          TopLevelPageResolver.topLevelPage(p, s)
-        )
-      ),
-      E.div(
-        theme.bottomBarCss,
-        E.div(
-          Text("Powered by "),
-          E.a(Text("blended"), A.target("_blank"), A.href("https://github.com/woq-blended/blended"))
+      E.main(
+        ContentStyles.root,
+        Drawer(
+          J("variant", "permanent"),
+          S.height("100%"),
+          S.width("200pt"),
+          List(
+            ListItem(
+              J("button", "true"),
+              Typography(Text("foo"))
+            )
+          )
+        ),
+        E.div(S.height("40pt")),
+        Card(
+          S.width("200pt"),
+          Typography(Text("You think water moves fast? You should see ice."))
+        ),
+        Card(
+          S.background(Theme.theme.palette.error.main.asInstanceOf[String]),
+          S.width("200pt"),
+          Typography(Text("You think water moves fast? You should see ice."))
         )
       )
     )

@@ -1,6 +1,7 @@
 package blended.samples
 
 import blended.ui.samples.JsonWebToken
+import com.github.ahnfelt.react4s.Loader
 import org.scalatest.FreeSpec
 
 class JWtDecodeSpec extends FreeSpec {
@@ -11,6 +12,7 @@ class JWtDecodeSpec extends FreeSpec {
   "A Json Web token" - {
 
     "should decode correctly" in {
+
       val foo = JsonWebToken.decode(token)
       foo.keys.foreach(println)
       foo.get("permissions").foreach(println)

@@ -16,7 +16,7 @@ object Versions {
 
   val react = "16.4.2"
 
-  val react4s = "0.9.14-SNAPSHOT"
+  val react4s = "0.9.15-SNAPSHOT"
 
   val scalaTest = "3.0.5"
 
