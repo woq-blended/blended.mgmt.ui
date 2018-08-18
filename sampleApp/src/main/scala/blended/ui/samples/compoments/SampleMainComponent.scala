@@ -4,10 +4,12 @@ import blended.ui.common.{Logger, MainComponent}
 import blended.ui.material.MaterialUI._
 import blended.ui.router.Router
 import blended.ui.samples.state.{SampleAppEvent, SampleAppState}
-import blended.ui.samples.theme.{BlendedSamplesTheme, ContentStyles, Theme}
+import blended.ui.samples.theme._
 import blended.ui.samples.{HomePage, Routes, SamplePage}
 import blended.ui.themes.SidebarMenuTheme
 import com.github.ahnfelt.react4s._
+
+import scala.scalajs.js
 
 case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppState, SampleAppEvent] {
 
@@ -31,30 +33,32 @@ case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppStat
 
     val (p,s) = (get(currentPage), get(appState))
 
+    val paperStyles = js.Dynamic.literal(
+      "paper" -> DrawerStyles.name
+    )
+
+
     E.div(
+      RootStyles,
       Component(AppBarComponent, s),
-      E.main(
-        ContentStyles.root,
-        Drawer(
-          J("variant", "permanent"),
-          S.height("100%"),
-          S.width("200pt"),
-          List(
-            ListItem(
-              J("button", "true"),
-              Typography(Text("foo"))
-            )
+      Drawer(
+        J("variant", "permanent"),
+        J("classes", paperStyles),
+        DrawerStyles,
+        E.div(S.height.px(64)),
+        List(
+          ListItem(
+            J("button", "true"),
+            Typography(Text("foo"))
           )
-        ),
-        E.div(S.height("40pt")),
-        Card(
-          S.width("200pt"),
-          Typography(Text("You think water moves fast? You should see ice."))
-        ),
-        Card(
-          S.background(Theme.theme.palette.error.main.asInstanceOf[String]),
-          S.width("200pt"),
-          Typography(Text("You think water moves fast? You should see ice."))
+        )
+      ),
+      E.div(
+        ContentStyles,
+        E.div(S.height.px(64)),
+        E.main(
+          ContentArea,
+          Component(HomePageComponent, s)
         )
       )
     )

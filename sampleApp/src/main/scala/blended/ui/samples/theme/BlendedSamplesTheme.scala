@@ -29,7 +29,7 @@ object Theme {
         "main" -> Colors.green("900")
       ),
       "background" -> js.Dynamic.literal (
-        "default" -> Colors.lightBlue("700")
+        "default" -> "#fafafa"
       )
     )
   )
@@ -37,32 +37,40 @@ object Theme {
   val theme = Styles.createMuiTheme(palette)
 }
 
+object RootStyles extends CssClass (
+  S.flexGrow.number(1),
+  S.height.percent(100),
+  S.width.percent(100),
+  S.zIndex.number(1),
+  S.overflow("hidden"),
+  S.position.absolute(),
+  S.display("flex")
+)
 
-object AppBarStyles {
+object AppBarStyles extends CssClass (
+  S.position.fixed(),
+  S.zIndex.number(Theme.theme.zIndex.drawer.asInstanceOf[Int] + 1)
+)
 
-  object root extends CssClass (
-    S.flexGrow("1")
-  )
+object DrawerStyles extends CssClass (
+  S.position.relative(),
+  S.height.percent(100),
+  S.width.px(200)
+)
 
-  object flex extends CssClass (
-    S.flexGrow("1")
-  )
+object ContentStyles extends CssClass (
+  S.position.relative(),
+  S.width.percent(100),
+  S.display("flex"),
+  S.flexDirection("column"),
+)
 
-  object menuButton extends CssClass (
-    S.marginLeft.pt(-12),
-    S.marginRight.pt(20)
-  )
-}
+object ContentArea extends CssClass (
+  ContentStyles,
+  S.height.percent(100),
+  S.background(Theme.theme.palette.background.default.asInstanceOf[String]),
+  S.padding.pt(Theme.theme.spacing.unit.asInstanceOf[Int] * 3)
+)
 
-object ContentStyles {
-
-  object root extends CssClass (
-    S.position("absolute"),
-    S.height("100%"),
-    S.width("100%"),
-    S.background(Theme.theme.palette.background.default.asInstanceOf[String]),
-    S.padding(s"${Theme.theme.spacing.unit.asInstanceOf[Int] * 3}pt")
-  )
-}
 
 
