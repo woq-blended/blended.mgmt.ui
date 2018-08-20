@@ -3,11 +3,10 @@ package blended.mgmt.app.components
 import akka.actor.{ActorRef, ActorSystem}
 import blended.mgmt.app._
 import blended.mgmt.app.backend.WSClientActor
-import blended.mgmt.app.state.{AppEvent, LoggedOut, MgmtAppState, UpdateContainerInfo}
-import blended.mgmt.app.theme.BlendedMgmtTheme
+import blended.mgmt.app.state.{AppEvent, MgmtAppState, UpdateContainerInfo}
+import blended.mgmt.app.theme._
 import blended.ui.common.{I18n, MainComponent}
-import blended.ui.router.Router
-import blended.ui.themes.SidebarMenuTheme
+import blended.ui.material.MaterialUI
 import blended.updater.config.ContainerInfo
 import blended.updater.config.json.PrickleProtocol._
 import com.github.ahnfelt.react4s._
@@ -19,11 +18,28 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
 
   override lazy val initialPage: Page = HomePage
   override lazy val initialState: MgmtAppState = MgmtAppState()
-  override lazy val routes: Router.Tree[Page, Page] = Routes.routes
 
-  override val theme: SidebarMenuTheme = BlendedMgmtTheme
+  override val mainRoutes: Map[String, Page => Page with Product] = Map(
+    "container" -> ContainerPage,
+    "services" -> ServicePage,
+    "profiles" -> ProfilePage,
+    "overlays" -> OverlayPage,
+    "rollout" -> RolloutPage,
+    "help" -> HelpPage
+  )
+
+  override val routes = {
+
+    val subRoutes = mainRoutes.map(p => routerPath(p._1, p._2)).toSeq
+
+    routerPath(
+      initialPage,
+      subRoutes:_*
+    )
+  }
 
   val system : ActorSystem = ActorSystem("MgmtApp")
+
   private[this] val ctListener = State[Option[ActorRef]](None)
 
   // A web sockets handler decoding container Info's
@@ -44,23 +60,25 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
       ))))
     }
 
-  private[this] lazy val menu: Node = {
-    val entries : Seq[(String, Page)] = Seq(
-      i18n.marktr("Overview") -> HomePage,
-      i18n.marktr("Container") -> ContainerPage(),
-      i18n.marktr("Services") -> ServicePage(),
-      i18n.marktr("Profiles") -> ProfilePage(),
-      i18n.marktr("Overlays") -> OverlayPage(),
-      i18n.marktr("Rollout") -> RolloutPage(),
-      i18n.marktr("Help") -> HelpPage()
-    )
+  def topLevelPage(page: Option[Page], state: MgmtAppState) : Node = {
 
-    E.div(
-      theme.menuColumnCss,
-      Tags(entries.map { case (k, v) =>
-        menuEntry(theme.menuEntryCss, theme.menuLinkCss, i18n.tr(k), v)
-      })
-    )
+    def pageOrLogin(p: Page, n: Node, state: MgmtAppState) : Node = {
+      if (!p.loginRequired || state.currentUser.isDefined){
+        n
+      } else {
+        Component(MgmtLoginComponent, state).withHandler(event => appState.modify(MgmtAppState.redux(event)))
+      }
+    }
+
+    page.map{
+      case p @ HomePage         => pageOrLogin(p, Component(HomePageComponent, state), state)
+      case p @ ContainerPage(_) => pageOrLogin(p, Component(ContainerPageComponent, state), state)
+      case p @ ServicePage(_)   => pageOrLogin(p, Component(ServicePageComponent, state), state)
+      case p @ ProfilePage(_)   => pageOrLogin(p, Component(ProfilePageComponent, state), state)
+      case p @ OverlayPage(_)   => pageOrLogin(p, Component(OverlayPageComponent, state), state)
+      case p @ RolloutPage(_)   => pageOrLogin(p, Component(RolloutPageComponent, state), state)
+      case p @ HelpPage(_)      => pageOrLogin(p, Component(HelpPageComponent, state), state)
+    }.getOrElse(E.div(E.p(Text("Not found"))))
   }
 
   override lazy val layout: Get => Element = { get =>
@@ -68,49 +86,26 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
     val page = get(currentPage)
     val state = get(appState)
 
-    def topLevelPage : Node = {
-
-      def pageOrLogin(p: Page, n: Node, state: MgmtAppState) : Node = {
-        if (!p.loginRequired || state.currentUser.isDefined){
-          n
-        } else {
-          Component(MgmtLoginComponent, state).withHandler(event => appState.modify(MgmtAppState.redux(event)))
-        }
-      }
-
-      page.map{
-        case p @ HomePage         => pageOrLogin(p, Component(HomePageComponent, state), state)
-        case p @ ContainerPage(_) => pageOrLogin(p, Component(ContainerPageComponent, state), state)
-        case p @ ServicePage(_)   => pageOrLogin(p, Component(ServicePageComponent, state), state)
-        case p @ ProfilePage(_)   => pageOrLogin(p, Component(ProfilePageComponent, state), state)
-        case p @ OverlayPage(_)   => pageOrLogin(p, Component(OverlayPageComponent, state), state)
-        case p @ RolloutPage(_)   => pageOrLogin(p, Component(RolloutPageComponent, state), state)
-        case p @ HelpPage(_)      => pageOrLogin(p, Component(HelpPageComponent, state), state)
-      }.getOrElse(E.div(E.p(Text("Not found"))))
-    }
-
     E.div(
-      E.div(
-        theme.topBarCss,
-        E.a(Text("Blended Management Console"), A.href(href(HomePage)), theme.brandTitleCss, theme.linkCss),
-        E.a(Text("Logout"), A.onClick { _ =>
-            state.currentUser.foreach{ u => appState.modify(MgmtAppState.redux(LoggedOut(u))) }
-          }
-        ).when(state.currentUser.isDefined)
+      RootStyles,
+      Component(MgmtAppBar.AppBarComponent, state),
+      MaterialUI.Drawer(
+        J("variant", "permanent"),
+        //J("classes", paperStyles),
+        DrawerStyles,
+        E.div(S.height.px(64)),
+        MaterialUI.List(Tags(
+          mainRoutes.map { r =>
+            MaterialUI.ListItem(J("button", true), MaterialUI.Typography(Text(r._1)))
+          }.toSeq
+        ))
       ),
       E.div(
-        theme.columnContainerCss,
-        menu,
-        E.div(
-          theme.contentColumnCss,
-          topLevelPage
-        )
-      ),
-      E.div(
-        theme.bottomBarCss,
-        E.div(
-          Text("Powered by "),
-          E.a(Text("blended"), A.target("_blank"), A.href("https://github.com/woq-blended/blended"))
+        ContentStyles,
+        E.div(S.height.px(64)),
+        E.main(
+          ContentArea,
+          topLevelPage(page, state)
         )
       )
     )

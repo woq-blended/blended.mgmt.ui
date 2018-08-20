@@ -1,25 +1,10 @@
 package blended.ui.samples.theme
 
 import blended.material.ui.Colors
-import blended.ui.components.reacttable.DefaultReactTableStyle
 import blended.ui.material.Styles
-import blended.ui.themes.{BlendedDefaultPalette, BlendedPalette, DefaultSideBarMenuTheme}
 import com.github.ahnfelt.react4s._
 
 import scala.scalajs.js
-
-object SamplesPalette extends BlendedDefaultPalette {
-
-  override val primary = "#1B9375"
-}
-
-object BlendedSamplesTheme extends DefaultSideBarMenuTheme {
-  override val palette: BlendedPalette = SamplesPalette
-}
-
-object BlendedSamplesTableStyle extends DefaultReactTableStyle {
-  override val palette: BlendedPalette = SamplesPalette
-}
 
 object Theme {
 

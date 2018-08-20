@@ -1,5 +1,6 @@
 package blended.ui.components.reacttable
 
+import blended.ui.material.MaterialUI._
 import com.github.ahnfelt.react4s._
 
 import scala.reflect.ClassTag
@@ -24,7 +25,7 @@ trait ReactTable[TableData] {
     * @param f is an extractor method to extract an element of type C from the TableData instance
     * @param ft is a rendering function to map the extracted element of type C to a Tag
     * @param cTag is an implicit class tag to determine C from f
-    * @tparam C Is the type of the elemented to be extracted from TableData for rendering
+    * @tparam C Is the type of the element to be extracted from TableData for rendering
     * @return A rendering function that can be applied to an instance of TableData resulting in a Tag
     */
   def cellRenderer[C](f : TableData => C)(ft : C => Tag)(implicit cTag : ClassTag[C]) : CellRenderer[C] = { data : TableData =>
@@ -52,6 +53,7 @@ trait ReactTable[TableData] {
   case class ColumnConfig(
     name : String,
     renderer : CellRenderer[_],
+    numeric : Boolean = false,
     width : Option[String] = None
   )
 
@@ -65,19 +67,17 @@ trait ReactTable[TableData] {
   /**
     * @param row is the instance of TableData to be displayed in this row
     * @param props are the table properties determining the display parameters
-    * @param style is an instance of [[ReactTableStyle]]
     */
-  case class ReactTableRow(row: P[TableData], props: P[TableProperties], style: P[ReactTableStyle]) extends Component[NoEmit] {
+  case class ReactTableRow(row: P[TableData], props: P[TableProperties]) extends Component[NoEmit] {
     override def render(get: Get): Node = {
 
       // determine the sequence of Tags to be displayed in this row
       val cells : Seq[Tag] = get(props).columns.map { col =>
-        E.div(S.flex(col.width.map(w => s"0 1 $w").getOrElse("1")), col.renderer(get(row)))
+        TableCell(J("numeric", col.numeric), col.renderer(get(row)))
       }
 
       // bundle the entire row into a div with the appropriate style
-      E.div(
-        get(style).reactTableRow,
+      TableRow(
         Tags(cells)
       )
     }
@@ -86,37 +86,37 @@ trait ReactTable[TableData] {
   /**
     * Defines the table header
     * @param props are the table properties defining the table display
-    * @param style is an instance of [[ReactTableStyle]]
     */
   case class ReactTableHeader(
-    props: P[TableProperties],
-    style : P[ReactTableStyle]
+    props: P[TableProperties]
   ) extends Component[NoEmit] {
 
     override def render(get: Get): Node = {
-      E.div(
-        get(style).reactTableHeader,
-        Tags(
-          get(props).columns.map { cfg =>
-            E.span(S.flex(cfg.width.map(w => s"0 1 $w").getOrElse("1")), Text(cfg.name.capitalize))
-          }
+      TableHead(
+        TableRow(
+          Tags(
+            get(props).columns.map { cfg =>
+              TableCell(J("numeric", cfg.numeric), Text(cfg.name.capitalize))
+            }
+          )
         )
       )
     }
   }
 
-  case class ReactTable(data: P[Seq[TableData]], props: P[TableProperties], style: P[ReactTableStyle]) extends Component[NoEmit] {
+  case class ReactTable(data: P[Seq[TableData]], props: P[TableProperties]) extends Component[NoEmit] {
 
     override def render(get: Get): Node = {
 
       val p = get(props)
-      val s = get(style)
 
-      E.div(
-        Component(ReactTableHeader, p, s),
-        Tags(get(data).map { r =>
-          Component(ReactTableRow, r, p, s).withKey(p.keyExtractor(r))
-        })
+      Paper(
+        Table(
+          Component(ReactTableHeader, p),
+          Tags(get(data).map { r =>
+            Component(ReactTableRow, r, p).withKey(p.keyExtractor(r))
+          })
+        )
       )
     }
   }
