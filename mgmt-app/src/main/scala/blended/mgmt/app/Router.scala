@@ -5,11 +5,11 @@ sealed trait Page {
 }
 
 final case object HomePage extends Page
-final case class ContainerPage(parent: Page = HomePage) extends Page
-final case class ServicePage(parent: Page = HomePage) extends Page
-final case class ProfilePage(parent : Page = HomePage) extends Page
-final case class OverlayPage(parent : Page = HomePage) extends Page
-final case class RolloutPage(parent: Page = HomePage) extends Page
-final case class HelpPage(parent: Page = HomePage) extends Page {
+final case class ContainerPage(parent: HomePage.type = HomePage) extends Page
+final case class ServicePage(parent: HomePage.type = HomePage) extends Page
+final case class ProfilePage(parent : HomePage.type = HomePage) extends Page
+final case class OverlayPage(parent : HomePage.type = HomePage) extends Page
+final case class RolloutPage(parent: HomePage.type = HomePage) extends Page
+final case class HelpPage(parent: HomePage.type = HomePage) extends Page {
   override val loginRequired: Boolean = false
 }

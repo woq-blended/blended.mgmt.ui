@@ -1,11 +1,13 @@
 package blended.mgmt.app.state
 
+import blended.mgmt.app.{HomePage, Page}
 import blended.updater.config.ContainerInfo
 
 sealed trait AppEvent
 final case class UpdateContainerInfo(info: ContainerInfo) extends AppEvent
 final case class LoggedIn(user: String) extends AppEvent
 final case class LoggedOut(user: String) extends AppEvent
+final case class PageSelected(p: Option[Page]) extends AppEvent
 
 object MgmtAppState {
 
@@ -22,11 +24,15 @@ object MgmtAppState {
 
       case LoggedOut(_: String) =>
         old.copy(currentUser = None)
+
+      case PageSelected(p) =>
+        old.copy(currentPage = p)
     }
   }
 }
 
 case class MgmtAppState(
+  currentPage : Option[Page] = Some(HomePage),
   currentUser : Option[String] = None,
   containerInfo : Map[String, ContainerInfo] = Map.empty
 )
