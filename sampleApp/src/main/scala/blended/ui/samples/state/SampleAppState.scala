@@ -1,6 +1,6 @@
 package blended.ui.samples.state
 
-sealed trait SampleAppEvent
+import blended.ui.samples.{HomePage, SamplePage}
 
 case class Person(
   first: String,
@@ -9,7 +9,19 @@ case class Person(
   eMail: String
 )
 
+sealed trait SampleAppEvent
+final case class PageSelected(p: Option[SamplePage]) extends SampleAppEvent
+
+object SampleAppState {
+
+  def redux(event: SampleAppEvent)(old: SampleAppState) : SampleAppState = event match {
+    case PageSelected(p) =>
+      old.copy(currentPage = p)
+  }
+}
+
 case class SampleAppState(
+  currentPage : Option[SamplePage] = Some(HomePage),
   persons : Seq[Person] = Seq(
     // scalastyle:off magic.number
     Person("Andreas", "Gies", 50, "andreas@wayofquality.de"),

@@ -4,18 +4,19 @@ import blended.ui.router.Router
 import com.github.ahnfelt.react4s._
 import org.scalajs.dom
 
-abstract class MainComponent[P,AS,E]() extends Component[NoEmit] {
+case class AppState[P] (
+  currentPage : Option[P]
+)
 
-  val initialPage : P
+abstract class MainComponent[P,AS,E] extends Component[NoEmit] {
+
   val initialState : AS
 
-  val mainRoutes : Map[String, P => P with Product] = Map.empty
-  val routerPath = new Router[P]
+  val routerPath : Router[P]
   val routes : Router.Tree[P,P]
 
-  def topLevelPage(page: Option[P], state: AS) : Node
+  protected def topLevelPage(state: AS) : Node
 
-  protected val currentPage : State[Option[P]] = State(Some(initialPage))
   protected[this] val appState = State(initialState)
 
   protected[this] def href(page : P): String =
@@ -32,16 +33,20 @@ abstract class MainComponent[P,AS,E]() extends Component[NoEmit] {
       dom.window.location.pathname
     }
 
-  protected def menuEntry(entryCss: CssClass, menuLinkCss: CssClass, title: String, target: P): Node =
-    E.div(entryCss, E.a(menuLinkCss, Text(title), A.href(href(target))))
+  protected def menuEntries(): Seq[(String, Option[P])] = routes
+    .prettyPaths
+    .map(_.split("/"))
+    .filter(_.size == 2)
+    .map(_.toSeq)
+    .map(_.last)
+    .map(_.replaceAll("'", ""))
+    .map(_.split("->"))
+    .map(_.head.trim())
+    .map(p => (p, routes.data(p)))
+    .filter(_._2.isDefined)
+    .map(p => (p._1.capitalize, p._2))
 
   val layout : Get => Element
-
-  if(dom.window.location.href.contains("?")) {
-    dom.window.onhashchange = { _ =>
-      currentPage.set(routes.data(path()))
-    }
-  }
 
   override def render(get: Get): Element = layout(get)
 }
