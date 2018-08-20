@@ -1,5 +1,6 @@
 package blended.ui.samples
 
+import blended.ui.material.MaterialUI.Paper
 import blended.ui.router.Router
 import blended.ui.samples.compoments._
 import blended.ui.samples.state.SampleAppState
@@ -19,12 +20,4 @@ object Routes {
 
 object TopLevelPageResolver {
 
-  def topLevelPage(page: Option[SamplePage], state: SampleAppState) : Node = {
-    page match {
-      case Some(p) => p match {
-        case HomePage => Component(HomePageComponent, state)
-      }
-      case None => E.div(E.p(Text("Not found")))
-    }
-  }
 }

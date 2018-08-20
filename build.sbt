@@ -97,7 +97,7 @@ lazy val components = project.in(file("components"))
     )
   )
   .enablePlugins(ScalaJSBundlerPlugin)
-  .dependsOn(common)
+  .dependsOn(common,material)
 
 lazy val materialGen = project.in(file("material-gen"))
   .settings(
