@@ -1,4 +1,5 @@
 import java.nio.file.{Files, StandardCopyOption}
+import com.typesafe.sbt.packager.SettingsHelper._
 
 inThisBuild(Seq(
   organization := "de.wayofquality.blended",
@@ -18,7 +19,7 @@ inThisBuild(Seq(
 
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),
-    "Local Maven Repository" at m2Repo
+    "Maven2 Local" at m2Repo
   )
 ))
 
@@ -197,11 +198,27 @@ lazy val app = project.in(file("mgmt-app"))
       organization.value %%% "blended.updater.config" % Versions.blended,
 
       "org.scalatest" %%% "scalatest" % Versions.scalaTest % "test"
-    )
+    ),
+
+    topLevelDirectory := None,
+
+    Universal/mappings ++= (Compile/fullOptJS/webpack).value.map{ f =>
+      f.data -> s"assets/${f.data.getName()}"
+    } ++ Seq(
+      target.value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "node_modules" / "react" / "cjs" / "react.production.min.js" -> "assets/react.production.min.js",
+      target.value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "node_modules" / "react-dom" / "cjs" / "react-dom.production.min.js" -> "assets/react-dom.production.min.js"
+    ),
+
+    makeDeploymentSettings(Universal, Universal/packageBin, "zip"),
+    addArtifact(Universal/packageBin/artifact, Universal/packageBin),
+
+    publish := publish.dependsOn(Universal/publish).value,
+    publishM2 := publishM2.dependsOn(Universal/publishM2).value,
+    publishLocal := publishLocal.dependsOn(Universal/publishLocal).value
   )
-  .settings(noPublish:_*)
+  .settings(doPublish:_*)
   .settings(npmSettings:_*)
-  .enablePlugins(ScalaJSBundlerPlugin)
+  .enablePlugins(ScalaJSBundlerPlugin,UniversalPlugin,UniversalDeployPlugin)
   .dependsOn(router, common, components)
 
 lazy val uitest = project.in(file("mgmt-app-test"))
