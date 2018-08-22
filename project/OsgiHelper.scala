@@ -68,25 +68,25 @@ object OsgiHelper {
         (Option(exportContents).map(c => Map("-exportcontents" -> c.mkString(","))).getOrElse(Map()))
 
      Seq(
-        OsgiKeys.bundleSymbolicName := Option(bundleSymbolicName).getOrElse(name.value),
-        OsgiKeys.bundleVersion := Option(bundleVersion).getOrElse(version.value),
-        OsgiKeys.bundleActivator := Option(bundleActivator),
-        OsgiKeys.importPackage :=
-          Seq(
-            scalaRangeImport(scalaBinaryVersion.value),
-          ) ++ Option(importPackage).getOrElse(Seq("*")
-          ),
-        // ensure we build a package with OSGi Manifest
-        packageBin.in(Compile) := {
-          packageBin.in(Compile).value
-          OsgiKeys.bundle.value
-        }
-      ) ++
-      Option(exportPackage).map(e => OsgiKeys.exportPackage := e) ++
-      Option(privatePackage).map(p => OsgiKeys.privatePackage := p) ++
-      Option(embeddedJars) ++
-      (if (extraEntries.isEmpty) Seq() else {
-        OsgiKeys.additionalHeaders := extraEntries
-      })
+       OsgiKeys.bundleSymbolicName := Option(bundleSymbolicName).getOrElse(name.value),
+       OsgiKeys.bundleVersion := Option(bundleVersion).getOrElse(version.value),
+       OsgiKeys.bundleActivator := Option(bundleActivator),
+       OsgiKeys.importPackage :=
+         Seq(
+           scalaRangeImport(scalaBinaryVersion.value),
+         ) ++ Option(importPackage).getOrElse(Seq("*")
+         ),
+       // ensure we build a package with OSGi Manifest
+       packageBin.in(Compile) := {
+         packageBin.in(Compile).value
+         OsgiKeys.bundle.value
+       }
+     ) ++
+     Option(exportPackage).map(e => OsgiKeys.exportPackage := e) ++
+     Option(privatePackage).map(p => OsgiKeys.privatePackage := p) ++
+     Option(embeddedJars) ++
+     (if (extraEntries.isEmpty) Seq() else {
+       OsgiKeys.additionalHeaders := extraEntries
+     })
   }
 }
