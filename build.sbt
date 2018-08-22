@@ -2,6 +2,10 @@ import java.nio.file.{Files, StandardCopyOption}
 import com.typesafe.sbt.packager.SettingsHelper._
 import com.typesafe.sbt.osgi.SbtOsgi.autoImport._
 
+lazy val jsDeps = JsDependencies
+lazy val npmDeps = NpmDependencies
+lazy val javaDeps = JavaDependencies
+
 // The location for the local maven repository
 lazy val m2Repo = "file://" + System.getProperty("maven.repo.local", System.getProperty("user.home") + "/.m2/repository")
 
@@ -31,12 +35,12 @@ lazy val noPublish = Seq(
 lazy val npmSettings = Seq(
   useYarn := true,
   npmDependencies.in(Compile) := Seq(
-    "react" -> Versions.react,
-    "react-dom" -> Versions.react,
-    "jsdom" -> Versions.jsdom,
-    "@material-ui/core" -> "1.4.3",
-    "@material-ui/icons" -> "2.0.0",
-    "jsonwebtoken" -> "8.3.0"
+    npmDeps.react,
+    npmDeps.reactDom,
+    npmDeps.jsDom,
+    npmDeps.materialUi,
+    npmDeps.materialIcons,
+    npmDeps.jsonWebToken
   )
 )
 
@@ -44,7 +48,7 @@ lazy val npmSettings = Seq(
 // Overall settings for this build
 // *******************************************************************************************************
 inThisBuild(Seq(
-  organization := "de.wayofquality.blended",
+  organization := Project.organization,
   version := "0.1.1-SNAPSHOT",
   scalaVersion := crossScalaVersions.value.head,
   crossScalaVersions := Seq("2.12.6"),
@@ -82,7 +86,7 @@ lazy val router = project.in(file("router"))
     webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
     emitSourceMaps := true,
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % Versions.scalaTest % "test"
+      jsDeps.scalaTestJs.value % "test"
     )
   ).enablePlugins(ScalaJSBundlerPlugin)
 
@@ -95,8 +99,7 @@ lazy val common = project.in(file("common"))
     webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
     emitSourceMaps := true,
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % Versions.scalaJsDom,
-      "com.github.ahnfelt" %%% "react4s" % Versions.react4s
+      jsDeps.scalaJsDom.value, jsDeps.react4s.value
     )
   )
   .dependsOn(router)
@@ -111,7 +114,7 @@ lazy val components = project.in(file("components"))
     webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
     emitSourceMaps := true,
     libraryDependencies ++= Seq(
-      "com.github.ahnfelt" %%% "react4s" % Versions.react4s
+      jsDeps.react4s.value
     )
   )
   .enablePlugins(ScalaJSBundlerPlugin)
@@ -124,10 +127,10 @@ lazy val materialGen = project.in(file("material-gen"))
   .settings(
     name := "merial-gen",
     libraryDependencies ++= Seq(
-      "de.tototec" % "de.tototec.cmdoption" % Versions.cmdOption,
-      "org.slf4j" % "slf4j-api" % Versions.slf4j,
-      "ch.qos.logback" % "logback-core" % Versions.logback,
-      "ch.qos.logback" % "logback-classic" % Versions.logback
+      javaDeps.cmdOption,
+      javaDeps.slf4jApi,
+      javaDeps.logbackCore,
+      javaDeps.logbackClassic
     )
   )
   .settings(npmSettings)
@@ -145,7 +148,7 @@ lazy val material = project.in(file("material"))
     webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
     emitSourceMaps := true,
     libraryDependencies ++= Seq(
-      "com.github.ahnfelt" %%% "react4s" % Versions.react4s
+      jsDeps.react4s.value
     ),
     generateMui := {
 
@@ -181,8 +184,8 @@ lazy val sampleApp = project.in(file("sampleApp"))
     scalaJSUseMainModuleInitializer := true,
 
     libraryDependencies ++= Seq(
-      "com.github.ahnfelt" %%% "react4s" % Versions.react4s,
-      "org.scalatest" %%% "scalatest" % Versions.scalaTest % "test"
+      jsDeps.react4s.value,
+      jsDeps.scalaTestJs.value % "test"
     ),
 
     Compile/fastOptJS/webpack := {
@@ -221,14 +224,14 @@ lazy val app = project.in(file("mgmt-app"))
     },
 
     libraryDependencies ++= Seq(
-      "org.akka-js" %%% "akkajsactor" % Versions.akkaJs,
-      "org.scala-js" %%% "scalajs-dom" % Versions.scalaJsDom,
-      "com.github.ahnfelt" %%% "react4s" % Versions.react4s,
-      "com.github.benhutchison" %%% "prickle" % Versions.prickle,
-      organization.value %%% "blended.updater.config" % Versions.blended,
-      organization.value %%% "blended.security" % Versions.blended,
+      jsDeps.akkaJsActor.value,
+      jsDeps.scalaJsDom.value,
+      jsDeps.react4s.value,
+      jsDeps.prickle.value,
+      jsDeps.blendedUpdaterConfig.value,
+      jsDeps.blendedSecurity.value,
 
-      "org.scalatest" %%% "scalatest" % Versions.scalaTest % "test"
+      jsDeps.scalaTestJs.value % "test"
     ),
 
     topLevelDirectory := None,
@@ -259,19 +262,16 @@ lazy val server = project.in(file("server"))
   .settings(
 
     libraryDependencies ++= Seq(
-      "com.github.domino-osgi" %% "domino" % "1.1.2",
-      organization.value % "blended.domino" % Versions.blended,
-      organization.value % "blended.akka.http" % Versions.blended
+      javaDeps.dominoOsgi,
+      javaDeps.blendedDomino,
+      javaDeps.blendedAkkaHttp
     ),
 
+    name := "blended.mgmt.ui.server",
     Compile/packageBin := OsgiKeys.bundle.value,
-    Compile/packageBin/artifact := {
-      val previous = (Compile/packageBin/artifact).value
-      previous.withName("blended.mgmt.ui.server")
-    }
+    //Compile/packageBin/artifact := (Compile/packageBin/artifact).value.withName("blended.mgmt.ui.server")
   )
   .settings(OsgiHelper.osgiSettings(
-    bundleSymbolicName = "blended.mgmt.ui.server",
     bundleActivator = "blended.mgmt.ui.server.internal.UiServerActivator",
     privatePackage = Seq("blended.mgmt.ui.server.internal")
   ))
@@ -295,10 +295,10 @@ lazy val uitest = project.in(file("mgmt-app-test"))
     },
 
     libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % Versions.scalaTest % "test",
-      "org.seleniumhq.selenium" % "selenium-java" % Versions.selenium % "test",
-      "com.typesafe.akka" %% "akka-http" % Versions.akkaHttp % "test",
-      "com.typesafe.akka" %% "akka-http-testkit" % Versions.akkaHttp % "test"
+      javaDeps.scalaTest % "test",
+      javaDeps.selenium % "test",
+      javaDeps.akkaHttp % "test",
+      javaDeps.akkaHttpTestkit % "test"
     )
   )
   .settings(noPublish)
