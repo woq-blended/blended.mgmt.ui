@@ -1,6 +1,48 @@
 import java.nio.file.{Files, StandardCopyOption}
 import com.typesafe.sbt.packager.SettingsHelper._
+import com.typesafe.sbt.osgi.SbtOsgi.autoImport._
 
+// The location for the local maven repository
+lazy val m2Repo = "file://" + System.getProperty("maven.repo.local", System.getProperty("user.home") + "/.m2/repository")
+
+// General settings for subprojects to be published
+lazy val doPublish = Seq(
+  publishMavenStyle := true,
+  publishArtifact in Test := false,
+  credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
+  publishTo := {
+    val nexus = "https://oss.sonatype.org/"
+    if(isSnapshot.value) {
+      Some("snapshots" at nexus + "content/repositories/snapshots")
+    } else {
+      Some("releases" at nexus + "service/local/staging/deploy/maven2")
+    }
+  }
+)
+
+// General settings for subprojects not to be published
+lazy val noPublish = Seq(
+  publishArtifact := false,
+  publish := {},
+  publishLocal := {}
+)
+
+// General settings for subprojects using NPM
+lazy val npmSettings = Seq(
+  useYarn := true,
+  npmDependencies.in(Compile) := Seq(
+    "react" -> Versions.react,
+    "react-dom" -> Versions.react,
+    "jsdom" -> Versions.jsdom,
+    "@material-ui/core" -> "1.4.3",
+    "@material-ui/icons" -> "2.0.0",
+    "jsonwebtoken" -> "8.3.0"
+  )
+)
+
+// *******************************************************************************************************
+// Overall settings for this build
+// *******************************************************************************************************
 inThisBuild(Seq(
   organization := "de.wayofquality.blended",
   version := "0.1.1-SNAPSHOT",
@@ -23,46 +65,17 @@ inThisBuild(Seq(
   )
 ))
 
-lazy val m2Repo = "file://" + System.getProperty("maven.repo.local", System.getProperty("user.home") + "/.m2/repository")
 
-lazy val doPublish = Seq(
-  publishMavenStyle := true,
-  publishArtifact in Test := false,
-  credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
-  publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if(isSnapshot.value) {
-      Some("snapshots" at nexus + "content/repositories/snapshots")
-    } else {
-      Some("releases" at nexus + "service/local/staging/deploy/maven2")
-    }
-  }
-)
-
-lazy val noPublish = Seq(
-  publishArtifact := false,
-  publish := {},
-  publishLocal := {}
-)
-
-lazy val npmSettings = Seq(
-  useYarn := true,
-  npmDependencies.in(Compile) := Seq(
-    "react" -> Versions.react,
-    "react-dom" -> Versions.react,
-    "jsdom" -> Versions.jsdom,
-    "@material-ui/core" -> "1.4.3",
-    "@material-ui/icons" -> "2.0.0",
-    "jsonwebtoken" -> "8.3.0"
-  )
-)
-
+// *******************************************************************************************************
 // The root project
+// *******************************************************************************************************
 lazy val root = project.in(file("."))
   .settings(noPublish)
-  .aggregate(common, router, components, materialGen, material, app, uitest, sampleApp)
+  .aggregate(common, router, components, materialGen, material, app, server, uitest, sampleApp)
 
-// The subproject defining the router
+// *******************************************************************************************************
+// The sub project for the router
+// *******************************************************************************************************
 lazy val router = project.in(file("router"))
   .settings(
     name := "router",
@@ -73,21 +86,25 @@ lazy val router = project.in(file("router"))
     )
   ).enablePlugins(ScalaJSBundlerPlugin)
 
-// Some common utilities
+// *******************************************************************************************************
+// The sub project for common utilities
+// *******************************************************************************************************
 lazy val common = project.in(file("common"))
   .settings(
     name := "common",
     webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
     emitSourceMaps := true,
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.5",
+      "org.scala-js" %%% "scalajs-dom" % Versions.scalaJsDom,
       "com.github.ahnfelt" %%% "react4s" % Versions.react4s
     )
   )
   .dependsOn(router)
   .enablePlugins(ScalaJSBundlerPlugin)
 
-// Reusable React4s components
+// *******************************************************************************************************
+// The sub project for reusable components
+// *******************************************************************************************************
 lazy val components = project.in(file("components"))
   .settings(
     name := "components",
@@ -100,11 +117,14 @@ lazy val components = project.in(file("components"))
   .enablePlugins(ScalaJSBundlerPlugin)
   .dependsOn(common,material)
 
+// *******************************************************************************************************
+// The sub project for the Material UI generator
+// *******************************************************************************************************
 lazy val materialGen = project.in(file("material-gen"))
   .settings(
     name := "merial-gen",
     libraryDependencies ++= Seq(
-      "de.tototec" % "de.tototec.cmdoption" % "0.6.0",
+      "de.tototec" % "de.tototec.cmdoption" % Versions.cmdOption,
       "org.slf4j" % "slf4j-api" % Versions.slf4j,
       "ch.qos.logback" % "logback-core" % Versions.logback,
       "ch.qos.logback" % "logback-classic" % Versions.logback
@@ -114,6 +134,9 @@ lazy val materialGen = project.in(file("material-gen"))
   .settings(noPublish)
   .enablePlugins(ScalaJSBundlerPlugin)
 
+// *******************************************************************************************************
+// The sub project for the React4s Material UI wrapper
+// *******************************************************************************************************
 lazy val generateMui = TaskKey[Seq[File]]("generateMui")
 
 lazy val material = project.in(file("material"))
@@ -147,6 +170,9 @@ lazy val material = project.in(file("material"))
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(common)
 
+// *******************************************************************************************************
+// The sub project for Sample App - A playground to test out components
+// *******************************************************************************************************
 lazy val sampleApp = project.in(file("sampleApp"))
   .settings(
     name := "sampleApp",
@@ -173,12 +199,16 @@ lazy val sampleApp = project.in(file("sampleApp"))
   .enablePlugins(ScalaJSBundlerPlugin)
   .dependsOn(router, common, components, material)
 
+// *******************************************************************************************************
+// The sub project for the Blended Management Console
+// *******************************************************************************************************
 lazy val app = project.in(file("mgmt-app"))
   .settings(
     name := "mgmt-app",
 
     webpackBundlingMode := scalajsbundler.BundlingMode.LibraryAndApplication(),
-    emitSourceMaps := true,
+    fastOptJS/emitSourceMaps := true,
+    fullOptJS/emitSourceMaps := false,
     scalaJSUseMainModuleInitializer := true,
 
     Compile/fastOptJS/webpack := {
@@ -192,10 +222,11 @@ lazy val app = project.in(file("mgmt-app"))
 
     libraryDependencies ++= Seq(
       "org.akka-js" %%% "akkajsactor" % Versions.akkaJs,
-      "org.scala-js" %%% "scalajs-dom" % "0.9.5",
+      "org.scala-js" %%% "scalajs-dom" % Versions.scalaJsDom,
       "com.github.ahnfelt" %%% "react4s" % Versions.react4s,
       "com.github.benhutchison" %%% "prickle" % Versions.prickle,
       organization.value %%% "blended.updater.config" % Versions.blended,
+      organization.value %%% "blended.security" % Versions.blended,
 
       "org.scalatest" %%% "scalatest" % Versions.scalaTest % "test"
     ),
@@ -221,6 +252,34 @@ lazy val app = project.in(file("mgmt-app"))
   .enablePlugins(ScalaJSBundlerPlugin,UniversalPlugin,UniversalDeployPlugin)
   .dependsOn(router, common, components)
 
+// *******************************************************************************************************
+// The sub project for the deployable Akka Http Server Module
+// *******************************************************************************************************
+lazy val server = project.in(file("server"))
+  .settings(
+
+    libraryDependencies ++= Seq(
+      "com.github.domino-osgi" %% "domino" % "1.1.2",
+      organization.value % "blended.domino" % Versions.blended,
+      organization.value % "blended.akka.http" % Versions.blended
+    ),
+
+    Compile/packageBin := OsgiKeys.bundle.value,
+    Compile/packageBin/artifact := {
+      val previous = (Compile/packageBin/artifact).value
+      previous.withName("blended.mgmt.ui.server")
+    }
+  )
+  .settings(OsgiHelper.osgiSettings(
+    bundleSymbolicName = "blended.mgmt.ui.server",
+    bundleActivator = "blended.mgmt.ui.server.internal.UiServerActivator",
+    privatePackage = Seq("blended.mgmt.ui.server.internal")
+  ))
+  .enablePlugins(SbtOsgi)
+
+// *******************************************************************************************************
+// The sub project for the Selenium Tests for the Management Console
+// *******************************************************************************************************
 lazy val uitest = project.in(file("mgmt-app-test"))
   .settings(
     name := "uitest",

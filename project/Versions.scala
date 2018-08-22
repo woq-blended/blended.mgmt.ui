@@ -8,6 +8,8 @@ object Versions {
 
   val blended = "2.5.0-M11-SNAPSHOT"
 
+  val cmdOption = "0.6.0"
+
   val jsdom = "11.12.0"
 
   val logback = "1.2.3"
@@ -17,6 +19,8 @@ object Versions {
   val react = "16.4.2"
 
   val react4s = "0.9.15-SNAPSHOT"
+
+  val scalaJsDom = "0.9.5"
 
   val scalaTest = "3.0.5"
 
