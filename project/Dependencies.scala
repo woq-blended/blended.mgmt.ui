@@ -7,7 +7,7 @@ object Project {
 
 object Versions {
 
-  val akka = "2.5.13"
+  val akka = "2.5.14"
   val akkaHttp = "10.1.3"
   val akkaJs = "1.2.5.13"
   val blended = "2.5.0-M11-SNAPSHOT"
@@ -48,6 +48,7 @@ object JavaDependencies {
 
   val akkaHttp = "com.typesafe.akka" %% "akka-http" % Versions.akkaHttp
   val akkaHttpTestkit = "com.typesafe.akka" %% "akka-http-testkit" % Versions.akkaHttp
+  val akkaStream = "com.typesafe.akka" %% "akka-stream" % Versions.akka
   val blendedAkkaHttp = Project.organization % "blended.akka.http" % Versions.blended
   val blendedDomino = Project.organization % "blended.domino" % Versions.blended
   val cmdOption = "de.tototec" % "de.tototec.cmdoption" % Versions.cmdOption
