@@ -239,8 +239,8 @@ lazy val app = project.in(file("mgmt-app"))
     Universal/mappings ++= (Compile/fullOptJS/webpack).value.map{ f =>
       f.data -> s"assets/${f.data.getName()}"
     } ++ Seq(
-      target.value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "node_modules" / "react" / "cjs" / "react.production.min.js" -> "assets/react.production.min.js",
-      target.value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "node_modules" / "react-dom" / "cjs" / "react-dom.production.min.js" -> "assets/react-dom.production.min.js"
+      target.value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "node_modules" / "react" / "umd" / "react.production.min.js" -> "assets/react.production.min.js",
+      target.value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "node_modules" / "react-dom" / "umd" / "react-dom.production.min.js" -> "assets/react-dom.production.min.js"
     ),
 
     makeDeploymentSettings(Universal, Universal/packageBin, "zip"),
@@ -264,27 +264,35 @@ lazy val server = project.in(file("server"))
     libraryDependencies ++= Seq(
       javaDeps.dominoOsgi,
       javaDeps.blendedDomino,
-      javaDeps.blendedAkkaHttp
+      javaDeps.blendedAkkaHttp,
+      javaDeps.akkaStream
     ),
 
     name := "blended.mgmt.ui.server",
 
-    Compile/packageBin/mappings ++= {
-
-      val files : Seq[File] = (app/Compile/fullOptJS/webpack).value.map(f => f.data) ++ Seq(
-        (app/target).value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "node_modules" / "react" / "cjs" / "react.production.min.js",
-        (app/target).value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "node_modules" / "react-dom" / "cjs" / "react-dom.production.min.js"
+    Compile/resourceGenerators += Def.task {
+      val jsFiles : Seq[(File, String)]= ((app/Compile/fullOptJS/webpack).value.map(f => f.data).filterNot(_.getName().contains("bundle")) ++
+      Seq(
+        (app/target).value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "node_modules" / "react" / "umd" / "react.production.min.js",
+        (app/target).value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "node_modules" / "react-dom" / "umd" / "react-dom.production.min.js"
+      )).map { f => (f, "assets/" + f.getName()) } ++
+      Seq(
+        (app/baseDirectory).value / "src" / "universal" / "index.html" -> "index.html"
       )
 
-      val map : Seq[(File, String)] = files.map { f => (f, "assets/" + f.getName()) }
-
-      map
-    },
+      jsFiles.map { case (srcFile, mapping) =>
+        val targetFile = (Compile/resourceManaged).value / "webapp" / mapping
+        Files.createDirectories(targetFile.getParentFile().toPath())
+        Files.copy(srcFile.toPath, targetFile.toPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
+        targetFile
+      }
+    }.taskValue,
 
     Compile/packageBin := {
-      val foo = (Compile/packageBin).value
-      OsgiKeys.bundle.value
-    }
+      val foo = OsgiKeys.bundle.value
+      (Compile/packageBin).value
+    },
+    publishM2 := publishM2.dependsOn(Compile/packageBin).value
   )
   .settings(OsgiHelper.osgiSettings(
     bundleActivator = "blended.mgmt.ui.server.internal.UiServerActivator",
