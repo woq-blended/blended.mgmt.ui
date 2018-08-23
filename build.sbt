@@ -268,8 +268,23 @@ lazy val server = project.in(file("server"))
     ),
 
     name := "blended.mgmt.ui.server",
-    Compile/packageBin := OsgiKeys.bundle.value,
-    //Compile/packageBin/artifact := (Compile/packageBin/artifact).value.withName("blended.mgmt.ui.server")
+
+    Compile/packageBin/mappings ++= {
+
+      val files : Seq[File] = (app/Compile/fullOptJS/webpack).value.map(f => f.data) ++ Seq(
+        (app/target).value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "node_modules" / "react" / "cjs" / "react.production.min.js",
+        (app/target).value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "node_modules" / "react-dom" / "cjs" / "react-dom.production.min.js"
+      )
+
+      val map : Seq[(File, String)] = files.map { f => (f, "assets/" + f.getName()) }
+
+      map
+    },
+
+    Compile/packageBin := {
+      val foo = (Compile/packageBin).value
+      OsgiKeys.bundle.value
+    }
   )
   .settings(OsgiHelper.osgiSettings(
     bundleActivator = "blended.mgmt.ui.server.internal.UiServerActivator",
