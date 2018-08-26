@@ -59,4 +59,21 @@ object Theme {
     S.background(theme.palette.background.default.asInstanceOf[String]),
     S.padding.pt(theme.spacing.unit.asInstanceOf[Int] * 3)
   )
+
+  // Applied to the Paper of the login component
+  object LoginPaper extends CssClass (
+    S.width.px(400),
+    S.marginLeft("auto"),
+    S.marginRight("auto")
+  )
+
+  object LoginComponent extends CssClass (
+    S.marginTop.pt(theme.spacing.unit.asInstanceOf[Int]),
+    S.marginBottom.pt(theme.spacing.unit.asInstanceOf[Int]),
+  )
+
+  object LoginTitle extends CssClass (
+    S.background(theme.palette.primary.main.asInstanceOf[String]),
+    S.color(theme.palette.primary.contrastText.asInstanceOf[String]),
+  )
 }
