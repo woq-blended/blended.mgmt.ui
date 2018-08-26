@@ -3,11 +3,10 @@ package blended.ui.samples.compoments
 import blended.ui.common.{Logger, MainComponent}
 import blended.ui.router.Router
 import blended.ui.samples.state._
-import blended.ui.samples.theme.SampleMaterialComponents._
-import blended.ui.samples.theme.SampleStyles._
 import blended.ui.samples.{HomePage, SamplePage}
 import com.github.ahnfelt.react4s._
 import org.scalajs.dom
+import blended.ui.samples.theme.Theme
 
 case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppState, SampleAppEvent] {
 
@@ -37,14 +36,14 @@ case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppStat
     val s = get(appState)
 
     E.div(
-      RootStyles,
-      Component(AppBar.AppBarC, s),
-      //Component(MenuDrawer.MenuDrawerC, menuEntries),
+      Theme.RootStyles,
+      Component(SampleAppBar.comp, s),
+      Component(SampleMenuDrawer.comp, menuEntries),
       E.div(
-        ContentStyles,
+        Theme.ContentStyles,
         E.div(S.height.px(64)),
         E.main(
-          ContentArea,
+          Theme.ContentArea,
           topLevelPage(s),
         )
       )

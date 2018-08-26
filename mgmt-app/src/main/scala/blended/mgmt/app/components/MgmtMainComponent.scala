@@ -3,9 +3,8 @@ package blended.mgmt.app.components
 import akka.actor.{ActorRef, ActorSystem}
 import blended.mgmt.app._
 import blended.mgmt.app.backend.WSClientActor
-import blended.mgmt.app.state.{AppEvent, MgmtAppState, PageSelected, UpdateContainerInfo}
-import blended.mgmt.app.theme.MgmtMaterialComponents._
-import blended.mgmt.app.theme.BlendedMgmtStyles._
+import blended.mgmt.app.state._
+import blended.mgmt.app.theme.Theme
 import blended.ui.common.{I18n, Logger, MainComponent}
 import blended.ui.router.Router
 import blended.updater.config.ContainerInfo
@@ -36,6 +35,8 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
     dom.window.onhashchange = { _ =>
       appState.modify(MgmtAppState.redux(PageSelected(routes.data(path()))))
     }
+  } else {
+    dom.window.location.href = dom.window.location.href + "?#"
   }
 
   val system : ActorSystem = ActorSystem("MgmtApp")
@@ -85,22 +86,26 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
 
     val state = get(appState)
 
-    E.div(
-      RootStyles,
-      Component(AppBar.AppBarC, state),
-      Component(
-        MenuDrawer.MenuDrawerC, menuEntries
-      ).withHandler{
-        case MenuDrawer.PageSelected(p) =>
+    val drawer : Option[ConstructorData[_]] = state.currentUser.map { _ =>
+      Component(MgmtMenuDrawer.comp, menuEntries).withHandler{
+        case MgmtMenuDrawer.PageSelected(p) =>
           if (p.isDefined) {
             p.foreach(page => dom.window.location.href = href(page))
           }
+      }
+    }
+
+    E.div(
+      Theme.RootStyles,
+      Component(MgmtAppBar.comp, state).withHandler {
+        case MgmtAppBar.Logout => appState.modify(MgmtAppState.redux(LoggedOut))
       },
+      Tags(drawer.toSeq:_*),
       E.div(
-        ContentStyles,
+        Theme.ContentStyles,
         E.div(S.height.px(64)),
         E.main(
-          ContentArea,
+          Theme.ContentArea,
           topLevelPage(state)
         )
       )

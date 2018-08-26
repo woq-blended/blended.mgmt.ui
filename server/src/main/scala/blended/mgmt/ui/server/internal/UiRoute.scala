@@ -1,10 +1,10 @@
 package blended.mgmt.ui.server.internal
 
 import akka.http.scaladsl.model
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse, StatusCodes}
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.server.Directives._
-import akka.stream.scaladsl.{Source, StreamConverters}
+import akka.http.scaladsl.server.Route
+import akka.stream.scaladsl.StreamConverters
 
 import scala.util.{Failure, Success, Try}
 
