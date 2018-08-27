@@ -21,6 +21,8 @@ object Theme {
 
   val theme = Styles.createMuiTheme(palette)
 
+  val spacingUnit : Int = theme.spacing.unit.asInstanceOf[Int]
+
   object RootStyles extends CssClass (
     S.flexGrow.number(1),
     S.height.percent(100),
@@ -57,19 +59,20 @@ object Theme {
     ContentStyles,
     S.height.percent(100),
     S.background(theme.palette.background.default.asInstanceOf[String]),
-    S.padding.pt(theme.spacing.unit.asInstanceOf[Int] * 3)
+    S.padding.pt(spacingUnit * 3)
   )
 
   // Applied to the Paper of the login component
   object LoginPaper extends CssClass (
     S.width.px(400),
+    S.padding.px(spacingUnit * 2),
     S.marginLeft("auto"),
     S.marginRight("auto")
   )
 
   object LoginComponent extends CssClass (
-    S.marginTop.pt(theme.spacing.unit.asInstanceOf[Int]),
-    S.marginBottom.pt(theme.spacing.unit.asInstanceOf[Int]),
+    S.marginTop.pt(spacingUnit),
+    S.marginBottom.pt(spacingUnit),
   )
 
   object LoginTitle extends CssClass (

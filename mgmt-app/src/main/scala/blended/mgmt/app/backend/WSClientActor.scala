@@ -16,30 +16,47 @@ class WSClientActor(url: String, onMessage: PartialFunction[Any, Unit]) extends 
   private case object Initialize
   private case class Closed(reason: String)
 
+  private[this] var socket : Option[WebSocket] = None
+
   override def preStart(): Unit = self ! Initialize
+
+  override def postStop(): Unit = {
+    socket.foreach(_.close())
+    super.postStop()
+  }
+
+  private[this] def configureSocket(socket: WebSocket) : Unit = {
+    socket.onopen = {
+      _ =>  log.info(s"Connected to [$url].")
+    }
+
+    socket.onclose = { e =>
+      self ! Closed(e.reason)
+    }
+
+    socket.onerror = { _ =>
+      socket.close()
+      self ! Closed(s"Closed upon error in Web Socket!")
+    }
+
+    socket.onmessage = { e =>
+      onMessage(e.data)
+    }
+  }
 
   override def receive: Receive = initializing
 
   def initializing : Receive = {
     case Initialize =>
-      val socket = new WebSocket(url)
-
-      socket.onopen = {_ =>  log.info(s"Connected to [$url].") }
-
-      socket.onclose = { e =>
-        self ! Closed(e.reason)
-      }
-
-      socket.onerror = { _ =>
-        socket.close()
-        self ! Closed(s"Closed upon error in Web Socket!")
-      }
-      socket.onmessage = { e =>
-        onMessage(e.data)
+      socket = Some(new WebSocket(url))
+      socket.foreach{ s =>
+        configureSocket(s)
+        context.become(active(s))
       }
   }
 
   def active(socket: WebSocket) : Receive = {
+
     case Closed(reason) =>
       log.info(s"Web Socket connection to [$url] closed: [$reason]")
       context.become(initializing)

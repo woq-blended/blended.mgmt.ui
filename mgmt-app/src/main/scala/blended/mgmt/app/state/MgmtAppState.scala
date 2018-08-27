@@ -1,12 +1,15 @@
 package blended.mgmt.app.state
 
-import blended.mgmt.app.backend.UserInfo
+import akka.actor.{ActorRef, ActorSystem}
+import blended.mgmt.app.backend.{UserInfo, WSClientActor}
 import blended.mgmt.app.{HomePage, Page}
 import blended.updater.config.ContainerInfo
+import prickle.Unpickle
+import blended.updater.config.json.PrickleProtocol._
 
 sealed trait AppEvent
 final case class UpdateContainerInfo(info: ContainerInfo) extends AppEvent
-final case class LoggedIn(user: UserInfo) extends AppEvent
+final case class LoggedIn(url: String, user: UserInfo) extends AppEvent
 final case object LoggedOut extends AppEvent
 final case class PageSelected(p: Option[Page]) extends AppEvent
 
@@ -20,11 +23,33 @@ object MgmtAppState {
           containerInfo = old.containerInfo.filterKeys(_ != info.containerId) + (info.containerId -> info)
         )
 
-      case LoggedIn(user: UserInfo) =>
-        old.copy(currentUser = Some(user))
+      case LoggedIn(url: String, user: UserInfo) =>
+        old.copy(
+          baseUrl = url,
+          currentUser = Some(user),
+          ctListener = Some( {
+
+            val handleCtInfo : PartialFunction[Any, Unit] = {
+              case s : String =>
+                Unpickle[ContainerInfo].fromString(s).map { ctInfo =>
+                  old.actorSystem.eventStream.publish(UpdateContainerInfo(ctInfo))
+                }
+            }
+
+            old.actorSystem.actorOf(WSClientActor.props(
+              "ws://localhost:9995/mgmtws/timer?name=test",
+              handleCtInfo
+            ))
+          })
+        )
 
       case LoggedOut =>
-        old.copy(currentUser = None)
+        old.ctListener.foreach(a => old.actorSystem.stop(a))
+        old.copy(
+          containerInfo = Map.empty,
+          currentPage = Some(HomePage),
+          currentUser = None
+        )
 
       case PageSelected(p) =>
         old.copy(currentPage = p)
@@ -33,7 +58,14 @@ object MgmtAppState {
 }
 
 case class MgmtAppState(
+  baseUrl : String = "http://localhost:9995",
   currentPage : Option[Page] = Some(HomePage),
   currentUser : Option[UserInfo] = None,
-  containerInfo : Map[String, ContainerInfo] = Map.empty
-)
+  containerInfo : Map[String, ContainerInfo] = Map.empty,
+  ctListener : Option[ActorRef] = None
+) {
+
+  private[this] val system : ActorSystem = ActorSystem("MgmtApp")
+  def actorSystem : ActorSystem = system
+
+}

@@ -1,6 +1,7 @@
 package blended.mgmt.app.components
 
-import blended.mgmt.app.backend.UserInfo
+import akka.actor.Props
+import blended.mgmt.app.backend.{EventStreamStateHandler, UserInfo}
 import blended.mgmt.app.state.{AppEvent, LoggedIn, MgmtAppState}
 import blended.mgmt.app.theme.Theme
 import blended.security.BlendedPermissions
@@ -10,20 +11,28 @@ import com.github.ahnfelt.react4s._
 case class MgmtLoginComponent(state: P[MgmtAppState]) extends Component[AppEvent] {
 
   private[this] case class LoginDetails(
-    url: String = "http://localhost:9995/management?#",
+    url: String = "",
     user : String = "",
     pwd : String = ""
   ) {
     def isValid() : Boolean = !(url.isEmpty() || user.isEmpty() || pwd.isEmpty())
   }
 
+  private[this] val initialized : State[Boolean] = State(false)
   private[this] val loginDetails : State[LoginDetails] = State(LoginDetails())
-  override def render(get: Get): Node = {
+
+  private[this] def showLoginForm(get : Get) : Node = {
+
+    if (!get(initialized)) {
+      loginDetails.set(LoginDetails(get(state).baseUrl, "", ""))
+      initialized.set(true)
+    }
 
     val details = get(loginDetails)
 
     Paper(
       Theme.LoginPaper,
+      J("elevation", 1),
       Toolbar(
         Theme.LoginTitle,
         Typography(
@@ -61,15 +70,20 @@ case class MgmtLoginComponent(state: P[MgmtAppState]) extends Component[AppEvent
       ),
       Button(
         Theme.LoginComponent,
+        J("id", "submit"),
         J("variant", "contained"),
         J("color", "primary"),
         J("fullWidth", true),
         J("disabled", !details.isValid()),
         Text("Login"),
         A.onClick { _ =>
-          emit(LoggedIn(UserInfo(details.user, BlendedPermissions())))
+          emit(LoggedIn(details.url, UserInfo(details.user, "", BlendedPermissions())))
         }
       )
     )
+  }
+
+  override def render(get: Get): Node = {
+    showLoginForm(get)
   }
 }
