@@ -230,7 +230,6 @@ lazy val app = project.in(file("mgmt-app"))
       jsDeps.prickle.value,
       jsDeps.blendedUpdaterConfig.value,
       jsDeps.blendedSecurity.value,
-
       jsDeps.scalaTestJs.value % "test"
     ),
 

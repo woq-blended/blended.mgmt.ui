@@ -1,7 +1,6 @@
-package blended.samples
+package blended.mgmt.app
 
-import blended.ui.samples.JsonWebToken
-import com.github.ahnfelt.react4s.Loader
+import blended.mgmt.app.backend.JsonWebToken
 import org.scalatest.FreeSpec
 
 class JWtDecodeSpec extends FreeSpec {
@@ -15,9 +14,8 @@ class JWtDecodeSpec extends FreeSpec {
 
       val foo = JsonWebToken.decode(token)
       foo.keys.foreach(println)
+      assert(foo.get("permissions").isDefined)
       foo.get("permissions").foreach(println)
     }
   }
-
-
 }

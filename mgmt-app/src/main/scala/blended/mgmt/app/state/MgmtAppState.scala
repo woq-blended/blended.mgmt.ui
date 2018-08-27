@@ -9,7 +9,7 @@ import blended.updater.config.json.PrickleProtocol._
 
 sealed trait AppEvent
 final case class UpdateContainerInfo(info: ContainerInfo) extends AppEvent
-final case class LoggedIn(url: String, user: UserInfo) extends AppEvent
+final case class LoggedIn(host: String, port: Int, user: UserInfo) extends AppEvent
 final case object LoggedOut extends AppEvent
 final case class PageSelected(p: Option[Page]) extends AppEvent
 
@@ -23,9 +23,10 @@ object MgmtAppState {
           containerInfo = old.containerInfo.filterKeys(_ != info.containerId) + (info.containerId -> info)
         )
 
-      case LoggedIn(url: String, user: UserInfo) =>
+      case LoggedIn(host: String, port: Int, user: UserInfo) =>
         old.copy(
-          baseUrl = url,
+          host = host,
+          port = port,
           currentUser = Some(user),
           ctListener = Some( {
 
@@ -58,11 +59,13 @@ object MgmtAppState {
 }
 
 case class MgmtAppState(
-  baseUrl : String = "http://localhost:9995",
+  host : String = "localhost",
+  port : Integer = 9995,
   currentPage : Option[Page] = Some(HomePage),
   currentUser : Option[UserInfo] = None,
   containerInfo : Map[String, ContainerInfo] = Map.empty,
-  ctListener : Option[ActorRef] = None
+  ctListener : Option[ActorRef] = None,
+  serverPublicKey : Option[String] = None
 ) {
 
   private[this] val system : ActorSystem = ActorSystem("MgmtApp")
