@@ -5,7 +5,7 @@ sealed trait Page {
   val loginRequired : Boolean = true
 }
 
-final case object HomePage extends Page {
+case object HomePage extends Page {
   override val title: String = "home"
 }
 

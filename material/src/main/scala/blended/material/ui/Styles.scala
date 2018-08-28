@@ -1,14 +1,11 @@
 package blended.material.ui
 
-import blended.ui.common.Logger
 import com.github.ahnfelt.react4s._
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport
 
 object Styles {
-
-  private[this] val log = Logger[Styles.type]
 
   @js.native
   @JSImport("@material-ui/core/styles", JSImport.Namespace)
@@ -19,17 +16,17 @@ object Styles {
     val withTheme : js.Function1[js.Any, js.Function1[Any, js.Any]] = js.native
   }
 
-  def withStyles(s : Styles) : (JsComponentConstructor => JsComponentConstructor) =
+  def withStyles(s : Styles) : JsComponentConstructor => JsComponentConstructor =
     withStyles(Map("root" -> s))
 
-  def withStyles(s : Style*) : (JsComponentConstructor => JsComponentConstructor) =
+  def withStyles(s : Style*) : JsComponentConstructor => JsComponentConstructor =
     withStyles(Map("root" -> Styles(s:_*)))
 
-  def withStyles(s : Map[String, Styles]) : (JsComponentConstructor => JsComponentConstructor) = { c =>
+  def withStyles(s : Map[String, Styles]) : JsComponentConstructor => JsComponentConstructor = { c =>
 
-    def muiStyle(s: Map[String, Styles]) : js.Any = js.Dictionary[js.Any]((s.map{ case (k,v) =>
-      k -> v.toJsAny()
-    }.toSeq):_*)
+    def muiStyle(s: Map[String, Styles]) : js.Any = js.Dictionary[js.Any](s.map{ case (k,v) =>
+      k -> v.asJsAny
+    }.toSeq:_*)
 
     val innerComponent = c.componentClass
     val styledComponent = StylesImpl.withStyles(muiStyle(s))(innerComponent)
@@ -55,13 +52,10 @@ object Styles {
     )
   }
 
-  val createMuiTheme = StylesImpl.createMuiTheme
+  val createMuiTheme : js.Dynamic = StylesImpl.createMuiTheme
   object MuiThemeProvider extends JsComponent(StylesImpl.MuiThemeProvider)
 }
 
 case class Styles(s : Style*) {
-
-  def toJsAny() : js.Any = {
-    js.Dictionary[String](s.map(style => style.name -> style.value):_*)
-  }
+  val asJsAny : js.Any = js.Dictionary[String](s.map(style => style.name -> style.value):_*)
 }

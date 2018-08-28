@@ -18,7 +18,7 @@ trait ReactTable[TableData] {
     * A cell renderer takes an instance of TableData and renders it as a Tag. Each ColumnConfig has a cell renderer to
     * determine the rendered item.
     */
-  type CellRenderer[C] = (TableData => Tag)
+  type CellRenderer[C] = TableData => Tag
 
   /**
     *
