@@ -78,7 +78,7 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
     val state = get(appState)
 
     val drawer: Option[ConstructorData[_]] = state.currentUser.map { _ =>
-      Component(MgmtMenuDrawer.comp, menuEntries).withHandler {
+      Component(MgmtMenuDrawer.Comp, menuEntries).withHandler {
         case MgmtMenuDrawer.PageSelected(p) =>
           if (p.isDefined) {
             p.foreach(page => dom.window.location.href = href(page))
@@ -88,7 +88,7 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
 
     E.div(
       Theme.RootStyles,
-      Component(MgmtAppBar.comp, state).withHandler {
+      Component(MgmtAppBar.Comp, state).withHandler {
         case MgmtAppBar.Logout => appState.modify(MgmtAppState.redux(LoggedOut))
       },
       Tags(drawer.toSeq: _*),

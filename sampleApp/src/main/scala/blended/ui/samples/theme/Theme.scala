@@ -1,7 +1,6 @@
 package blended.ui.samples.theme
 
-import blended.material.ui.Colors
-import blended.ui.material.Styles
+import blended.material.ui.{Colors, Styles}
 import com.github.ahnfelt.react4s.{CssClass, S}
 
 import scala.scalajs.js

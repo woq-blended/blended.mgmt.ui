@@ -10,8 +10,9 @@ object MgmtMenuDrawer {
   sealed trait MenuDrawerEvent
   case class PageSelected(page : Option[Page]) extends MenuDrawerEvent
 
-  case class comp(entries : P[Seq[(String, Option[Page])]]) extends Component[MenuDrawerEvent] {
+  case class Comp(entries : P[Seq[(String, Option[Page])]]) extends Component[MenuDrawerEvent] {
 
+    // scalastyle:off magic.number
     override def render(get: Get): Node = MaterialUI.Drawer(Map("paper" -> Theme.MenuDrawerStyles))(
       J("variant", "permanent"),
       Theme.MenuDrawerStyles,
@@ -26,8 +27,6 @@ object MgmtMenuDrawer {
         }
       ))
     )
-
+    // scalastyle:on magic.number
   }
 }
-
-

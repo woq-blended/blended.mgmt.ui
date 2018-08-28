@@ -10,7 +10,7 @@ object SampleMenuDrawer {
   sealed trait MenuDrawerEvent
   case class PageSelected(page : Option[SamplePage]) extends MenuDrawerEvent
 
-  case class comp(entries : P[Seq[(String, Option[SamplePage])]]) extends Component[MenuDrawerEvent] {
+  case class Comp(entries : P[Seq[(String, Option[SamplePage])]]) extends Component[MenuDrawerEvent] {
 
     override def render(get: Get): Node = MaterialUI.Drawer(Map("paper" -> Theme.MenuDrawerStyles))(
       J("variant", "permanent"),

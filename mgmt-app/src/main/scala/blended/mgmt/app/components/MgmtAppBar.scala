@@ -10,7 +10,7 @@ object MgmtAppBar {
   sealed trait AppBarEvent
   case object Logout extends AppBarEvent
 
-  case class comp(s: P[MgmtAppState]) extends Component[AppBarEvent] {
+  case class Comp(s: P[MgmtAppState]) extends Component[AppBarEvent] {
 
     private[this] def title(get: Get) : String =
       "Blended Management Console" + get(s).currentPage.map(p => " - " + p.title.capitalize).getOrElse("")

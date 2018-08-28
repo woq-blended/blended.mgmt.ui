@@ -1,7 +1,7 @@
 package blended.material.gen
 
 import java.io.File
-import java.nio.file.{Files, OpenOption, Path, Paths}
+import java.nio.file.Files
 
 import de.tototec.cmdoption._
 import org.slf4j.LoggerFactory
@@ -39,7 +39,7 @@ object MaterialGenerator {
       cp.parse(args: _*)
     } catch {
       case e: CmdlineParserException =>
-        reportError(s"${e.getMessage()}\nRun launcher --help for help.")
+        reportError(s"${e.getMessage}\nRun launcher --help for help.")
     }
 
     if (cmdline.help) {
@@ -56,7 +56,7 @@ object MaterialGenerator {
       case Success(options) =>
         new MaterialGenerator(options).run()
       case Failure(t) =>
-        reportError(t.getMessage())
+        reportError(t.getMessage)
     }
   }
 }
@@ -65,11 +65,11 @@ class MaterialGenerator(options: MaterialGenerator.CmdLine) {
 
   def run() : Unit = {
 
-    val targetDir = new File(options.out + "/blended/ui/material")
+    val targetDir = new File(options.out + "/blended/material/ui")
 
-    def targetFile(f : String) : String = new File(targetDir, f).getAbsolutePath()
+    def targetFile(f : String) : String = new File(targetDir, f).getAbsolutePath
 
-    Files.createDirectories(targetDir.toPath())
+    Files.createDirectories(targetDir.toPath)
 
     val componentIndex = options.dir + "/core/index.js"
     new ComponentGenerator(componentIndex, targetFile("MaterialUI.scala")).generate()

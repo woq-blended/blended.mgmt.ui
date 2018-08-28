@@ -38,7 +38,7 @@ case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppStat
     E.div(
       Theme.RootStyles,
       Component(SampleAppBar.comp, s),
-      Component(SampleMenuDrawer.comp, menuEntries),
+      Component(SampleMenuDrawer.Comp, menuEntries),
       E.div(
         Theme.ContentStyles,
         E.div(S.height.px(64)),

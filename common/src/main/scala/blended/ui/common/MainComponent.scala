@@ -36,7 +36,7 @@ abstract class MainComponent[P,AS,E] extends Component[NoEmit] {
   protected def menuEntries(): Seq[(String, Option[P])] = routes
     .prettyPaths
     .map(_.split("/"))
-    .filter(_.size == 2)
+    .filter(_.length == 2)
     .map(_.toSeq)
     .map(_.last)
     .map(_.replaceAll("'", ""))

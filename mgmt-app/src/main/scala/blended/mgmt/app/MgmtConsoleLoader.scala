@@ -1,9 +1,9 @@
 package blended.mgmt.app
 
+import blended.material.ui.Styles
 import blended.mgmt.app.components.MgmtMainComponent
 import blended.mgmt.app.theme.Theme
 import blended.ui.material.MaterialUI.CssBaseline
-import blended.ui.material.Styles
 import com.github.ahnfelt.react4s._
 
 object MgmtConsoleLoader {

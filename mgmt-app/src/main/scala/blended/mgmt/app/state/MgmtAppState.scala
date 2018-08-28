@@ -10,7 +10,7 @@ import blended.updater.config.json.PrickleProtocol._
 sealed trait AppEvent
 final case class UpdateContainerInfo(info: ContainerInfo) extends AppEvent
 final case class LoggedIn(host: String, port: Int, user: UserInfo) extends AppEvent
-final case object LoggedOut extends AppEvent
+case object LoggedOut extends AppEvent
 final case class PageSelected(p: Option[Page]) extends AppEvent
 
 object MgmtAppState {
@@ -60,7 +60,9 @@ object MgmtAppState {
 
 case class MgmtAppState(
   host : String = "localhost",
+  // scalastyle:off magic.number
   port : Integer = 9995,
+  // scalastyle:on magic.number
   currentPage : Option[Page] = Some(HomePage),
   currentUser : Option[UserInfo] = None,
   containerInfo : Map[String, ContainerInfo] = Map.empty,

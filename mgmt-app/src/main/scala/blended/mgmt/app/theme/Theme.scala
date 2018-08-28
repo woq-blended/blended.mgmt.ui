@@ -1,7 +1,6 @@
 package blended.mgmt.app.theme
 
-import blended.material.ui.Colors
-import blended.ui.material.Styles
+import blended.material.ui.{Colors, Styles}
 import com.github.ahnfelt.react4s.{CssClass, S}
 
 import scala.scalajs.js
@@ -11,7 +10,7 @@ object Theme {
   val palette : js.Dynamic  = js.Dynamic.literal(
     "palette" -> js.Dynamic.literal (
       "primary" -> js.Dynamic.literal (
-        "main" -> Colors.green("900")
+        "main" -> Colors.purple("900")
       ),
       "background" -> js.Dynamic.literal (
         "default" -> "#fafafa"
@@ -66,8 +65,7 @@ object Theme {
   object LoginPaper extends CssClass (
     S.width.px(400),
     S.padding.px(spacingUnit * 2),
-    S.marginLeft("auto"),
-    S.marginRight("auto")
+    S.margin("auto")
   )
 
   object LoginComponent extends CssClass (

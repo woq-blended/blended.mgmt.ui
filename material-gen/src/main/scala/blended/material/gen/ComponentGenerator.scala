@@ -52,7 +52,7 @@ class ComponentGenerator(sourceFile : String, targetFile: String) extends Abstra
       |
       |    def createComponent(componentClass: Any, clazzes : Map[String, CssClass], children: JsTag*) : JsComponentConstructor = {
       |
-      |      val effectiveChildren = if (!clazzes.isEmpty) {
+      |      val effectiveChildren = if (clazzes.nonEmpty) {
       |        J("classes", clazzes.map( c => c._1 -> c._2.name).toJSDictionary) +: children
       |      } else {
       |        children

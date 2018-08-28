@@ -1,4 +1,4 @@
-package blended.ui.material
+package blended.material.ui
 
 import blended.ui.common.Logger
 import com.github.ahnfelt.react4s._
