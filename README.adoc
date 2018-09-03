@@ -3,19 +3,19 @@ image:https://api.codacy.com/project/badge/Grade/6b6fed51afb44d48a1ba2ccca66b673
 
 == Blended Management UI
 
-This project contains the Scala.JS project implementing a management console that can be used as a client to a blended container hosting the blended management REST Api.
+This project contains the Scala.js project implementing a management console that can be used as a client to a https://github.com/woq-blended/blended[blended] container hosting the blended management REST Api.
 
-The management console is a React application implemented in Scala.JS using react4s and the Metrial UI react components.
+The management console is a React application implemented in https://www.scala-js.org/[Scala.js] using http://www.react4s.org[react4s] and the https://material-ui.com/[Material UI react components].
 
 === Subprojects
 
 The overall project contains several subprojects:
 
-* ```common``` contains reusable objects which may be of use in any Scala.JS/react4s application such as a simple logger and internationalization support.
+* ```common``` contains reusable objects which may be of use in any Scala.js/react4s application such as a simple logger and internationalization support.
 
 * ```components``` contains reusable higher level React components, such as a ReactTable.
 
-* ```material-gen``` contains a simple generator which reads the ```index.js``` files of Material-UI React and generates simple Scala.JS wrappers to use those components in Scala.JS / react4s.
+* ```material-gen``` contains a simple generator which reads the ```index.js``` files of Material-UI React and generates simple Scala.js wrappers to use those components in Scala.js / react4s.
 
 * ```material``` uses the generated components and is the place to enrich the Material-API manually to make it more Scala-ish. For now the manual code is around customizing the styles used in Material-Ui-React-Components.
 
