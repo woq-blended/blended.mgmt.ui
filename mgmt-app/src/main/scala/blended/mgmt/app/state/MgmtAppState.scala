@@ -38,7 +38,7 @@ object MgmtAppState {
             }
 
             old.actorSystem.actorOf(WSClientActor.props(
-              "ws://localhost:9995/mgmtws/timer?name=test",
+              s"ws://$host:$port/mgmtws/?token=${user.token}",
               handleCtInfo
             ))
           })

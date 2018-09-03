@@ -10,7 +10,10 @@ object Theme {
   val palette : js.Dynamic  = js.Dynamic.literal(
     "palette" -> js.Dynamic.literal (
       "primary" -> js.Dynamic.literal (
-        "main" -> Colors.purple("900")
+        "main" -> Colors.teal("500")
+      ),
+      "secondary" -> js.Dynamic.literal (
+        "main" -> Colors.amber("A400")
       ),
       "background" -> js.Dynamic.literal (
         "default" -> "#fafafa"

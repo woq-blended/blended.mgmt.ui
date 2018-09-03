@@ -27,7 +27,6 @@ lazy val doPublish = Seq(
 // General settings for subprojects not to be published
 lazy val noPublish = Seq(
   publishArtifact := false,
-  publish := {},
   publishLocal := {}
 )
 

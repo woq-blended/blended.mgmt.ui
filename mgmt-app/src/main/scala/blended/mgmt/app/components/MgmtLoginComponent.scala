@@ -43,27 +43,31 @@ case class MgmtLoginComponent(state: P[MgmtAppState]) extends Component[AppEvent
       headers = Map("Authorization" -> ("Basic " + window.btoa(details.user + ":" + details.pwd)))
     ).onComplete {
       case Failure(e) =>
-        loginDetails.modify(_.copy(errorMsg = Some(e.getMessage)))
+        log.error(e)(e.getMessage)
+        loginDetails.modify(_.copy(errorMsg = Some("Failed to login")))
       case Success(s) =>
-        log.info("login succeeded")
+        if (s.status == 200) {
+          val token = s.responseText
 
-        val token = s.responseText
-        log.info(token)
+          val decoded = JsonWebToken.decode(token)
+          val json = decoded.getOrElse("permissions", "").asInstanceOf[String]
 
-        val decoded = JsonWebToken.decode(token)
-        val json = decoded.getOrElse("permissions", "").asInstanceOf[String]
+          log.info(json)
 
-        log.info(json)
-
-        BlendedPermissions.fromJson(json) match {
-          case Failure(e) => log.error(s"Could not decode permissions [${e.getMessage}]")
-          case Success(p) =>
-            emit(LoggedIn(
-              details.host, details.port,
-              UserInfo(
-                details.user, token, p
-              )
-            ))
+          BlendedPermissions.fromJson(json) match {
+            case Failure(e) =>
+              loginDetails.modify(_.copy(errorMsg = Some(s"Could not decode permissions [${e.getMessage}]")))
+            case Success(p) =>
+              log.info(s"Successfully logged in [${details.user}]")
+              emit(LoggedIn(
+                details.host, details.port,
+                UserInfo(
+                  details.user, token, p
+                )
+              ))
+          }
+        } else {
+          loginDetails.modify(_.copy(errorMsg = Some(s"Login failed with status code [${s.status}]")))
         }
     }
   }

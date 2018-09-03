@@ -33,7 +33,7 @@ abstract class MainComponent[P,AS,E] extends Component[NoEmit] {
       dom.window.location.pathname
     }
 
-  protected def menuEntries(): Seq[(String, Option[P])] = routes
+  protected def menuEntries: Seq[(String, Option[P])] = routes
     .prettyPaths
     .map(_.split("/"))
     .filter(_.length == 2)

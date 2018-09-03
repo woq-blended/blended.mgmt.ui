@@ -61,5 +61,7 @@ class WSClientActor(url: String, onMessage: PartialFunction[Any, Unit]) extends 
       log.info(s"Web Socket connection to [$url] closed: [$reason]")
       context.become(initializing)
       context.system.scheduler.scheduleOnce(1.second, self, Initialize)(context.dispatcher)
+      
+    case msg : String => socket.send(msg)
   }
 }
