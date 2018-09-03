@@ -1,0 +1,60 @@
+image:https://www.travis-ci.org/woq-blended/blended.mgmt.ui.svg?branch=master["Build Status", link="https://www.travis-ci.org/woq-blended/blended.mgmt.ui"]
+image:https://api.codacy.com/project/badge/Grade/6b6fed51afb44d48a1ba2ccca66b6733["Codacy code quality", link="https://www.codacy.com/app/blended/blended.mgmt.ui?utm_source=github.com&utm_medium=referral&utm_content=woq-blended/blended.mgmt.ui&utm_campaign=Badge_Grade"]
+
+== Blended Management UI
+
+This project contains the Scala.JS project implementing a management console that can be used as a client to a blended container hosting the blended management REST Api.
+
+The management console is a React application implemented in Scala.JS using react4s and the Metrial UI react components.
+
+=== Subprojects
+
+The overall project contains several subprojects:
+
+* ```common``` contains reusable objects which may be of use in any Scala.JS/react4s application such as a simple logger and internationalization support.
+
+* ```components``` contains reusable higher level React components, such as a ReactTable.
+
+* ```material-gen``` contains a simple generator which reads the ```index.js``` files of Material-UI React and generates simple Scala.JS wrappers to use those components in Scala.JS / react4s.
+
+* ```material``` uses the generated components and is the place to enrich the Material-API manually to make it more Scala-ish. For now the manual code is around customizing the styles used in Material-Ui-React-Components.
+
+* ```router``` is essentially taken from https://github.com/werk/router4s with some more options for variable paths and some test cases. Once the management console reaches it's final stages the changes will be contributed back to the original project.
+
+* ```mgmt-app``` contains the actual management console.
+
+* ```sampleApp``` contains a sample application that can be used as a playground to test out React Components without breaking the management console. Over time this subproject will become obsolete.
+
+* ```mgmt-app-test``` contains the setup for testing the management console with Selenium. For now it just has a very simple test and the setup. The test performs tests on the management console built wih ```app/fastOptJS/webpack``` and requires the http://chromedriver.chromium.org/getting-started[SeleniumDriver for Chrome] to be set up correctly. Test can be executed with ```uitest/test```
+
+* ```server``` contains a simple server based on Akka-HTTP which will serve the management console resources via Akka-HTTP. The resulting jar can be deployed into a container which is hosting the blended Akka-HTTP-Server bundle.
+
+=== Building
+
+==== Management console
+
+The fastest way to build the management console ist to start sbt and run ```app/fastOptJS/webpack```. This will build everything into the directory ```./sampleApp/target/scala-2.12/scalajs-bundler/main```.
+
+The build process will copy the file ```index-dev.html``` into that directory as well, so the management console can be started by loading the ```index-dev.html``` file in a browser.
+
+[NOTE]
+====
+In IntelliJ, simply navigate to the ```index-dev.html``` in the directory above and select any of the browser buttons in the top right corner of the editor.
+====
+
+The management console requires a running managemen container hosting the REST- and WebSocket API to connect to.
+
+During development you can use sbt in file watching mode with ```~app/fastOptJS/webpack```, so that the management console is rebuilt and repackaged whenever code changes are saved to disk. After the rebuild ,simply refresh the browser page to load the new version.
+
+==== Server bundle
+
+The server bundle can be built simply with ```server/packageBin``` to produce the OSGi deployable bundle.
+
+==== Tests
+
+Run ```test``` to execute all Unit- and Selenium-Tests.
+
+=== Publishing locally
+
+Run ```publishM2``` to publish all relevant artifacts in the local maven repository. This is required to use the server bundle in a management container packaging.
+

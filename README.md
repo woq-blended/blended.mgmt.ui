@@ -1,2 +1,0 @@
-[![Build Status](https://www.travis-ci.org/woq-blended/blended.mgmt.ui.svg?branch=master)](https://www.travis-ci.org/woq-blended/blended.mgmt.ui)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6b6fed51afb44d48a1ba2ccca66b6733)](https://www.codacy.com/app/blended/blended.mgmt.ui?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=woq-blended/blended.mgmt.ui&amp;utm_campaign=Badge_Grade)
