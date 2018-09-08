@@ -3,6 +3,7 @@ package blended.mgmt.app.state
 import akka.actor.{ActorRef, ActorSystem}
 import blended.mgmt.app.backend.{UserInfo, WSClientActor}
 import blended.mgmt.app.{HomePage, Page}
+import blended.ui.common.Logger
 import blended.updater.config.ContainerInfo
 import prickle.Unpickle
 import blended.updater.config.json.PrickleProtocol._
@@ -14,6 +15,8 @@ case object LoggedOut extends AppEvent
 final case class PageSelected(p: Option[Page]) extends AppEvent
 
 object MgmtAppState {
+
+  private[this] val log = Logger[MgmtAppState.type]
 
   def redux(event: AppEvent)(old: MgmtAppState) : MgmtAppState = {
 
@@ -32,6 +35,7 @@ object MgmtAppState {
 
             val handleCtInfo : PartialFunction[Any, Unit] = {
               case s : String =>
+                log.debug(s"handling web socket message [$s]")
                 Unpickle[ContainerInfo].fromString(s).map { ctInfo =>
                   old.actorSystem.eventStream.publish(UpdateContainerInfo(ctInfo))
                 }
@@ -47,6 +51,7 @@ object MgmtAppState {
       case LoggedOut =>
         old.ctListener.foreach(a => old.actorSystem.stop(a))
         old.copy(
+          ctListener = None,
           containerInfo = Map.empty,
           currentPage = Some(HomePage),
           currentUser = None

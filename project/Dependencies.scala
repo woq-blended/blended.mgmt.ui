@@ -7,8 +7,8 @@ object Project {
 
 object Versions {
 
-  val akka = "2.5.14"
-  val akkaHttp = "10.1.3"
+  val akka = "2.5.9"
+  val akkaHttp = "10.1.1"
   val akkaJs = "1.2.5.13"
   val blended = "2.5.0-M11-SNAPSHOT"
   val cmdOption = "0.6.0"

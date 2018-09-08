@@ -14,7 +14,7 @@ webpack:
 
 .PHONY: package # Package the web application into target/app
 package:
-	sbt universal:packageBin
+	sbt -mem 4096 server/publishM2
 
 .PHONY: test # Run all unit tests and UI tests
 test:
