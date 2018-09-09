@@ -7,6 +7,10 @@ import blended.ui.common.Logger
 import blended.updater.config.ContainerInfo
 import prickle.Unpickle
 import blended.updater.config.json.PrickleProtocol._
+import com.typesafe.config.ConfigFactory
+
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 sealed trait AppEvent
 final case class UpdateContainerInfo(info: ContainerInfo) extends AppEvent
@@ -17,6 +21,8 @@ final case class PageSelected(p: Option[Page]) extends AppEvent
 object MgmtAppState {
 
   private[this] val log = Logger[MgmtAppState.type]
+
+  val events : mutable.ListBuffer[AppEvent] = ListBuffer.empty
 
   def redux(event: AppEvent)(old: MgmtAppState) : MgmtAppState = {
 
@@ -37,11 +43,12 @@ object MgmtAppState {
               case s : String =>
                 log.debug(s"handling web socket message [$s]")
                 Unpickle[ContainerInfo].fromString(s).map { ctInfo =>
-                  old.actorSystem.eventStream.publish(UpdateContainerInfo(ctInfo))
+                  log.info(s"Publishing container AppEvents [$ctInfo]")
+                  events.append(UpdateContainerInfo(ctInfo))
                 }
             }
 
-            old.actorSystem.actorOf(WSClientActor.props(
+            old.system.actorOf(WSClientActor.props(
               s"ws://$host:$port/mgmtws/?token=${user.token}",
               handleCtInfo
             ))
@@ -49,7 +56,7 @@ object MgmtAppState {
         )
 
       case LoggedOut =>
-        old.ctListener.foreach(a => old.actorSystem.stop(a))
+        old.ctListener.foreach(a => old.system.stop(a))
         old.copy(
           ctListener = None,
           containerInfo = Map.empty,
@@ -75,7 +82,14 @@ case class MgmtAppState(
   serverPublicKey : Option[String] = None
 ) {
 
-  private[this] val system : ActorSystem = ActorSystem("MgmtApp")
-  def actorSystem : ActorSystem = system
+  lazy val conf = ConfigFactory
+    .parseString(
+      """akka {
+         loglevel = "DEBUG"
+         stdout-loglevel = "DEBUG"
+        }""")
+    .withFallback(akkajs.Config.default)
+
+  val system : ActorSystem = ActorSystem("MgmtApp", conf)
 
 }

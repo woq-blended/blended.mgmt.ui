@@ -16,6 +16,9 @@ class EventStreamStateHandler(handleEvent: AppEvent => Try[Unit]) extends Actor 
 
   private[this] val log = Logger[EventStreamStateHandler]
 
+
+  override def preStart(): Unit = log.info("Started EventStreamHandler")
+
   override def receive: Receive = {
     case evt : AppEvent =>
       log.debug(s"Handling event [$evt]")
@@ -24,4 +27,6 @@ class EventStreamStateHandler(handleEvent: AppEvent => Try[Unit]) extends Actor 
         case Success(_) => log.debug(s"Successfully processed event [$evt]")
       }
   }
+
+  override def postStop(): Unit = log.info("Stopped EventStreamHandler")
 }

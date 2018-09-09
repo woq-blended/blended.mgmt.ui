@@ -2,16 +2,23 @@ package blended.mgmt.app.backend
 
 import akka.actor.{Actor, ActorLogging, Props}
 import org.scalajs.dom.raw.WebSocket
+
 import scala.concurrent.duration._
 
 object WSClientActor {
 
-  def props(url: String, onMessage: PartialFunction[Any, Unit]) : Props = {
+  def props(
+    url: String,
+    onMessage: PartialFunction[Any, Unit]
+  ) : Props = {
     Props(new WSClientActor(url, onMessage))
   }
 }
 
-class WSClientActor(url: String, onMessage: PartialFunction[Any, Unit]) extends Actor with ActorLogging {
+class WSClientActor(
+  url: String,
+  onMessage: PartialFunction[Any, Unit]
+) extends Actor with ActorLogging {
 
   private case object Initialize
   private case class Closed(reason: String)
@@ -40,6 +47,7 @@ class WSClientActor(url: String, onMessage: PartialFunction[Any, Unit]) extends 
     }
 
     socket.onmessage = { e =>
+      log.info(s"handling web socket message [${e.data}]")
       onMessage(e.data)
     }
   }

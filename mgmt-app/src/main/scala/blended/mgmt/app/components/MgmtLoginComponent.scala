@@ -33,7 +33,7 @@ case class MgmtLoginComponent(state: P[MgmtAppState]) extends Component[AppEvent
 
   private[this] def performLogin(get: Get) : Unit = {
 
-    implicit val eCtxt : ExecutionContext = get(state).actorSystem.dispatcher
+    implicit val eCtxt : ExecutionContext = get(state).system.dispatcher
     val details = get(loginDetails)
 
     val requestUrl = s"http://${details.host}:${details.port}/login/"

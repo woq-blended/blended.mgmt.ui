@@ -10,6 +10,8 @@ import blended.ui.router.Router
 import com.github.ahnfelt.react4s._
 import org.scalajs.dom
 
+import scala.scalajs.js
+import scala.scalajs.js.timers.SetIntervalHandle
 import scala.util.Try
 
 case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEvent] {
@@ -17,10 +19,12 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
   private[this] val log = Logger[MgmtMainComponent]
   private[this] val i18n = I18n()
 
+  var intervalHandle : Option[SetIntervalHandle] = None
+
   override lazy val initialState: MgmtAppState = {
     val state = MgmtAppState()
 
-    val as = state.actorSystem
+    val as = state.system
     val stateHandler = as.actorOf(Props(EventStreamStateHandler.props { event =>
       Try {
         appState.modify{ MgmtAppState.redux(event) }
@@ -29,6 +33,21 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
     as.eventStream.subscribe(stateHandler, classOf[AppEvent])
 
     state
+  }
+
+
+  override def componentWillRender(get: Get): Unit = {
+    if (intervalHandle.isEmpty) {
+      intervalHandle = Some(js.timers.setInterval(1000) {
+        val events = MgmtAppState.events.toList
+        MgmtAppState.events.clear()
+        events.foreach { e => appState.modify(MgmtAppState.redux(e)) }
+      })
+    }
+  }
+
+  override def componentWillUnmount(get: Get): Unit = {
+    intervalHandle.foreach(i => js.timers.clearInterval(i))
   }
 
   override val routerPath: Router[Page] = new Router[Page]
@@ -49,8 +68,6 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
   } else {
     dom.window.location.href = dom.window.location.href + "?#"
   }
-
-  // A web sockets handler decoding container Info's
 
   def topLevelPage(state: MgmtAppState): Node = {
 
