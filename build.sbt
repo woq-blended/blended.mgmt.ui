@@ -267,6 +267,7 @@ lazy val server = project.in(file("server"))
     ),
 
     name := "blended.mgmt.ui.server",
+    moduleName := "blended.mgmt.ui.server",
 
     Compile/resourceGenerators += Def.task {
       val jsFiles : Seq[(File, String)]= ((app/Compile/fullOptJS/webpack).value.map(f => f.data).filterNot(_.getName().contains("bundle")) ++

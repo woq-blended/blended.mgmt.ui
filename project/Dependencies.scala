@@ -10,7 +10,7 @@ object Versions {
   val akka = "2.5.9"
   val akkaHttp = "10.1.1"
   val akkaJs = "1.2.5.13"
-  val blended = "2.5.0-M11-SNAPSHOT"
+  val blended = "2.5.0-SBT-SNAPSHOT"
   val cmdOption = "0.6.0"
   val dominoOsgi = "1.1.2"
   val jsdom = "11.12.0"
@@ -49,8 +49,8 @@ object JavaDependencies {
   val akkaHttp = "com.typesafe.akka" %% "akka-http" % Versions.akkaHttp
   val akkaHttpTestkit = "com.typesafe.akka" %% "akka-http-testkit" % Versions.akkaHttp
   val akkaStream = "com.typesafe.akka" %% "akka-stream" % Versions.akka
-  val blendedAkkaHttp = Project.organization % "blended.akka.http" % Versions.blended
-  val blendedDomino = Project.organization % "blended.domino" % Versions.blended
+  val blendedAkkaHttp = Project.organization %% "blended.akka.http" % Versions.blended
+  val blendedDomino = Project.organization %% "blended.domino" % Versions.blended
   val cmdOption = "de.tototec" % "de.tototec.cmdoption" % Versions.cmdOption
   val dominoOsgi = "com.github.domino-osgi" %% "domino" % Versions.dominoOsgi
   val logbackClassic = "ch.qos.logback" % "logback-classic" % Versions.logback

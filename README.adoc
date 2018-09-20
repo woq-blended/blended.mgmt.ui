@@ -35,6 +35,7 @@ The overall project contains several subprojects:
 
 The fastest way to build the management console ist to start sbt and run ```app/fastOptJS/webpack```. This will build everything into the directory ```./sampleApp/target/scala-2.12/scalajs-bundler/main```.
 
+
 The build process will copy the file ```index-dev.html``` into that directory as well, so the management console can be started by loading the ```index-dev.html``` file in a browser.
 
 [NOTE]
