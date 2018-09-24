@@ -10,7 +10,7 @@ object Versions {
   val akka = "2.5.9"
   val akkaHttp = "10.1.1"
   val akkaJs = "1.2.5.13"
-  val blended = "2.5.0-SBT-SNAPSHOT"
+  val blended = "2.6.0-M1-SNAPSHOT"
   val cmdOption = "0.6.0"
   val dominoOsgi = "1.1.2"
   val jsdom = "11.12.0"
