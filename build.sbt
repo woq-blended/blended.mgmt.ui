@@ -50,7 +50,7 @@ inThisBuild(Seq(
   organization := Project.organization,
   version := "0.2-SNAPSHOT",
   scalaVersion := crossScalaVersions.value.head,
-  crossScalaVersions := Seq("2.12.6"),
+  crossScalaVersions := Seq("2.12.7"),
   scalacOptions in Compile ++= Seq(
     "-deprecation",
     "-feature"
