@@ -324,3 +324,4 @@ lazy val uitest = project.in(file("mgmt-app-test"))
     )
   )
   .settings(noPublish)
+
