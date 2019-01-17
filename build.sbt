@@ -48,9 +48,9 @@ lazy val npmSettings = Seq(
 // *******************************************************************************************************
 inThisBuild(Seq(
   organization := Project.organization,
-  version := "0.3-SNAPSHOT",
+  version := "0.3",
   scalaVersion := crossScalaVersions.value.head,
-  crossScalaVersions := Seq("2.12.7"),
+  crossScalaVersions := Seq("2.12.8"),
   scalacOptions in Compile ++= Seq(
     "-deprecation",
     "-feature"
