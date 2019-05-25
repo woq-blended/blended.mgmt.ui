@@ -1,6 +1,9 @@
+import org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport.emitSourceMaps
 import phoenix.ProjectFactory
-import sbt.AutoPlugin
+import sbt.{AutoPlugin, ClasspathDep, Def, ProjectReference}
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin
+import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport.webpackBundlingMode
+import sbt._
 
 object MgmtUiCommon extends ProjectFactory {
 
@@ -8,52 +11,26 @@ object MgmtUiCommon extends ProjectFactory {
     override def projectName: String = "blended.mgmt.ui.common"
     override def description: String = "Common functionality for the management UI"
 
+    override def projectDir: Option[String] = Some("common")
+
+    override def settings: Seq[sbt.Setting[_]] = super.settings ++ Seq(
+      webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
+      emitSourceMaps := true,
+    )
+
+    /** Dependencies */
+    override def deps = Def.setting(super.deps.value ++ Seq(
+      JsDependencies.scalaJsDom.value,
+      JsDependencies.react4s.value
+    ))
+
     /**
       * Override this method to specify additional plugins for this project.
       */
     override def plugins: Seq[AutoPlugin] = super.plugins ++
       Seq(ScalaJSBundlerPlugin)
+
+    override def dependsOn: Seq[ClasspathDep[ProjectReference]] = Seq(MgmtUiRouter.project)
   }
 
 }
-
-
-//object BlendedMgmtAgent extends ProjectFactory {
-//  object config extends ProjectSettings {
-//    override val projectName = "blended.mgmt.agent"
-//    override val description = "Bundle to regularly report monitoring information to a central container hosting the container registry"
-//
-//    override def deps = Seq(
-//      Dependencies.orgOsgi,
-//      Dependencies.akkaOsgi,
-//      Dependencies.akkaHttp,
-//      Dependencies.akkaStream,
-//      Dependencies.akkaTestkit % Test,
-//      Dependencies.scalatest % Test
-//    )
-//
-//    override def bundle = super.bundle.copy(
-//      bundleActivator = s"${projectName}.internal.AgentActivator",
-//      exportPackage = Seq()
-//    )
-//
-//    override def dependsOn: Seq[ClasspathDep[ProjectReference]] = Seq(
-//      BlendedAkka.project,
-//      BlendedUpdaterConfigJvm.project,
-//      BlendedUtilLogging.project,
-//      BlendedPrickleAkkaHttp.project
-//    )
-//  }
-//}
-
-//lazy val common = project.in(file("common"))
-//  .settings(
-//    name := "common",
-//    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
-//    emitSourceMaps := true,
-//    libraryDependencies ++= Seq(
-//      jsDeps.scalaJsDom.value, jsDeps.react4s.value
-//    )
-//  )
-//  .dependsOn(router)
-//  .enablePlugins(ScalaJSBundlerPlugin)

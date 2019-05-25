@@ -94,21 +94,10 @@ lazy val root = project.in(file("."))
 // *******************************************************************************************************
 lazy val router = MgmtUiRouter.project
 
-
 // *******************************************************************************************************
 // The sub project for common utilities
 // *******************************************************************************************************
-lazy val common = project.in(file("common"))
-  .settings(
-    name := "common",
-    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
-    emitSourceMaps := true,
-    libraryDependencies ++= Seq(
-      jsDeps.scalaJsDom.value, jsDeps.react4s.value
-    )
-  )
-  .dependsOn(router)
-  .enablePlugins(ScalaJSBundlerPlugin)
+lazy val common = MgmtUiCommon.project
 
 // *******************************************************************************************************
 // The sub project for reusable components
