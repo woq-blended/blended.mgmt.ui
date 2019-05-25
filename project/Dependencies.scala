@@ -1,7 +1,7 @@
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import sbt._
 
-object Project {
+object ProjectDeprecated {
   val organization = "de.wayofquality.blended"
 }
 
@@ -36,8 +36,8 @@ object NpmDependencies {
 
 object JsDependencies {
   val akkaJsActor = Def.setting("org.akka-js" %%% "akkajsactor" % Versions.akkaJs)
-  val blendedSecurity = Def.setting(Project.organization %%% "blended.security" % Versions.blended)
-  val blendedUpdaterConfig = Def.setting(Project.organization %%% "blended.updater.config" % Versions.blended)
+  val blendedSecurity = Def.setting(ProjectDeprecated.organization %%% "blended.security" % Versions.blended)
+  val blendedUpdaterConfig = Def.setting(ProjectDeprecated.organization %%% "blended.updater.config" % Versions.blended)
   val prickle = Def.setting("com.github.benhutchison" %%% "prickle" % Versions.prickle)
   val react4s = Def.setting("com.github.ahnfelt" %%% "react4s" % Versions.react4s)
   val scalaJsDom = Def.setting("org.scala-js" %%% "scalajs-dom" % Versions.scalaJsDom)
@@ -49,8 +49,8 @@ object JavaDependencies {
   val akkaHttp = "com.typesafe.akka" %% "akka-http" % Versions.akkaHttp
   val akkaHttpTestkit = "com.typesafe.akka" %% "akka-http-testkit" % Versions.akkaHttp
   val akkaStream = "com.typesafe.akka" %% "akka-stream" % Versions.akka
-  val blendedAkkaHttp = Project.organization %% "blended.akka.http" % Versions.blended
-  val blendedDomino = Project.organization %% "blended.domino" % Versions.blended
+  val blendedAkkaHttp = ProjectDeprecated.organization %% "blended.akka.http" % Versions.blended
+  val blendedDomino = ProjectDeprecated.organization %% "blended.domino" % Versions.blended
   val cmdOption = "de.tototec" % "de.tototec.cmdoption" % Versions.cmdOption
   val dominoOsgi = "com.github.domino-osgi" %% "domino" % Versions.dominoOsgi
   val logbackClassic = "ch.qos.logback" % "logback-classic" % Versions.logback

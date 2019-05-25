@@ -9,6 +9,18 @@ lazy val javaDeps = JavaDependencies
 // The location for the local maven repository
 lazy val m2Repo = "file://" + System.getProperty("maven.repo.local", System.getProperty("user.home") + "/.m2/repository")
 
+lazy val global = Def.settings(
+  Global/scalariformAutoformat := false,
+  Global/scalariformWithBaseDirectory := true,
+
+  Global/testlogDirectory := target.value / "testlog",
+
+  Global/useGpg := false,
+  Global/pgpPublicRing := baseDirectory.value / "project" / ".gnupg" / "pubring.gpg",
+  Global/pgpSecretRing := baseDirectory.value / "project" / ".gnupg" / "secring.gpg",
+  Global/pgpPassphrase := sys.env.get("PGP_PASS").map(_.toArray)
+)
+
 // General settings for subprojects to be published
 lazy val doPublish = Seq(
   publishMavenStyle := true,
@@ -47,7 +59,7 @@ lazy val npmSettings = Seq(
 // Overall settings for this build
 // *******************************************************************************************************
 inThisBuild(Seq(
-  organization := Project.organization,
+  organization := ProjectDeprecated.organization,
   version := "0.5-SNAPSHOT",
   scalaVersion := crossScalaVersions.value.head,
   crossScalaVersions := Seq("2.12.8"),
@@ -74,20 +86,14 @@ inThisBuild(Seq(
 // *******************************************************************************************************
 lazy val root = project.in(file("."))
   .settings(noPublish)
+  .settings(global)
   .aggregate(common, router, components, materialGen, material, app, server, uitest, sampleApp)
 
 // *******************************************************************************************************
 // The sub project for the router
 // *******************************************************************************************************
-lazy val router = project.in(file("router"))
-  .settings(
-    name := "router",
-    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
-    emitSourceMaps := true,
-    libraryDependencies ++= Seq(
-      jsDeps.scalaTestJs.value % "test"
-    )
-  ).enablePlugins(ScalaJSBundlerPlugin)
+lazy val router = MgmtUiRouter.project
+
 
 // *******************************************************************************************************
 // The sub project for common utilities
