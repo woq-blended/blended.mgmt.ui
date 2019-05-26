@@ -1,6 +1,5 @@
 import org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport.emitSourceMaps
 import phoenix.ProjectFactory
-import sbt.{AutoPlugin, ClasspathDep, Def, ProjectReference}
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport.webpackBundlingMode
 import sbt._

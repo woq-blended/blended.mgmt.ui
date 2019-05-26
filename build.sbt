@@ -91,53 +91,10 @@ lazy val root = project.in(file("."))
 
 lazy val router = MgmtUiRouter.project
 lazy val common = MgmtUiCommon.project
-
-// *******************************************************************************************************
-// The sub project for reusable components
-// *******************************************************************************************************
-lazy val components = project.in(file("components"))
-  .settings(
-    name := "components",
-    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
-    emitSourceMaps := true,
-    libraryDependencies ++= Seq(
-      jsDeps.react4s.value
-    )
-  )
-  .enablePlugins(ScalaJSBundlerPlugin)
-  .dependsOn(common,material)
-
+lazy val components = MgmtUiComponents.project
 lazy val materialGen = MgmtUiMaterialGen.project
 lazy val material = MgmtUiMaterial.project
-
-// *******************************************************************************************************
-// The sub project for Sample App - A playground to test out components
-// *******************************************************************************************************
-lazy val sampleApp = project.in(file("sampleApp"))
-  .settings(
-    name := "sampleApp",
-    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryAndApplication(),
-    emitSourceMaps := true,
-    scalaJSUseMainModuleInitializer := true,
-
-    libraryDependencies ++= Seq(
-      jsDeps.react4s.value,
-      jsDeps.scalaTestJs.value % "test"
-    ),
-
-    Compile/fastOptJS/webpack := {
-      val result = (Compile/fastOptJS/webpack).toTask.value
-      val dir = baseDirectory.value / "index-dev.html"
-      val t = target.value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "index-dev.html"
-
-      Files.copy(dir.toPath, t.toPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
-      result
-    }
-  )
-  .settings(noPublish:_*)
-  .settings(npmSettings:_*)
-  .enablePlugins(ScalaJSBundlerPlugin)
-  .dependsOn(router, common, components, material)
+lazy val sampleApp = MgmtUiSampleApp.project
 
 // *******************************************************************************************************
 // The sub project for the Blended Management Console

@@ -26,36 +26,48 @@ object Versions {
 
 object NpmDependencies {
 
-  val jsDom = "jsdom" -> Versions.jsdom
-  val jsonWebToken = "jsonwebtoken" -> "8.3.0"
-  val materialUi = "@material-ui/core" -> "1.4.3"
-  val materialIcons = "@material-ui/icons" -> "2.0.0"
-  val react = "react" -> Versions.react
-  val reactDom = "react-dom" -> Versions.react
+  val jsDom : (String, String) = "jsdom" -> Versions.jsdom
+  val jsonWebToken : (String, String) = "jsonwebtoken" -> "8.3.0"
+  val materialUi : (String, String) = "@material-ui/core" -> "1.4.3"
+  val materialIcons : (String, String) = "@material-ui/icons" -> "2.0.0"
+  val react : (String, String) = "react" -> Versions.react
+  val reactDom : (String, String) = "react-dom" -> Versions.react
 }
 
 object JsDependencies {
-  val akkaJsActor = Def.setting("org.akka-js" %%% "akkajsactor" % Versions.akkaJs)
-  val blendedSecurity = Def.setting(ProjectDeprecated.organization %%% "blended.security" % Versions.blended)
-  val blendedUpdaterConfig = Def.setting(ProjectDeprecated.organization %%% "blended.updater.config" % Versions.blended)
-  val prickle = Def.setting("com.github.benhutchison" %%% "prickle" % Versions.prickle)
-  val react4s = Def.setting("com.github.ahnfelt" %%% "react4s" % Versions.react4s)
-  val scalaJsDom = Def.setting("org.scala-js" %%% "scalajs-dom" % Versions.scalaJsDom)
-  val scalaTestJs = Def.setting("org.scalatest" %%% "scalatest" % Versions.scalaTest)
+  val akkaJsActor : Def.Initialize[ModuleID] =
+    Def.setting("org.akka-js" %%% "akkajsactor" % Versions.akkaJs)
+
+  val blendedSecurity : Def.Initialize[ModuleID] =
+    Def.setting(ProjectDeprecated.organization %%% "blended.security" % Versions.blended)
+
+  val blendedUpdaterConfig : Def.Initialize[ModuleID] =
+    Def.setting(ProjectDeprecated.organization %%% "blended.updater.config" % Versions.blended)
+
+  val prickle : Def.Initialize[ModuleID] =
+    Def.setting("com.github.benhutchison" %%% "prickle" % Versions.prickle)
+
+  val react4s : Def.Initialize[ModuleID] =
+    Def.setting("com.github.ahnfelt" %%% "react4s" % Versions.react4s)
+
+  val scalaJsDom : Def.Initialize[ModuleID] =
+    Def.setting("org.scala-js" %%% "scalajs-dom" % Versions.scalaJsDom)
+
+  val scalaTestJs : Def.Initialize[ModuleID] =
+    Def.setting("org.scalatest" %%% "scalatest" % Versions.scalaTest)
 }
 
 object JavaDependencies {
-
-  val akkaHttp = "com.typesafe.akka" %% "akka-http" % Versions.akkaHttp
-  val akkaHttpTestkit = "com.typesafe.akka" %% "akka-http-testkit" % Versions.akkaHttp
-  val akkaStream = "com.typesafe.akka" %% "akka-stream" % Versions.akka
-  val blendedAkkaHttp = ProjectDeprecated.organization %% "blended.akka.http" % Versions.blended
-  val blendedDomino = ProjectDeprecated.organization %% "blended.domino" % Versions.blended
-  val cmdOption = "de.tototec" % "de.tototec.cmdoption" % Versions.cmdOption
-  val dominoOsgi = "com.github.domino-osgi" %% "domino" % Versions.dominoOsgi
-  val logbackClassic = "ch.qos.logback" % "logback-classic" % Versions.logback
-  val logbackCore = "ch.qos.logback" % "logback-core" % Versions.logback
-  val scalaTest = "org.scalatest" %% "scalatest" % Versions.scalaTest
-  val selenium = "org.seleniumhq.selenium" % "selenium-java" % Versions.selenium
-  val slf4jApi = "org.slf4j" % "slf4j-api" % Versions.slf4j
+  val akkaHttp : ModuleID = "com.typesafe.akka" %% "akka-http" % Versions.akkaHttp
+  val akkaHttpTestkit : ModuleID = "com.typesafe.akka" %% "akka-http-testkit" % Versions.akkaHttp
+  val akkaStream : ModuleID = "com.typesafe.akka" %% "akka-stream" % Versions.akka
+  val blendedAkkaHttp : ModuleID = ProjectDeprecated.organization %% "blended.akka.http" % Versions.blended
+  val blendedDomino : ModuleID = ProjectDeprecated.organization %% "blended.domino" % Versions.blended
+  val cmdOption : ModuleID = "de.tototec" % "de.tototec.cmdoption" % Versions.cmdOption
+  val dominoOsgi : ModuleID = "com.github.domino-osgi" %% "domino" % Versions.dominoOsgi
+  val logbackClassic : ModuleID = "ch.qos.logback" % "logback-classic" % Versions.logback
+  val logbackCore : ModuleID = "ch.qos.logback" % "logback-core" % Versions.logback
+  val scalaTest : ModuleID = "org.scalatest" %% "scalatest" % Versions.scalaTest
+  val selenium : ModuleID = "org.seleniumhq.selenium" % "selenium-java" % Versions.selenium
+  val slf4jApi : ModuleID = "org.slf4j" % "slf4j-api" % Versions.slf4j
 }
