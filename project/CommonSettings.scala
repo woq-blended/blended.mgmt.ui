@@ -3,6 +3,7 @@ import sbt.Keys._
 import sbt._
 import xerial.sbt.Sonatype.SonatypeKeys._
 import com.typesafe.sbt.SbtScalariform.autoImport._
+import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport._
 
 
 trait CommonSettings extends ProjectConfig {
@@ -39,5 +40,27 @@ trait CommonSettings extends ProjectConfig {
 
     scalariformAutoformat := false,
     scalariformWithBaseDirectory := true
+  )
+}
+
+trait NoPublish extends ProjectConfig {
+  override def settings: Seq[sbt.Setting[_]] = super.settings ++ Seq(
+    publishArtifact := false,
+    publishLocal := {}
+  )
+}
+
+trait NpmSettings extends ProjectConfig {
+
+  override def settings: Seq[sbt.Setting[_]] = super.settings ++ Seq(
+    useYarn := true,
+    npmDependencies.in(Compile) := Seq(
+      NpmDependencies.react,
+      NpmDependencies.reactDom,
+      NpmDependencies.jsDom,
+      NpmDependencies.materialUi,
+      NpmDependencies.materialIcons,
+      NpmDependencies.jsonWebToken
+    )
   )
 }

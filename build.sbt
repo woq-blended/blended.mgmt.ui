@@ -117,19 +117,7 @@ lazy val components = project.in(file("components"))
 // *******************************************************************************************************
 // The sub project for the Material UI generator
 // *******************************************************************************************************
-lazy val materialGen = project.in(file("material-gen"))
-  .settings(
-    name := "merial-gen",
-    libraryDependencies ++= Seq(
-      javaDeps.cmdOption,
-      javaDeps.slf4jApi,
-      javaDeps.logbackCore,
-      javaDeps.logbackClassic
-    )
-  )
-  .settings(npmSettings)
-  .settings(noPublish)
-  .enablePlugins(ScalaJSBundlerPlugin)
+lazy val materialGen = MgmtUiMaterialGen.project
 
 // *******************************************************************************************************
 // The sub project for the React4s Material UI wrapper
