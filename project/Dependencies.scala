@@ -17,7 +17,7 @@ object Versions {
   val logback = "1.2.3"
   val prickle = "1.1.14"
   val react = "16.4.2"
-  val react4s = "0.9.15-SNAPSHOT"
+  val react4s = "0.9.26-SNAPSHOT"
   val scalaJsDom = "0.9.5"
   val scalaTest = "3.0.5"
   val selenium = "3.13.0"
