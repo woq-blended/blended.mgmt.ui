@@ -69,7 +69,7 @@ object MgmtUiApp extends ProjectFactory {
       scalaTestJs.value % "test"
     ))
 
-    override def plugins: Seq[AutoPlugin] = Seq(
+    override def plugins: Seq[AutoPlugin] = super.plugins ++ Seq(
       ScalaJSBundlerPlugin, UniversalPlugin, UniversalDeployPlugin
     )
   }

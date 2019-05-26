@@ -43,6 +43,6 @@ object MgmtUiSampleApp extends ProjectFactory {
       MgmtUiMaterial.project
     )
 
-    override def plugins: Seq[AutoPlugin] = Seq(ScalaJSBundlerPlugin)
+    override def plugins: Seq[AutoPlugin] = super.plugins ++ Seq(ScalaJSBundlerPlugin)
   }
 }

@@ -1,6 +1,3 @@
-import java.nio.file.{Files, StandardCopyOption}
-import com.typesafe.sbt.osgi.SbtOsgi.autoImport._
-
 lazy val jsDeps = JsDependencies
 lazy val npmDeps = NpmDependencies
 lazy val javaDeps = JavaDependencies
@@ -39,19 +36,6 @@ lazy val doPublish = Seq(
 lazy val noPublish = Seq(
   publishArtifact := false,
   publishLocal := {}
-)
-
-// General settings for subprojects using NPM
-lazy val npmSettings = Seq(
-  useYarn := true,
-  npmDependencies.in(Compile) := Seq(
-    npmDeps.react,
-    npmDeps.reactDom,
-    npmDeps.jsDom,
-    npmDeps.materialUi,
-    npmDeps.materialIcons,
-    npmDeps.jsonWebToken
-  )
 )
 
 // *******************************************************************************************************
@@ -96,52 +80,7 @@ lazy val material = MgmtUiMaterial.project
 lazy val sampleApp = MgmtUiSampleApp.project
 lazy val app = MgmtUiApp.project
 
-// *******************************************************************************************************
-// The sub project for the deployable Akka Http Server Module
-// *******************************************************************************************************
-lazy val server = project.in(file("server"))
-  .settings(
-
-    libraryDependencies ++= Seq(
-      javaDeps.dominoOsgi,
-      javaDeps.blendedDomino,
-      javaDeps.blendedAkkaHttp,
-      javaDeps.akkaStream
-    ),
-
-    name := "blended.mgmt.ui.server",
-    moduleName := "blended.mgmt.ui.server",
-
-    Compile/resourceGenerators += Def.task {
-      val jsFiles : Seq[(File, String)]= ((app/Compile/fullOptJS/webpack).value.map(f => f.data).filterNot(_.getName().contains("bundle")) ++
-      Seq(
-        (app/target).value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "node_modules" / "react" / "umd" / "react.production.min.js",
-        (app/target).value / ("scala-" + scalaBinaryVersion.value) / "scalajs-bundler" / "main" / "node_modules" / "react-dom" / "umd" / "react-dom.production.min.js"
-      )).map { f => (f, "assets/" + f.getName()) } ++
-      Seq(
-        (app/baseDirectory).value / "src" / "universal" / "index.html" -> "index.html"
-      )
-
-      jsFiles.map { case (srcFile, mapping) =>
-        val targetFile = (Compile/resourceManaged).value / "webapp" / mapping
-        Files.createDirectories(targetFile.getParentFile().toPath())
-        Files.copy(srcFile.toPath, targetFile.toPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
-        targetFile
-      }
-    }.taskValue,
-
-    Compile/packageBin := {
-      val foo = OsgiKeys.bundle.value
-      (Compile/packageBin).value
-    },
-    publishM2 := publishM2.dependsOn(Compile/packageBin).value
-  )
-  .settings(OsgiHelper.osgiSettings(
-    bundleActivator = "blended.mgmt.ui.server.internal.UiServerActivator",
-    privatePackage = Seq("blended.mgmt.ui.server.internal")
-  ))
-  .enablePlugins(SbtOsgi)
-
+lazy val server = MgmtUiServer.project
 // *******************************************************************************************************
 // The sub project for the Selenium Tests for the Management Console
 // *******************************************************************************************************
