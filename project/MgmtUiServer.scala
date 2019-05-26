@@ -35,7 +35,9 @@ object MgmtUiServer extends ProjectFactory {
           Seq(
             (MgmtUiApp.project/Compile/fullOptJS/crossTarget).value / "node_modules" / "react" / "umd" / "react.production.min.js",
             (MgmtUiApp.project/Compile/fullOptJS/crossTarget).value / "node_modules" / "react-dom" / "umd" / "react-dom.production.min.js"
-          )).map { f => (f, "assets/" + f.getName()) } ++
+          )).map { f =>
+            (f, "assets/" + f.getName())
+          } ++
           Seq(
             (MgmtUiApp.project/baseDirectory).value / "src" / "universal" / "index.html" -> "index.html"
           )

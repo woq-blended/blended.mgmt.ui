@@ -41,15 +41,15 @@ object MgmtUiApp extends ProjectFactory {
       Universal/mappings ++= (Compile/fullOptJS/webpack).value.map{ f =>
         f.data -> s"assets/${f.data.getName()}"
       } ++ Seq(
-        (fastOptJS/crossTarget).value / "node_modules" / "react" / "umd" / "react.production.min.js" -> "assets/react.production.min.js",
-        (fastOptJS/crossTarget).value / "node_modules" / "react-dom" / "umd" / "react-dom.production.min.js" -> "assets/react-dom.production.min.js"
+        (Compile/fastOptJS/crossTarget).value / "node_modules" / "react" / "umd" / "react.production.min.js" -> "assets/react.production.min.js",
+        (Compile/fastOptJS/crossTarget).value / "node_modules" / "react-dom" / "umd" / "react-dom.production.min.js" -> "assets/react-dom.production.min.js"
       ),
 
       publish := publish.dependsOn(Universal/publish).value,
       publishM2 := publishM2.dependsOn(Universal/publishM2).value,
       publishLocal := publishLocal.dependsOn(Universal/publishLocal).value
-    ) ++ 
-    addArtifact(Universal/packageBin/artifact, Universal/packageBin).settings ++ 
+    ) ++
+    addArtifact(Universal/packageBin/artifact, Universal/packageBin).settings ++
     makeDeploymentSettings(Universal, Universal/packageBin, "zip")
 
     override def dependsOn: Seq[ClasspathDep[ProjectReference]] = Seq(
