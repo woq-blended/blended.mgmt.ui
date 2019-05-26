@@ -89,14 +89,7 @@ lazy val root = project.in(file("."))
   .settings(global)
   .aggregate(common, router, components, materialGen, material, app, server, uitest, sampleApp)
 
-// *******************************************************************************************************
-// The sub project for the router
-// *******************************************************************************************************
 lazy val router = MgmtUiRouter.project
-
-// *******************************************************************************************************
-// The sub project for common utilities
-// *******************************************************************************************************
 lazy val common = MgmtUiCommon.project
 
 // *******************************************************************************************************
@@ -114,46 +107,8 @@ lazy val components = project.in(file("components"))
   .enablePlugins(ScalaJSBundlerPlugin)
   .dependsOn(common,material)
 
-// *******************************************************************************************************
-// The sub project for the Material UI generator
-// *******************************************************************************************************
 lazy val materialGen = MgmtUiMaterialGen.project
-
-// *******************************************************************************************************
-// The sub project for the React4s Material UI wrapper
-// *******************************************************************************************************
-lazy val generateMui = TaskKey[Seq[File]]("generateMui")
-
-lazy val material = project.in(file("material"))
-  .settings(
-    name := "material",
-    webpackBundlingMode := scalajsbundler.BundlingMode.LibraryOnly(),
-    emitSourceMaps := true,
-    libraryDependencies ++= Seq(
-      jsDeps.react4s.value
-    ),
-    generateMui := {
-
-      runner.value.run(
-        "blended.material.gen.MaterialGenerator",
-        (materialGen/Runtime/fullClasspath).value.files,
-        Seq(
-          "-d", ((materialGen/Compile/npmUpdate).value / "node_modules" / "@material-ui").getAbsolutePath(),
-          "-o", (sourceManaged.value / "main").getAbsolutePath()
-        ),
-        streams.value.log
-      )
-
-      val pathFinder : PathFinder = sourceManaged.value ** "*.scala"
-      pathFinder.get.filter(_.getAbsolutePath().endsWith("scala")).map(_.getAbsoluteFile())
-    },
-
-    Compile/sourceGenerators += generateMui
-  )
-  .settings(npmSettings)
-  .settings(noPublish)
-  .enablePlugins(ScalaJSPlugin)
-  .dependsOn(common)
+lazy val material = MgmtUiMaterial.project
 
 // *******************************************************************************************************
 // The sub project for Sample App - A playground to test out components
