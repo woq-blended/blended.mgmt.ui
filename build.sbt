@@ -15,11 +15,9 @@ inThisBuild(
     ),
     licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
     publishArtifact in Test := false,
-    resolvers ++= Seq(
-      Resolver.sonatypeRepo("snapshots")
-    )
+    resolvers += Resolver.sonatypeRepo("snapshots")
   ) ++ Seq(
-    version := Files.readAllLines( baseDirectory.value / "version.txt").toPath).get(0),
+    version := Files.readAllLines( (baseDirectory.value / "version.txt").toPath).get(0),
     isSnapshot := version.value.endsWith("SNAPSHOT")
   )
 )
