@@ -50,6 +50,23 @@ trait NoPublish extends ProjectConfig {
   )
 }
 
+trait Publish extends ProjectConfig {
+  
+  override def settings: Seq[sbt.Setting[_]] = super.settings ++ Seq(
+    publishMavenStyle := true,
+    publishArtifact in Test := false,
+    credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
+    publishTo := {
+      val nexus = "https://oss.sonatype.org/"
+      if(isSnapshot.value) {
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      } else {
+        Some("releases" at nexus + "service/local/staging/deploy/maven2")
+      }
+    }
+  )
+}
+
 trait NpmSettings extends ProjectConfig {
 
   override def settings: Seq[sbt.Setting[_]] = super.settings ++ Seq(
