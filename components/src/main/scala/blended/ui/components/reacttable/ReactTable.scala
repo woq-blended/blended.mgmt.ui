@@ -18,7 +18,7 @@ trait ReactTable[TableData] {
     * A cell renderer takes an instance of TableData and renders it as a Tag. Each ColumnConfig has a cell renderer to
     * determine the rendered item.
     */
-  type CellRenderer[C] = TableData => Tag
+  type CellRenderer[C] = TableData => Node
 
   /**
     *
@@ -28,7 +28,7 @@ trait ReactTable[TableData] {
     * @tparam C Is the type of the element to be extracted from TableData for rendering
     * @return A rendering function that can be applied to an instance of TableData resulting in a Tag
     */
-  def cellRenderer[C](f : TableData => C)(ft : C => Tag)(implicit cTag : ClassTag[C]) : CellRenderer[C] = { data : TableData =>
+  def cellRenderer[C](f : TableData => C)(ft : C => Node)(implicit cTag : ClassTag[C]) : CellRenderer[C] = { data : TableData =>
      ft(f(data))
   }
 

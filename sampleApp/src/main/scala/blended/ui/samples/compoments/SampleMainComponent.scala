@@ -27,7 +27,8 @@ case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppStat
 
   override def topLevelPage(state: SampleAppState): Node = {
     state.currentPage.map {
-      case p @ HomePage => Component(HomePageComponent, state)
+      //case p @ HomePage => Component(HomePageComponent, state)
+      case HomePage => Component(SampleTreePage, state)
     }.getOrElse(E.div(E.p(Text("Not found"))))
   }
 

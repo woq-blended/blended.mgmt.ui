@@ -23,7 +23,7 @@ object MgmtUiSampleApp extends ProjectFactory {
       Compile/fastOptJS/webpack := {
         val result = (Compile/fastOptJS/webpack).toTask.value
         val dir = baseDirectory.value / "index-dev.html"
-        val t = (fastOptJS/crossTarget).value / "index-dev.html"
+        val t = (Compile/fastOptJS/crossTarget).value / "index-dev.html"
 
         Files.copy(dir.toPath, t.toPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
         result

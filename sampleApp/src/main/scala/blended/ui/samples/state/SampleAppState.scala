@@ -21,7 +21,9 @@ object SampleAppState {
 }
 
 case class SampleAppState(
+
   currentPage : Option[SamplePage] = Some(HomePage),
+
   persons : Seq[Person] = Seq(
     // scalastyle:off magic.number
     Person("Andreas", "Gies", 50, "andreas@wayofquality.de"),
