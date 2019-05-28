@@ -33,7 +33,7 @@ The overall project contains several subprojects:
 
 ==== Management console
 
-The fastest way to build the management console ist to start sbt and run ```app/fastOptJS/webpack```. This will build everything into the directory ```./sampleApp/target/scala-2.12/scalajs-bundler/main```.
+The fastest way to build the management console ist to start sbt and run ```blendedMgmtUiApp//fastOptJS/webpack```. This will build everything into the directory ```./sampleApp/target/scala-2.12/scalajs-bundler/main```.
 
 
 The build process will copy the file ```index-dev.html``` into that directory as well, so the management console can be started by loading the ```index-dev.html``` file in a browser.
@@ -45,11 +45,11 @@ In IntelliJ, simply navigate to the ```index-dev.html``` in the directory above 
 
 The management console requires a running managemen container hosting the REST- and WebSocket API to connect to.
 
-During development you can use sbt in file watching mode with ```~app/fastOptJS/webpack```, so that the management console is rebuilt and repackaged whenever code changes are saved to disk. After the rebuild ,simply refresh the browser page to load the new version.
+During development you can use sbt in file watching mode with ```~blendedMgmtUiApp/fastOptJS/webpack```, so that the management console is rebuilt and repackaged whenever code changes are saved to disk. After the rebuild ,simply refresh the browser page to load the new version.
 
 ==== Server bundle
 
-The server bundle can be built simply with ```server/packageBin``` to produce the OSGi deployable bundle.
+The server bundle can be built simply with ```blendedMgmtUiServer/packageBin``` to produce the OSGi deployable bundle.
 
 ==== Tests
 
@@ -57,5 +57,5 @@ Run ```test``` to execute all Unit- and Selenium-Tests.
 
 === Publishing locally
 
-Run ```publishM2``` to publish all relevant artifacts in the local maven repository. This is required to use the server bundle in a management container packaging.
+Run ```publishLocal``` to publish all relevant artifacts in the local Ivy repository. This is required to use the server bundle in a management container packaging.
 
