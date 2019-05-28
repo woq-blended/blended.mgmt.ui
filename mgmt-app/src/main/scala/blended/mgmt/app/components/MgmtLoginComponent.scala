@@ -10,11 +10,83 @@ import com.github.ahnfelt.react4s._
 import org.scalajs.dom.ext.Ajax
 import org.scalajs.dom.window
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
-case class MgmtLoginComponent(state: P[MgmtAppState]) extends Component[AppEvent] {
+object MgmtLoginComponent {
+
+  private val log = Logger[MgmtLoginComponent]
+
+  def validateLogin(id : String, token : String) : Try[UserInfo] = {
+    val decoded = JsonWebToken.decode(token)
+    val json = decoded.getOrElse("permissions", "").asInstanceOf[String]
+
+    log.debug(json)
+
+    BlendedPermissions.fromJson(json).map{ p =>
+      UserInfo(id, token, p)
+    }
+  }
+}
+
+trait LoginExecutor {
+  def performLogin(
+    user : String, password : String, props : Map[String, String]
+  )(implicit eCtxt : ExecutionContext) : Future[String]
+
+  def login(
+    user : String,
+    password : String,
+    props : Map[String, String]
+  )(implicit eCtxt : ExecutionContext) : Future[UserInfo] = {
+    performLogin(user, password, props).map{token => MgmtLoginComponent.validateLogin(user, token).get}
+  }
+}
+
+object RestLoginLoginExecutor {
+  val loginUrlKey = "loginUrl"
+}
+
+class DummyLoginExecutor extends LoginExecutor {
+
+  override def performLogin(user: String, password: String, props: Map[String, String])(implicit eCtxt: ExecutionContext): Future[String] = Future {
+
+    val token : String =  "eyJhbGciOiJSUzUxMiJ9.eyJqdGkiOiIyMDE4LTA4LTE1LTE5OjQ3OjQ0OjQ4OS0xIiwic3ViIjoiYW5kcmVhcyIsImlhdCI6MTUzNDM1NTI2NCwicGVybWlzc2lvbnMiOiJ7XCJncmFudGVkXCI6IHtcIiNlbGVtc1wiOiBbe1wicGVybWlzc2lvbkNsYXNzXCI6IHtcIiNlbGVtc1wiOiBbXCJhZG1pbnNcIl19LCBcInByb3BlcnRpZXNcIjoge1wiI2VsZW1zXCI6IFtdfX0sIHtcInBlcm1pc3Npb25DbGFzc1wiOiB7XCIjZWxlbXNcIjogW1wiYmxlbmRlZFwiXX0sIFwicHJvcGVydGllc1wiOiB7XCIjZWxlbXNcIjogW119fV19fSIsImV4cCI6MTUzNDM1NTMyNH0.ObRwVtt2XlA_WRGtcVwhr_jOm1xvzOQUlsvqXu7RMN-j7hqdWp-eqkwjC6OL0jL7iXKTDw3I9ZBz4AvJpUYgsn5YoTbfs5L_5Iqe1F4mh9Pcp4VSN9F9Tuhh5YufEdN1F-YO2AssPC1fYWiW1cBEgqXGY91IVY_p6hHBOdPRPfCC-hLucXtRyzsyK8e3FcvOL-juhbDuY9Nef2E-160AS7Wl-hdEkOretdqMPZYnJxO3eUtiDyQtSU1GiBp8AuhsferqLp6LtHF6hDxq0o7k3_3vbcNR1OSTz9SXl8JJylG2XkcpeBXjpsy4Gc1SRikGPyfDcPKIt8fPH1IrAEoOkw"
+
+    if (user.equals("root") && password.equals("mysecret")) {
+      token
+    } else {
+      throw new Exception("Failed to login")
+    }
+  }
+}
+
+class RestLoginLoginExecutor() extends LoginExecutor {
+
+  override def performLogin(
+    user : String, password : String, props : Map[String, String]
+  )(implicit eCtxt : ExecutionContext) : Future[String] = {
+
+    props.get(RestLoginLoginExecutor.loginUrlKey) match {
+      case None => throw new Exception(s"No ${RestLoginLoginExecutor.loginUrlKey} given to log in.")
+      case Some(loginUrl) =>
+        Ajax.post(
+          url = loginUrl,
+          headers = Map("Authorization" -> ("Basic " + window.btoa(user + ":" + password)))
+        ).map { s =>
+          if (s.status == 200) {
+            s.responseText
+          } else {
+            throw new Exception(s"Login failed with status code [${s.status}]")
+          }
+        }
+    }
+  }
+}
+
+case class MgmtLoginComponent(state: P[MgmtAppState], loginExecutor : P[LoginExecutor])
+  extends Component[AppEvent] {
 
   private[this] val log = Logger[MgmtLoginComponent]
 
@@ -38,37 +110,15 @@ case class MgmtLoginComponent(state: P[MgmtAppState]) extends Component[AppEvent
 
     val requestUrl = s"http://${details.host}:${details.port}/login/"
 
-    Ajax.post(
-      url = requestUrl,
-      headers = Map("Authorization" -> ("Basic " + window.btoa(details.user + ":" + details.pwd)))
+    get(loginExecutor).login(
+      details.user, details.pwd, Map(RestLoginLoginExecutor.loginUrlKey -> requestUrl)
     ).onComplete {
-      case Failure(e) =>
-        log.error(e)(e.getMessage)
+      case Failure(t) =>
+        log.error(t)(t.getMessage)
         loginDetails.modify(_.copy(errorMsg = Some("Failed to login")))
-      case Success(s) =>
-        if (s.status == 200) {
-          val token = s.responseText
-
-          val decoded = JsonWebToken.decode(token)
-          val json = decoded.getOrElse("permissions", "").asInstanceOf[String]
-
-          log.info(json)
-
-          BlendedPermissions.fromJson(json) match {
-            case Failure(e) =>
-              loginDetails.modify(_.copy(errorMsg = Some(s"Could not decode permissions [${e.getMessage}]")))
-            case Success(p) =>
-              log.info(s"Successfully logged in [${details.user}]")
-              emit(LoggedIn(
-                details.host, details.port,
-                UserInfo(
-                  details.user, token, p
-                )
-              ))
-          }
-        } else {
-          loginDetails.modify(_.copy(errorMsg = Some(s"Login failed with status code [${s.status}]")))
-        }
+      case Success(info) =>
+        log.info(s"User [${info.id}] logged in successfully")
+        emit(LoggedIn(details.host, details.port, info))
     }
   }
 

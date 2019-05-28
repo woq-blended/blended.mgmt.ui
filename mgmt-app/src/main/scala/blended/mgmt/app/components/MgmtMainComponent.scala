@@ -75,7 +75,9 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
       if (state.currentUser.isDefined) {
         n
       } else {
-        Component(MgmtLoginComponent, state).withHandler(event => appState.modify(MgmtAppState.redux(event)))
+        Component(
+          MgmtLoginComponent, state, new DummyLoginExecutor()// new RestLoginLoginExecutor()
+        ).withHandler(event => appState.modify(MgmtAppState.redux(event)))
       }
     }
 
