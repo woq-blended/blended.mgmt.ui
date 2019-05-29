@@ -26,6 +26,7 @@ object Versions {
 
 object NpmDependencies {
 
+  val babel : (String, String) = "@babel/runtime" -> "7.0.0-beta.55"
   val jsDom : (String, String) = "jsdom" -> Versions.jsdom
   val jsonWebToken : (String, String) = "jsonwebtoken" -> "8.3.0"
   val materialUi : (String, String) = "@material-ui/core" -> "1.4.3"

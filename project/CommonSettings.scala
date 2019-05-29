@@ -51,7 +51,7 @@ trait NoPublish extends ProjectConfig {
 }
 
 trait Publish extends ProjectConfig {
-  
+
   override def settings: Seq[sbt.Setting[_]] = super.settings ++ Seq(
     publishMavenStyle := true,
     publishArtifact in Test := false,
@@ -72,6 +72,7 @@ trait NpmSettings extends ProjectConfig {
   override def settings: Seq[sbt.Setting[_]] = super.settings ++ Seq(
     useYarn := true,
     npmDependencies.in(Compile) := Seq(
+      NpmDependencies.babel,
       NpmDependencies.react,
       NpmDependencies.reactDom,
       NpmDependencies.jsDom,
