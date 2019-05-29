@@ -35,7 +35,6 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
     state
   }
 
-
   override def componentWillRender(get: Get): Unit = {
     if (intervalHandle.isEmpty) {
       intervalHandle = Some(js.timers.setInterval(1000) {
@@ -43,6 +42,15 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
         MgmtAppState.events.clear()
         events.foreach { e => appState.modify(MgmtAppState.redux(e)) }
       })
+    }
+
+    if(dom.window.location.href.contains("?")) {
+      appState.modify(MgmtAppState.redux(PageSelected(routes.data(path()))))
+      dom.window.onhashchange = { _ =>
+        appState.modify(MgmtAppState.redux(PageSelected(routes.data(path()))))
+      }
+    } else {
+      dom.window.location.href = dom.window.location.href + "?#"
     }
   }
 
@@ -61,18 +69,10 @@ case class MgmtMainComponent() extends MainComponent[Page, MgmtAppState, AppEven
     routerPath("help", HelpPage)
   )
 
-  if(dom.window.location.href.contains("?")) {
-    dom.window.onhashchange = { _ =>
-      appState.modify(MgmtAppState.redux(PageSelected(routes.data(path()))))
-    }
-  } else {
-    dom.window.location.href = dom.window.location.href + "?#"
-  }
-
   def topLevelPage(state: MgmtAppState): Node = {
 
     def pageOrLogin(p: Page, n: Node, state: MgmtAppState): Node = {
-      if (state.currentUser.isDefined) {
+      if (!p.loginRequired || state.currentUser.isDefined) {
         n
       } else {
         Component(

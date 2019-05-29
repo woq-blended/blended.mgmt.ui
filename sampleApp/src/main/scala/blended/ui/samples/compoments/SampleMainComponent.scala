@@ -8,9 +8,13 @@ import com.github.ahnfelt.react4s._
 import org.scalajs.dom
 import blended.ui.samples.theme.Theme
 
+import scala.scalajs.js
+import scala.scalajs.js.timers.SetIntervalHandle
+
 case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppState, SampleAppEvent] {
 
   private[this] val log = Logger[SampleMainComponent]
+  private[this] var intervalHandle : Option[SetIntervalHandle] = None
 
   override lazy val initialState: SampleAppState = SampleAppState()
 
@@ -19,10 +23,23 @@ case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppStat
     HomePage
   )
 
-  if(dom.window.location.href.contains("?")) {
-    dom.window.onhashchange = { _ =>
-      appState.modify(SampleAppState.redux(PageSelected(routes.data(path()))))
+  override def componentWillRender(get: Get): Unit = {
+
+    if (intervalHandle.isEmpty) {
+      intervalHandle = Some(js.timers.setInterval(1000) {
+        appState.modify(SampleAppState.redux(RefreshTree))
+      })
     }
+
+    if(dom.window.location.href.contains("?")) {
+      dom.window.onhashchange = { _ =>
+        appState.modify(SampleAppState.redux(PageSelected(routes.data(path()))))
+      }
+    }
+  }
+
+  override def componentWillUnmount(get: Get): Unit = {
+    intervalHandle.foreach(js.timers.clearInterval)
   }
 
   override def topLevelPage(state: SampleAppState): Node = {
