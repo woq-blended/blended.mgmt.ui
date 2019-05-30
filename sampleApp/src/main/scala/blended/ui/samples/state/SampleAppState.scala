@@ -1,6 +1,6 @@
 package blended.ui.samples.state
 
-import blended.ui.samples.compoments.SampleTree
+import blended.ui.samples.components.SampleTree
 import blended.ui.samples.{HomePage, SamplePage}
 
 import scala.util.Random

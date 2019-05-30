@@ -1,4 +1,4 @@
-package blended.ui.samples.compoments
+package blended.ui.samples.components
 
 import blended.material.ui.Styles
 import blended.ui.samples.state.{SampleAppEvent, SampleAppState}
@@ -26,8 +26,8 @@ trait RichMatIcon{
 }
 
 object AddCircleIcon extends RichMatIcon {
-  def apply() =
-    Styles.withStyles(S.color("#ff0000"))(createIcon(AddCircle, Map.empty))
+  def apply(): JsComponentConstructor =
+    Styles.withStyles(S.color("#00ffff"))(createIcon(AddCircle, Map.empty))
 }
 
 case class HomePageComponent(state: P[SampleAppState]) extends Component[SampleAppEvent] {

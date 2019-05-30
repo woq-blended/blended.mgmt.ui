@@ -1,4 +1,4 @@
-package blended.ui.samples.compoments
+package blended.ui.samples.components
 
 import blended.ui.components.reacttable.ReactTable
 import blended.ui.samples.state.Person

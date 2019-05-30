@@ -1,4 +1,4 @@
-package blended.ui.samples.compoments
+package blended.ui.samples.components
 
 import blended.ui.samples.state.{SampleAppEvent, SampleAppState}
 import com.github.ahnfelt.react4s._
