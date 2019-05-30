@@ -27,7 +27,7 @@ trait RichMatIcon{
 
 object AddCircleIcon extends RichMatIcon {
   def apply() =
-    Styles.withStyles(S.color("#0000ff"))(createIcon(AddCircle, Map.empty))
+    Styles.withStyles(S.color("#ff0000"))(createIcon(AddCircle, Map.empty))
 }
 
 case class HomePageComponent(state: P[SampleAppState]) extends Component[SampleAppEvent] {

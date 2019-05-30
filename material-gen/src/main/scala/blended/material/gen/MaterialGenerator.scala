@@ -78,6 +78,6 @@ class MaterialGenerator(options: MaterialGenerator.CmdLine) {
     new ColorGenerator(colorIndex, targetFile("Colors.scala")).generate()
 
     val iconIndex = options.dir + "/icons/index.js"
-    new IconGenerator(iconIndex, targetFile("Icons.scala")).generate()
+    //new IconGenerator(iconIndex, targetFile("Icons.scala")).generate()
   }
 }

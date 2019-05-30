@@ -16,7 +16,7 @@ object Versions {
   val jsdom = "11.12.0"
   val logback = "1.2.3"
   val prickle = "1.1.14"
-  val react = "16.4.2"
+  val react = "16.8.6"
   val react4s = "0.9.26-SNAPSHOT"
   val scalaJsDom = "0.9.5"
   val scalaTest = "3.0.5"
@@ -29,8 +29,8 @@ object NpmDependencies {
   val babel : (String, String) = "@babel/runtime" -> "7.0.0-beta.55"
   val jsDom : (String, String) = "jsdom" -> Versions.jsdom
   val jsonWebToken : (String, String) = "jsonwebtoken" -> "8.3.0"
-  val materialUi : (String, String) = "@material-ui/core" -> "1.4.3"
-  val materialIcons : (String, String) = "@material-ui/icons" -> "2.0.0"
+  val materialUi : (String, String) = "@material-ui/core" -> "3.9.3"
+  val materialIcons : (String, String) = "@material-ui/icons" -> "3.0.2"
   val react : (String, String) = "react" -> Versions.react
   val reactDom : (String, String) = "react-dom" -> Versions.react
 }
