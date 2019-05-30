@@ -1,34 +1,8 @@
 package blended.ui.samples.components
 
-import blended.material.ui.Styles
+import blended.material.ui.MatIcons._
 import blended.ui.samples.state.{SampleAppEvent, SampleAppState}
 import com.github.ahnfelt.react4s._
-
-import scala.scalajs.js.JSConverters._
-import scala.scalajs.js
-import scala.scalajs.js.annotation.JSImport
-
-@js.native
-@JSImport("@material-ui/icons/AddCircle", JSImport.Default)
-object AddCircle extends js.Object
-
-trait RichMatIcon{
-
-  def createIcon(componentClass: Any, clazzes : Map[String, CssClass]) : JsComponentConstructor = {
-    val effectiveChildren : Seq[JsTag]= if (clazzes.nonEmpty) {
-      Seq(J("classes", clazzes.map( c => c._1 -> c._2.name).toJSDictionary))
-    } else {
-      Seq.empty
-    }
-
-    JsComponentConstructor(componentClass, effectiveChildren, None, None)
-  }
-}
-
-object AddCircleIcon extends RichMatIcon {
-  def apply(): JsComponentConstructor =
-    Styles.withStyles(S.color("#00ffff"))(createIcon(AddCircle, Map.empty))
-}
 
 case class HomePageComponent(state: P[SampleAppState]) extends Component[SampleAppEvent] {
 
@@ -36,6 +10,7 @@ case class HomePageComponent(state: P[SampleAppState]) extends Component[SampleA
     E.div(
       Tags(
         AddCircleIcon(),
+        RemoveCircleIcon(),
         Component(PersonTable.ReactTable, get(state).persons, PersonTable.props)
       )
     )
