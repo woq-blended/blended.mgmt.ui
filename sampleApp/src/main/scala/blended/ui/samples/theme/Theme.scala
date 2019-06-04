@@ -10,15 +10,24 @@ object Theme {
   val palette : js.Dynamic  = js.Dynamic.literal(
     "palette" -> js.Dynamic.literal (
       "primary" -> js.Dynamic.literal (
-        "main" -> Colors.green("900")
+        "main" -> Colors.brown("700")
+      ),
+      "secondary" -> js.Dynamic.literal (
+        "main" -> Colors.deepOrange("200")
       ),
       "background" -> js.Dynamic.literal (
-        "default" -> "#fafafa"
+        "default" -> (Colors.grey("200")).asInstanceOf[String]
       )
     )
   )
 
   val theme = Styles.createMuiTheme(palette)
+
+  val primary : String = theme.palette.primary.main.asInstanceOf[String]
+  val secondary : String = theme.palette.secondary.main.asInstanceOf[String]
+  val background : String = theme.palette.background.default.asInstanceOf[String]
+
+  val spacingUnit : Int = theme.spacing.unit.asInstanceOf[Int]
 
   // Applied to the Browser window as a hole
   object RootStyles extends CssClass (
@@ -56,7 +65,11 @@ object Theme {
   object ContentArea extends CssClass (
     ContentStyles,
     S.height.percent(100),
-    S.background(theme.palette.background.default.asInstanceOf[String]),
-    S.padding.pt(theme.spacing.unit.asInstanceOf[Int] * 3)
+    S.background(background),
+    S.padding.px(spacingUnit * 3)
+  )
+
+  object IconStyles extends CssClass (
+    S.color(secondary)
   )
 }

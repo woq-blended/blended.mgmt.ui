@@ -33,11 +33,11 @@ class IconGenerator(sourceFile: String, targetFile: String) extends AbstractGene
        |
        |  trait RichMatIcon{
        |
-       |    def createIcon(componentClass: Any, clazzes : Map[String, CssClass]) : JsComponentConstructor = {
+       |    def createIcon(componentClass: Any, clazzes : Map[String, CssClass], children: JsTag*) : JsComponentConstructor = {
        |      val effectiveChildren : Seq[JsTag]= if (clazzes.nonEmpty) {
-       |        Seq(J("classes", clazzes.map( c => c._1 -> c._2.name).toJSDictionary))
+       |        J("classes", clazzes.map( c => c._1 -> c._2.name).toJSDictionary) +: children
        |      } else {
-       |        Seq.empty
+       |        children
        |      }
        |
        |      JsComponentConstructor(componentClass, effectiveChildren, None, None)
@@ -59,11 +59,10 @@ class IconGenerator(sourceFile: String, targetFile: String) extends AbstractGene
     val toObject : String => String = { icon =>
       s"""
          |  object ${icon}Icon extends RichMatIcon {
-         |    def apply(): JsComponentConstructor =
-         |      Styles.withStyles(S.color("#808080"))(createIcon($icon, Map.empty))
+         |    def apply(clazzes : Map[String, CssClass])(children : JsTag*): JsComponentConstructor = createIcon($icon, clazzes, children:_*)
+         |    def apply(children : JsTag*) : JsComponentConstructor = createIcon($icon, Map.empty, children:_*)
          |  }
        """.stripMargin
-
     }
 
     val icons = iconNames.map(toIcon)

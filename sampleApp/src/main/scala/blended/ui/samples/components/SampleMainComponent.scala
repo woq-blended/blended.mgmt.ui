@@ -3,17 +3,16 @@ package blended.ui.samples.components
 import blended.ui.common.{Logger, MainComponent}
 import blended.ui.router.Router
 import blended.ui.samples.state._
+import blended.ui.samples.theme.Theme
 import blended.ui.samples.{HomePage, SamplePage}
 import com.github.ahnfelt.react4s._
 import org.scalajs.dom
-import blended.ui.samples.theme.Theme
 
 import scala.scalajs.js
 import scala.scalajs.js.timers.SetIntervalHandle
 
 case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppState, SampleAppEvent] {
 
-  private[this] val log = Logger[SampleMainComponent]
   private[this] var intervalHandle : Option[SetIntervalHandle] = None
 
   override lazy val initialState: SampleAppState = SampleAppState()
