@@ -3,6 +3,7 @@ package blended.ui.components.reacttree
 import blended.material.ui.MatIcons.{AddCircleIcon, RemoveCircleIcon}
 import blended.mgmt.ui.theme.Theme
 import blended.mgmt.ui.theme.Theme.IconStyles
+import blended.ui.material.MaterialUI.{IconButton, Typography}
 import com.github.ahnfelt.react4s._
 
 trait ReactTree[NodeData] {
@@ -33,7 +34,12 @@ trait ReactTree[NodeData] {
     * A convenience renderer to render node values as Strings.
     */
   val defaultNodeRenderer : NodeRenderer = nd => _ => E.div(
-    Text(s"$nd")
+    S.marginTop.auto(),
+    Typography(
+      J("variant", "headline"),
+      J("component", "h2"),
+      Text(s"$nd")
+    )
   )
 
   val defaultKeyExtractor : NodeData => String = { _.hashCode().toString() }
@@ -55,21 +61,25 @@ trait ReactTree[NodeData] {
     override def render(get: Get): Node = {
 
       val toggle : Tag = if (get(data).isLeaf) {
-        E.div(S.width.px(24))
+        E.div(S.height.px(24), S.width.px(24))
       } else {
         if (get(collapsed)) {
-          AddCircleIcon(
+          IconButton(
             IconStyles,
-            A.onLeftClick{_ =>
-              collapsed.modify(v => !v)
-            },
+            AddCircleIcon(
+              A.onLeftClick{_ =>
+                collapsed.modify(v => !v)
+              }
+            )
           )
         } else {
-          RemoveCircleIcon(
+          IconButton(
             IconStyles,
-            A.onLeftClick{_ =>
-              collapsed.modify(v => !v)
-            }
+            RemoveCircleIcon(
+              A.onLeftClick{_ =>
+                collapsed.modify(v => !v)
+              }
+            )
           )
         }
       }
@@ -78,8 +88,8 @@ trait ReactTree[NodeData] {
         S.display("flex"),
         S.flexFlow("row"),
         E.div(
-          S.width.pt(Theme.spacingUnit * get(level)),
-          S.height.px(24)
+          S.width.pt(Theme.spacingUnit * 2 * get(level)),
+          S.height.px(1)
         ),
         Tags(toggle),
         p.renderer(d)(get(level))

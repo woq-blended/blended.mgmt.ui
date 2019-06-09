@@ -70,6 +70,9 @@ object Theme {
   )
 
   object IconStyles extends CssClass (
+    S.padding.pt(0),
+    S.height.em(1),
+    S.marginTop.auto(),
     S.color(secondary)
   )
 }

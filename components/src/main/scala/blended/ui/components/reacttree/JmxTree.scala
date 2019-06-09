@@ -1,6 +1,7 @@
 package blended.ui.components.reacttree
 
 import blended.jmx.JmxObjectName
+import blended.ui.material.MaterialUI.Typography
 import com.github.ahnfelt.react4s._
 
 sealed trait JmxNodeType {
@@ -21,9 +22,14 @@ case class ObjNameNode(name : JmxObjectName, parentName: JmxObjectName) extends 
 }
 
 object JmxTree extends ReactTree[JmxNodeType] {
-  override val defaultNodeRenderer: JmxTree.NodeRenderer = node => level => E.div(
-    Text(node.title)
+  override val defaultNodeRenderer: JmxTree.NodeRenderer = node => _ => E.div(
+    S.marginTop.auto(),
+    Typography(
+      J("variant", "body1"),
+      Text(s"${node.title}")
+    )
   )
+
   override val defaultKeyExtractor: JmxNodeType => String = {
     case RootNode => "JmxRoot"
     case DomainNode(d) => d
