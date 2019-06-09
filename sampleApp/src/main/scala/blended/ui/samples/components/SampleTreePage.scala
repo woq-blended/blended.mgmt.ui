@@ -13,7 +13,7 @@ case class SampleTreePage(state : P[SampleAppState]) extends Component[SampleApp
         Component(
           JmxTree.ReactTree,
           JmxTreeHelper.treeModel(get(state).names),
-          JmxTree.TreeProperties( )
+          JmxTree.TreeProperties()
         )
       )
     )

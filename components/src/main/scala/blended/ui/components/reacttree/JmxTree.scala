@@ -1,14 +1,35 @@
 package blended.ui.components.reacttree
 
 import blended.jmx.JmxObjectName
+import com.github.ahnfelt.react4s._
 
-sealed trait JmxNodeType
+sealed trait JmxNodeType {
+  def title : String
+}
 
-case object RootNode extends JmxNodeType
-case class DomainNode(domain : String) extends JmxNodeType
-case class ObjNameNode(name : JmxObjectName, parentName: JmxObjectName) extends JmxNodeType
+case object RootNode extends JmxNodeType {
+  override def title: String = "/"
+}
 
-object JmxTree extends ReactTree[JmxNodeType]
+case class DomainNode(domain : String) extends JmxNodeType {
+  override def title: String = domain
+}
+
+case class ObjNameNode(name : JmxObjectName, parentName: JmxObjectName) extends JmxNodeType {
+  private val titleKey: String = name.differingKeys(parentName).head
+  override def title: String = name.properties(titleKey)
+}
+
+object JmxTree extends ReactTree[JmxNodeType] {
+  override val defaultNodeRenderer: JmxTree.NodeRenderer = node => level => E.div(
+    Text(node.title)
+  )
+  override val defaultKeyExtractor: JmxNodeType => String = {
+    case RootNode => "JmxRoot"
+    case DomainNode(d) => d
+    case ObjNameNode(n, _) => n.objectName
+  }
+}
 
 object JmxTreeHelper {
 

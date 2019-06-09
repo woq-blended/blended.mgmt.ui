@@ -25,6 +25,7 @@ object MgmtUiComponents extends ProjectFactory{
     ))
 
     override def dependsOn: Seq[ClasspathDep[ProjectReference]] = Seq(
+      MgmtUiTheme.project,
       MgmtUiCommon.project,
       MgmtUiMaterial.project
     )

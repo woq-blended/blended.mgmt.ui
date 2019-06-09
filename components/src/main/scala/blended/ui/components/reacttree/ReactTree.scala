@@ -1,5 +1,8 @@
 package blended.ui.components.reacttree
 
+import blended.material.ui.MatIcons.{AddCircleIcon, RemoveCircleIcon}
+import blended.mgmt.ui.theme.Theme
+import blended.mgmt.ui.theme.Theme.IconStyles
 import com.github.ahnfelt.react4s._
 
 trait ReactTree[NodeData] {
@@ -21,15 +24,19 @@ trait ReactTree[NodeData] {
 
   case class TreeNode(
     nodeValue : NodeData,
-    children : List[TreeNode] = List.empty
-  )
+    children : List[TreeNode] = List.empty,
+  ) {
+    val isLeaf : Boolean = children.isEmpty
+  }
 
   /**
     * A convenience renderer to render node values as Strings.
     */
-  val defaultNodeRenderer : NodeRenderer = nd => level => E.div(
-    Text(s"$level - $nd")
+  val defaultNodeRenderer : NodeRenderer = nd => _ => E.div(
+    Text(s"$nd")
   )
+
+  val defaultKeyExtractor : NodeData => String = { _.hashCode().toString() }
 
   /**
     * A class holding the configuration for the tree, such as a custom renderer and a key
@@ -37,26 +44,60 @@ trait ReactTree[NodeData] {
     */
   case class TreeProperties(
     renderer : NodeRenderer = defaultNodeRenderer,
-    keyExtractor : NodeData => String = {_.hashCode().toString() }
+    keyExtractor : NodeData => String = defaultKeyExtractor
   )
 
   private case class TreeNodeComponent(data : P[TreeNode], props : P[TreeProperties], level: P[Int])
     extends Component[NoEmit] {
 
+    private[this] val collapsed : State[Boolean] = State(true)
+
     override def render(get: Get): Node = {
 
+      val toggle : Tag = if (get(data).isLeaf) {
+        E.div(S.width.px(24))
+      } else {
+        if (get(collapsed)) {
+          AddCircleIcon(
+            IconStyles,
+            A.onLeftClick{_ =>
+              collapsed.modify(v => !v)
+            },
+          )
+        } else {
+          RemoveCircleIcon(
+            IconStyles,
+            A.onLeftClick{_ =>
+              collapsed.modify(v => !v)
+            }
+          )
+        }
+      }
+
       val renderValue: NodeData => TreeProperties => Node = d => p => E.div(
+        S.display("flex"),
+        S.flexFlow("row"),
+        E.div(
+          S.width.pt(Theme.spacingUnit * get(level)),
+          S.height.px(24)
+        ),
+        Tags(toggle),
         p.renderer(d)(get(level))
       )
 
       val render: TreeNode => TreeProperties => Node = n => p => {
+
+        val childTags : Seq[Tag] = if (get(collapsed)) {
+          Seq.empty
+        } else {
+          n.children.map { c =>
+            Component(TreeNodeComponent, c, p, get(level) + 1).withKey(p.keyExtractor(c.nodeValue))
+          }
+        }
+
         E.div(
           renderValue(n.nodeValue)(p),
-          Tags(
-            n.children.map { c =>
-              Component(TreeNodeComponent, c, p, get(level) + 1).withKey(p.keyExtractor(c.nodeValue))
-            }
-          )
+          Tags(childTags)
         )
       }
 

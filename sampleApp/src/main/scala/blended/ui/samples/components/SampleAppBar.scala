@@ -1,8 +1,8 @@
 package blended.ui.samples.components
 
+import blended.mgmt.ui.theme.Theme
 import blended.ui.material.MaterialUI
 import blended.ui.samples.state.SampleAppState
-import blended.ui.samples.theme.Theme
 import com.github.ahnfelt.react4s._
 
 object SampleAppBar {

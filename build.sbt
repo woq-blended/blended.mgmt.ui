@@ -27,7 +27,7 @@ inThisBuild(
 // *******************************************************************************************************
 lazy val root = project.in(file("."))
   .settings(RootSettings.settings)
-  .aggregate(common, router, components, materialGen, material, app, server, uitest, sampleApp)
+  .aggregate(common, router, components, materialGen, material, app, server, uitest, sampleApp, theme)
 
 lazy val router = MgmtUiRouter.project
 lazy val common = MgmtUiCommon.project
@@ -38,3 +38,4 @@ lazy val sampleApp = MgmtUiSampleApp.project
 lazy val app = MgmtUiApp.project
 lazy val server = MgmtUiServer.project
 lazy val uitest = MgmtUiTest.project
+lazy val theme = MgmtUiTheme.project

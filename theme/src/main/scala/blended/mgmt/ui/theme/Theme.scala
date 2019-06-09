@@ -1,7 +1,7 @@
-package blended.ui.samples.theme
+package blended.mgmt.ui.theme
 
 import blended.material.ui.{Colors, Styles}
-import com.github.ahnfelt.react4s.{CssClass, S}
+import com.github.ahnfelt.react4s._
 
 import scala.scalajs.js
 
@@ -16,12 +16,12 @@ object Theme {
         "main" -> Colors.deepOrange("200")
       ),
       "background" -> js.Dynamic.literal (
-        "default" -> (Colors.grey("200")).asInstanceOf[String]
+        "default" -> Colors.grey("200").asInstanceOf[String]
       )
     )
   )
 
-  val theme = Styles.createMuiTheme(palette)
+  val theme : js.Dynamic = Styles.createMuiTheme(palette)
 
   val primary : String = theme.palette.primary.main.asInstanceOf[String]
   val secondary : String = theme.palette.secondary.main.asInstanceOf[String]

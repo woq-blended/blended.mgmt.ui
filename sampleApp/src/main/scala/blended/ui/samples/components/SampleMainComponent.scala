@@ -1,9 +1,9 @@
 package blended.ui.samples.components
 
+import blended.mgmt.ui.theme.Theme
 import blended.ui.common.{Logger, MainComponent}
 import blended.ui.router.Router
 import blended.ui.samples.state._
-import blended.ui.samples.theme.Theme
 import blended.ui.samples.{HomePage, SamplePage}
 import com.github.ahnfelt.react4s._
 import org.scalajs.dom
