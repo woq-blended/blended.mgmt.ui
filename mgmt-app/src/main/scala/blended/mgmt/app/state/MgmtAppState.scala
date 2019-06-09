@@ -1,16 +1,19 @@
 package blended.mgmt.app.state
 
 import akka.actor.{ActorRef, ActorSystem}
+import blended.jmx.JmxObjectName
 import blended.mgmt.app.backend.{UserInfo, WSClientActor}
 import blended.mgmt.app.{HomePage, Page}
 import blended.ui.common.Logger
 import blended.updater.config.ContainerInfo
-import prickle.Unpickle
+import prickle._
 import blended.updater.config.json.PrickleProtocol._
+import blended.jmx.json.PrickleProtocol._
 import com.typesafe.config.ConfigFactory
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.util.{Failure, Success}
 
 sealed trait AppEvent
 final case class UpdateContainerInfo(info: ContainerInfo) extends AppEvent
@@ -41,10 +44,17 @@ object MgmtAppState {
 
             val handleCtInfo : PartialFunction[Any, Unit] = {
               case s : String =>
-                log.debug(s"handling web socket message [$s]")
-                Unpickle[ContainerInfo].fromString(s).map { ctInfo =>
-                  log.info(s"Publishing container AppEvents [$ctInfo]")
-                  events.append(UpdateContainerInfo(ctInfo))
+                Unpickle[ContainerInfo].fromString(s) match {
+                  case Success(ctInfo) =>
+                    log.info(s"Publishing container AppEvents [$ctInfo]")
+                    events.append(UpdateContainerInfo(ctInfo))
+                  case Failure(exception) =>
+                }
+
+                Unpickle[List[JmxObjectName]].fromString(s) match {
+                  case Success(names) =>
+                    log.info(s"Got new object name list: $names")
+                  case Failure(t) =>
                 }
             }
 

@@ -24,11 +24,11 @@ case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppStat
 
   override def componentWillRender(get: Get): Unit = {
 
-    if (intervalHandle.isEmpty) {
-      intervalHandle = Some(js.timers.setInterval(1000) {
-        appState.modify(SampleAppState.redux(RefreshTree))
-      })
-    }
+//    if (intervalHandle.isEmpty) {
+//      intervalHandle = Some(js.timers.setInterval(1000) {
+//        appState.modify(SampleAppState.redux(RefreshTree))
+//      })
+//    }
 
     if(dom.window.location.href.contains("?")) {
       dom.window.onhashchange = { _ =>
@@ -43,8 +43,8 @@ case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppStat
 
   override def topLevelPage(state: SampleAppState): Node = {
     state.currentPage.map {
-      case p @ HomePage => Component(HomePageComponent, state)
-      //case HomePage => Component(SampleTreePage, state)
+      //case p @ HomePage => Component(HomePageComponent, state)
+      case HomePage => Component(SampleTreePage, state)
     }.getOrElse(E.div(E.p(Text("Not found"))))
   }
 

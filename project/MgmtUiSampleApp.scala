@@ -1,5 +1,6 @@
 import java.nio.file.{Files, StandardCopyOption}
 
+import JsDependencies._
 import sbt._
 import sbt.Keys._
 import phoenix.ProjectFactory
@@ -9,7 +10,9 @@ import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin
 
 object MgmtUiSampleApp extends ProjectFactory {
 
+  // scalastyle:off object.name
   object config extends ProjectSettings with NpmSettings with NoPublish {
+  // scalastyle:on object.name
 
     override def projectName: String = "blended.mgmt.ui.sampleapp"
     override def description: String = "A playground to test UI components without breaking the management app."
@@ -32,8 +35,9 @@ object MgmtUiSampleApp extends ProjectFactory {
 
     /** Dependencies */
     override def deps : Def.Initialize[Seq[ModuleID]] = Def.setting(super.deps.value ++ Seq(
-      JsDependencies.react4s.value,
-      JsDependencies.scalaTestJs.value % "test"
+      blendedJmx.value,
+      react4s.value,
+      scalaTestJs.value % "test"
     ))
 
     override def dependsOn: Seq[ClasspathDep[ProjectReference]] = Seq(

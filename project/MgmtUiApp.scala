@@ -13,7 +13,9 @@ import com.typesafe.sbt.packager.SettingsHelper._
 
 object MgmtUiApp extends ProjectFactory {
 
+  // scalastyle:off object.name
   object config extends ProjectSettings with NpmSettings with Publish {
+  // scalastyle:on object.name
     import JsDependencies._
 
     override def projectName: String = "blended.mgmt.ui.app"
@@ -59,11 +61,12 @@ object MgmtUiApp extends ProjectFactory {
     )
 
     /** Dependencies */
-    override def deps = Def.setting(super.deps.value ++ Seq(
+    override def deps : Def.Initialize[Seq[ModuleID]] = Def.setting(super.deps.value ++ Seq(
       akkaJsActor.value,
       scalaJsDom.value,
       react4s.value,
       prickle.value,
+      blendedJmx.value,
       blendedUpdaterConfig.value,
       blendedSecurity.value,
       scalaTestJs.value % "test"

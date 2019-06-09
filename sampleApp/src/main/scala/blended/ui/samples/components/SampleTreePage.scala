@@ -1,5 +1,6 @@
 package blended.ui.samples.components
 
+import blended.ui.components.reacttree.{JmxTree, JmxTreeHelper}
 import blended.ui.samples.state.{SampleAppEvent, SampleAppState}
 import com.github.ahnfelt.react4s._
 
@@ -9,9 +10,11 @@ case class SampleTreePage(state : P[SampleAppState]) extends Component[SampleApp
 
     E.div(
       Tags(
-        Component(SampleTree.ReactTree, get(state).tree, SampleTree.TreeProperties(
-          keyExtractor = s => s
-        ))
+        Component(
+          JmxTree.ReactTree,
+          JmxTreeHelper.treeModel(get(state).names),
+          JmxTree.TreeProperties( )
+        )
       )
     )
   }

@@ -44,7 +44,7 @@ trait LoginExecutor {
   }
 }
 
-object RestLoginLoginExecutor {
+object RestLoginExecutor {
   val loginUrlKey = "loginUrl"
 }
 
@@ -62,14 +62,14 @@ class DummyLoginExecutor extends LoginExecutor {
   }
 }
 
-class RestLoginLoginExecutor() extends LoginExecutor {
+class RestLoginExecutor() extends LoginExecutor {
 
   override def performLogin(
     user : String, password : String, props : Map[String, String]
   )(implicit eCtxt : ExecutionContext) : Future[String] = {
 
-    props.get(RestLoginLoginExecutor.loginUrlKey) match {
-      case None => throw new Exception(s"No ${RestLoginLoginExecutor.loginUrlKey} given to log in.")
+    props.get(RestLoginExecutor.loginUrlKey) match {
+      case None => throw new Exception(s"No ${RestLoginExecutor.loginUrlKey} given to log in.")
       case Some(loginUrl) =>
         Ajax.post(
           url = loginUrl,
@@ -111,7 +111,7 @@ case class MgmtLoginComponent(state: P[MgmtAppState], loginExecutor : P[LoginExe
     val requestUrl = s"http://${details.host}:${details.port}/login/"
 
     get(loginExecutor).login(
-      details.user, details.pwd, Map(RestLoginLoginExecutor.loginUrlKey -> requestUrl)
+      details.user, details.pwd, Map(RestLoginExecutor.loginUrlKey -> requestUrl)
     ).onComplete {
       case Failure(t) =>
         log.error(t)(t.getMessage)

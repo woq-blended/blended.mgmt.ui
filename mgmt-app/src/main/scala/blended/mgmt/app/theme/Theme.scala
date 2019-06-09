@@ -5,7 +5,7 @@ import com.github.ahnfelt.react4s.{CssClass, S}
 
 import scala.scalajs.js
 
-object Theme {
+object Theme extends LoginStyles {
 
   val palette : js.Dynamic  = js.Dynamic.literal(
     "palette" -> js.Dynamic.literal (
@@ -21,7 +21,7 @@ object Theme {
     )
   )
 
-  val theme = Styles.createMuiTheme(palette)
+  val theme : js.Dynamic = Styles.createMuiTheme(palette)
 
   val spacingUnit : Int = theme.spacing.unit.asInstanceOf[Int]
 
@@ -64,20 +64,4 @@ object Theme {
     S.padding.pt(spacingUnit * 3)
   )
 
-  // Applied to the Paper of the login component
-  object LoginPaper extends CssClass (
-    S.width.px(400),
-    S.padding.px(spacingUnit * 2),
-    S.margin("auto")
-  )
-
-  object LoginComponent extends CssClass (
-    S.marginTop.pt(spacingUnit),
-    S.marginBottom.pt(spacingUnit),
-  )
-
-  object LoginTitle extends CssClass (
-    S.background(theme.palette.primary.main.asInstanceOf[String]),
-    S.color(theme.palette.primary.contrastText.asInstanceOf[String]),
-  )
 }

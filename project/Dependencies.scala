@@ -45,6 +45,9 @@ object JsDependencies {
   val blendedUpdaterConfig : Def.Initialize[ModuleID] =
     Def.setting(ProjectDeprecated.organization %%% "blended.updater.config" % Versions.blended)
 
+  val blendedJmx : Def.Initialize[ModuleID] =
+    Def.setting(ProjectDeprecated.organization %%% "blended.jmx" % Versions.blended)
+
   val prickle : Def.Initialize[ModuleID] =
     Def.setting("com.github.benhutchison" %%% "prickle" % Versions.prickle)
 

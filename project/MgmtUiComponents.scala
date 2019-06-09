@@ -6,7 +6,10 @@ import sbt._
 
 object MgmtUiComponents extends ProjectFactory{
 
+  // scalastyle:off object.name
   object config extends ProjectSettings {
+  // scalastyle:on object.name
+
     override def projectName: String = "blended.mgmt.ui.components"
     override def description: String = "Reusable components for building Material UI's"
 
@@ -17,6 +20,7 @@ object MgmtUiComponents extends ProjectFactory{
     )
 
     override def deps : Def.Initialize[Seq[ModuleID]] = Def.setting(super.deps.value ++ Seq(
+      JsDependencies.blendedJmx.value,
       JsDependencies.react4s.value
     ))
 
