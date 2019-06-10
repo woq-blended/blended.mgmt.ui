@@ -16,8 +16,13 @@ object Styles {
     val withTheme : js.Function1[js.Any, js.Function1[Any, js.Any]] = js.native
   }
 
-  def withStyles(jsProps : Seq[JsProp]) : ElementOrComponent => ElementOrComponent = {
+  def withChildren(children : Tag*) : Node => Node = {
+    case comp : JsComponentConstructor => JsComponentConstructor(comp.componentClass, comp.children ++ children, comp.key, comp.ref)
+    case elem : Element => elem.copy(children = elem.children ++ children)
+    case o => o
+  }
 
+  def withStyles(jsProps : Seq[JsProp]) : ElementOrComponent => ElementOrComponent = {
     case comp : JsComponentConstructor => JsComponentConstructor(comp.componentClass, comp.children ++ jsProps, comp.key, comp.ref)
     case elem : Element => elem.copy(children = jsProps.map(p => Attribute(p.name, p.value)) ++ elem.children)
     case o => o

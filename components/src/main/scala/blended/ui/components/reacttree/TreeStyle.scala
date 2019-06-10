@@ -12,9 +12,18 @@ object TreeStyle {
     S.height.px(1)
   )
 
+  object NodeLabelDivStyle extends CssClass(
+    S.marginTop.auto(),
+    S.flex("1")
+  )
+
+  object NodeSelectedStyle extends CssClass(
+    S.background(Theme.background)
+  )
+
   object NodeLabelTextStyle {
     def apply() : Seq[JsProp] = Seq(
-      J("variant", "body")
+      J("variant", "body1")
     )
   }
 }

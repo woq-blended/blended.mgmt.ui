@@ -1,10 +1,10 @@
 package blended.ui.components.reacttree
 
 import blended.jmx.JmxObjectName
-import blended.ui.material.MaterialUI.Typography
-import com.github.ahnfelt.react4s._
 import blended.material.ui.Styles._
-import blended.ui.components.reacttree.TreeStyle.NodeLabelTextStyle
+import blended.ui.components.reacttree.TreeStyle._
+import blended.ui.material.MaterialUI.{Paper, Typography}
+import com.github.ahnfelt.react4s._
 
 sealed trait JmxNodeType {
   def title : String
@@ -44,11 +44,16 @@ case class ObjNameNode(name : JmxObjectName, parentName: JmxObjectName) extends 
 
 object JmxTree extends ReactTree[JmxNodeType] {
 
-  override val nodeRenderer: JmxTree.NodeRenderer = node => _ => E.div(
-    S.marginTop.auto(),
-    withStyles(NodeLabelTextStyle())(Typography(
-      Text(s"${node.title}")
-    ))
+  override val nodeRenderer: JmxTree.NodeRenderer = node => _ => selected => E.div(
+    NodeLabelDivStyle,
+    Paper(
+      NodeSelectedStyle.when(selected),
+      withStyles(NodeLabelTextStyle())(
+        Typography(
+          Text(s"${node.title}")
+        )
+      )
+    )
   )
 
   override val keyExtractor: JmxNodeType => String = {
@@ -56,6 +61,8 @@ object JmxTree extends ReactTree[JmxNodeType] {
     case DomainNode(d) => d
     case ObjNameNode(n, _) => n.objectName
   }
+
+  override val showRoot: Boolean = false
 }
 
 object JmxTreeHelper {

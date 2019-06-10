@@ -4,15 +4,20 @@ import blended.material.ui.MatIcons.{AddCircleIcon, RemoveCircleIcon}
 import blended.material.ui.Styles._
 import blended.mgmt.ui.theme.Theme.IconStyles
 import blended.ui.components.reacttree.TreeStyle._
-import blended.ui.material.MaterialUI.{IconButton, Typography}
+import blended.ui.material.MaterialUI.{IconButton, Paper, Typography}
 import com.github.ahnfelt.react4s._
 
 trait ReactTree[NodeData] {
 
+  sealed trait TreeEvent
+  case class NodeSelected(
+    node : NodeData
+  ) extends TreeEvent
+
   /**
-    * A node renderer takes an instance of [[NodeData]] and renders it as a Tag.
+    * A node renderer takes an instance of [[NodeData]] and the level of the node and renders it as a Tag.
     */
-  type NodeRenderer = NodeData => Int => Node
+  type NodeRenderer = NodeData => Int => Boolean => Node
 
   object TreeNode {
     def apply(
@@ -34,13 +39,18 @@ trait ReactTree[NodeData] {
   /**
     * A convenience renderer to render node values as Strings.
     */
-  val nodeRenderer : NodeRenderer = nd => _ =>
-    withStyles(NodeLabelTextStyle())(Typography(
-      Text(s"$nd")
-    ))
+  val nodeRenderer : NodeRenderer = nd => _ => selected =>
+    Paper(
+      NodeSelectedStyle.when(selected),
+      withStyles(NodeLabelTextStyle())(Typography(
+        Text(s"$nd")
+      ))
+    )
 
 
   val keyExtractor : NodeData => String = { _.hashCode().toString() }
+
+  val showRoot : Boolean = true
 
   /**
     * A class holding the configuration for the tree, such as a custom renderer and a key
@@ -48,17 +58,38 @@ trait ReactTree[NodeData] {
     */
   case class TreeProperties(
     renderer : NodeRenderer = nodeRenderer,
-    keyExtractor : NodeData => String = keyExtractor
+    keyExtractor : NodeData => String = keyExtractor,
+    showRootNode : Boolean = showRoot
   )
 
-  private case class TreeNodeComponent(data : P[TreeNode], props : P[TreeProperties], level: P[Int])
-    extends Component[NoEmit] {
+  private case class TreeNodeComponent(
+    data : P[TreeNode],
+    selected : P[Option[NodeData]],
+    level: P[Int],
+    props : P[TreeProperties]
+  ) extends Component[TreeEvent] {
 
+    private[this] val initialized : State[Boolean] = State(false)
     private[this] val collapsed : State[Boolean] = State(true)
 
-    override def render(get: Get): Node = {
+    override def componentWillRender(get: Get): Unit = if (!get(initialized)) {
+      collapsed.set(get(level) > 0)
+      initialized.set(true)
+    }
 
-      val toggle : Tag = if (get(data).isLeaf) {
+    private def childTags(get : Get) : Seq[Tag] = if (get(level) > 0 && get(collapsed)) {
+      Seq.empty
+    } else {
+      val p = get(props)
+      get(data).children.map { c =>
+        Component(TreeNodeComponent, c, get(selected), get(level) + 1, p)
+          .withKey(p.keyExtractor(c.nodeValue))
+          .withHandler{ e => emit(e) }
+      }
+    }
+
+    private def toggleIcon(get : Get) : Tag = {
+      if (get(data).isLeaf) {
         E.div(S.height.px(24), S.width.px(24))
       } else {
         if (get(collapsed)) {
@@ -73,37 +104,62 @@ trait ReactTree[NodeData] {
           )
         }
       }
+    }
 
-      val renderValue: NodeData => TreeProperties => Node = d => p => E.div(
-        S.display("flex"), S.flexFlow("row"),
-        E.div(indentStyle(get(level)):_*),
-        Tags(toggle),
-        p.renderer(d)(get(level))
-      )
+    override def render(get: Get): Node = {
 
-      val render: TreeNode => TreeProperties => Node = n => p => {
+      val node = get(data)
+      val isSelected : Boolean = get(selected) match {
+        case None => false
+        case Some(s) => s.equals(node.nodeValue)
+      }
 
-        val childTags : Seq[Tag] = if (get(collapsed)) {
-          Seq.empty
+      val l : Int = get(level)
+
+      val renderValue: NodeData => TreeProperties => Node = d => p => {
+
+        val indent : Int = if (l > 0 && !p.showRootNode) {
+          l - 1
         } else {
-          n.children.map { c =>
-            Component(TreeNodeComponent, c, p, get(level) + 1).withKey(p.keyExtractor(c.nodeValue))
-          }
+          l
         }
 
         E.div(
-          renderValue(n.nodeValue)(p),
-          Tags(childTags)
+          S.display("flex"), S.flexFlow("row"),
+          E.div(indentStyle(indent):_*).when(l > 0),
+          toggleIcon(get),
+          withChildren(
+            A.onClick { _ =>
+              emit(NodeSelected(d))
+            }
+          )(p.renderer(d)(get(level))(isSelected))
         )
       }
 
-      render(get(data))(get(props))
+      val render: TreeNode => TreeProperties => Node = n => p => {
+
+        E.div(
+          renderValue(n.nodeValue)(p).when(l > 0 || p.showRootNode),
+          Tags(childTags(get))
+        )
+      }
+
+      render(node)(get(props))
     }
   }
 
-  case class ReactTree(data : P[TreeNode], props : P[TreeProperties]) extends Component[NoEmit] {
+  case class ReactTree(data : P[TreeNode], props : P[TreeProperties]) extends Component[TreeEvent] {
+
+    private val selectedNode : State[Option[NodeData]] = State(None)
+
     override def render(get: Get): Node = E.div(
-      Component(TreeNodeComponent, get(data), get(props), 0).withKey(get(props).keyExtractor(get(data).nodeValue))
+      Component(TreeNodeComponent, get(data), get(selectedNode), 0, get(props))
+        .withKey(get(props).keyExtractor(get(data).nodeValue))
+        .withHandler {
+          case s: NodeSelected =>
+            selectedNode.set(Some(s.node))
+            emit(s)
+        }
     )
   }
 }

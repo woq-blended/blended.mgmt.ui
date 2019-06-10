@@ -1,10 +1,7 @@
 package blended.ui.samples.state
 
 import blended.jmx.JmxObjectName
-import blended.ui.samples.components.SampleTree
 import blended.ui.samples.{HomePage, SamplePage}
-
-import scala.util.Random
 
 case class Person(
   first: String,
@@ -15,31 +12,12 @@ case class Person(
 
 sealed trait SampleAppEvent
 final case class PageSelected(p: Option[SamplePage]) extends SampleAppEvent
-final case object RefreshTree extends SampleAppEvent
 
 object SampleAppState {
 
   def redux(event: SampleAppEvent)(old: SampleAppState) : SampleAppState = event match {
     case PageSelected(p) =>
       old.copy(currentPage = p)
-
-    case RefreshTree =>
-      old.copy(tree = sampleTree("Root", 3))
-  }
-
-  private val rnd = new Random()
-
-  private def sampleTree(v : String, depth : Int) : SampleTree.TreeNode = {
-
-    val children : List[SampleTree.TreeNode] = if (depth > 0) {
-      1.to(rnd.nextInt(3) + 2).map{ i =>
-        sampleTree(s"$v - $i", depth - 1)
-      }.toList
-    } else {
-      List.empty
-    }
-
-    SampleTree.TreeNode(v, children)
   }
 }
 
@@ -80,9 +58,6 @@ case class SampleAppState(
     JmxObjectName("java.lang:name=PS MarkSweep,type=GarbageCollector").get,
     JmxObjectName("com.sun.management:type=HotSpotDiagnostic").get,
     JmxObjectName("jdk.management.jfr:type=FlightRecorder").get
-  ),
-
-
-  tree : SampleTree.TreeNode = SampleAppState.sampleTree("Root", 3)
+  )
 )
 

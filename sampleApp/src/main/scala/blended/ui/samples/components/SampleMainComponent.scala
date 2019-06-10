@@ -1,7 +1,7 @@
 package blended.ui.samples.components
 
 import blended.mgmt.ui.theme.Theme
-import blended.ui.common.{Logger, MainComponent}
+import blended.ui.common.MainComponent
 import blended.ui.router.Router
 import blended.ui.samples.state._
 import blended.ui.samples.{HomePage, SamplePage}
@@ -23,12 +23,6 @@ case class SampleMainComponent() extends MainComponent[SamplePage, SampleAppStat
   )
 
   override def componentWillRender(get: Get): Unit = {
-
-//    if (intervalHandle.isEmpty) {
-//      intervalHandle = Some(js.timers.setInterval(1000) {
-//        appState.modify(SampleAppState.redux(RefreshTree))
-//      })
-//    }
 
     if(dom.window.location.href.contains("?")) {
       dom.window.onhashchange = { _ =>
