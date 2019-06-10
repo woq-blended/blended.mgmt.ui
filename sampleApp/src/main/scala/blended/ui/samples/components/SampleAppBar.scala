@@ -7,7 +7,9 @@ import com.github.ahnfelt.react4s._
 
 object SampleAppBar {
 
+  // scalastyle:off class.name
   case class comp(s: P[SampleAppState]) extends Component[NoEmit] {
+  // scalastyle:on class.name
 
     private[this] def title(get: Get) : String =
       "Blended Component PlayGround"
@@ -20,7 +22,7 @@ object SampleAppBar {
           J("color", "inherit"),
           S.flexGrow.number(1),
           Text(title(get))
-        ),
+        )
       )
 
       MaterialUI.AppBar(

@@ -1,8 +1,9 @@
 package blended.ui.components.reacttree
 
 import blended.material.ui.MatIcons.{AddCircleIcon, RemoveCircleIcon}
-import blended.mgmt.ui.theme.Theme
+import blended.material.ui.Styles._
 import blended.mgmt.ui.theme.Theme.IconStyles
+import blended.ui.components.reacttree.TreeStyle._
 import blended.ui.material.MaterialUI.{IconButton, Typography}
 import com.github.ahnfelt.react4s._
 
@@ -33,24 +34,21 @@ trait ReactTree[NodeData] {
   /**
     * A convenience renderer to render node values as Strings.
     */
-  val defaultNodeRenderer : NodeRenderer = nd => _ => E.div(
-    S.marginTop.auto(),
-    Typography(
-      J("variant", "headline"),
-      J("component", "h2"),
+  val nodeRenderer : NodeRenderer = nd => _ =>
+    withStyles(NodeLabelTextStyle())(Typography(
       Text(s"$nd")
-    )
-  )
+    ))
 
-  val defaultKeyExtractor : NodeData => String = { _.hashCode().toString() }
+
+  val keyExtractor : NodeData => String = { _.hashCode().toString() }
 
   /**
     * A class holding the configuration for the tree, such as a custom renderer and a key
     * extractor.
     */
   case class TreeProperties(
-    renderer : NodeRenderer = defaultNodeRenderer,
-    keyExtractor : NodeData => String = defaultKeyExtractor
+    renderer : NodeRenderer = nodeRenderer,
+    keyExtractor : NodeData => String = keyExtractor
   )
 
   private case class TreeNodeComponent(data : P[TreeNode], props : P[TreeProperties], level: P[Int])
@@ -66,31 +64,19 @@ trait ReactTree[NodeData] {
         if (get(collapsed)) {
           IconButton(
             IconStyles,
-            AddCircleIcon(
-              A.onLeftClick{_ =>
-                collapsed.modify(v => !v)
-              }
-            )
+            AddCircleIcon( A.onLeftClick{_ => collapsed.modify(v => !v) } )
           )
         } else {
           IconButton(
             IconStyles,
-            RemoveCircleIcon(
-              A.onLeftClick{_ =>
-                collapsed.modify(v => !v)
-              }
-            )
+            RemoveCircleIcon( A.onLeftClick{_ => collapsed.modify(v => !v) } )
           )
         }
       }
 
       val renderValue: NodeData => TreeProperties => Node = d => p => E.div(
-        S.display("flex"),
-        S.flexFlow("row"),
-        E.div(
-          S.width.pt(Theme.spacingUnit * 2 * get(level)),
-          S.height.px(1)
-        ),
+        S.display("flex"), S.flexFlow("row"),
+        E.div(indentStyle(get(level)):_*),
         Tags(toggle),
         p.renderer(d)(get(level))
       )
