@@ -1,6 +1,6 @@
 package blended.mgmt.ui.theme
 
-import blended.material.ui.{Colors, Styles}
+import blended.material.ui.{Colors, PaletteIntention, Styles}
 import com.github.ahnfelt.react4s._
 
 import scala.scalajs.js
@@ -23,8 +23,10 @@ object Theme {
 
   val theme : js.Dynamic = Styles.createMuiTheme(palette)
 
-  val primary : String = theme.palette.primary.main.asInstanceOf[String]
-  val secondary : String = theme.palette.secondary.main.asInstanceOf[String]
+  val primary : PaletteIntention = PaletteIntention(theme.palette.primary)
+  val secondary :PaletteIntention = PaletteIntention(theme.palette.secondary)
+  val error : PaletteIntention = PaletteIntention(theme.palette.error)
+
   val background : String = theme.palette.background.default.asInstanceOf[String]
 
   val spacingUnit : Int = theme.spacing.unit.asInstanceOf[Int]
@@ -73,6 +75,6 @@ object Theme {
     S.padding.pt(0),
     S.height.em(1),
     S.marginTop.auto(),
-    S.color(secondary)
+    S.color(secondary.main)
   )
 }

@@ -1,7 +1,7 @@
 package blended.ui.samples.components
 
 import blended.ui.common.Logger
-import blended.ui.components.reacttree.{DomainNode, JmxTree, JmxTreeHelper, ObjNameNode, RootNode}
+import blended.ui.components.reacttree._
 import blended.ui.samples.state.{SampleAppEvent, SampleAppState}
 import com.github.ahnfelt.react4s._
 

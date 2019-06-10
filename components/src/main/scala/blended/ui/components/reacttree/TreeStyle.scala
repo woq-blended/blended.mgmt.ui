@@ -1,5 +1,6 @@
 package blended.ui.components.reacttree
 
+import blended.material.ui.Colors
 import blended.mgmt.ui.theme.Theme
 import com.github.ahnfelt.react4s._
 
@@ -14,11 +15,18 @@ object TreeStyle {
 
   object NodeLabelDivStyle extends CssClass(
     S.marginTop.auto(),
-    S.flex("1")
+    S.flex.number(1)
   )
 
   object NodeSelectedStyle extends CssClass(
-    S.background(Theme.background)
+    S.background(Theme.secondary.main),
+    S.color(Theme.secondary.contrastText)
+  )
+
+  object NodeHoverStyle extends CssClass(
+    Css.hover(
+      S.background(Theme.secondary.main)
+    )
   )
 
   object NodeLabelTextStyle {

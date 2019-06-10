@@ -47,9 +47,10 @@ object JmxTree extends ReactTree[JmxNodeType] {
   override val nodeRenderer: JmxTree.NodeRenderer = node => _ => selected => E.div(
     NodeLabelDivStyle,
     Paper(
-      NodeSelectedStyle.when(selected),
       withStyles(NodeLabelTextStyle())(
         Typography(
+          NodeHoverStyle,
+          NodeSelectedStyle.when(selected),
           Text(s"${node.title}")
         )
       )

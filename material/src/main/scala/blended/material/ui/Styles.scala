@@ -66,5 +66,7 @@ object Styles {
 }
 
 case class Styles(s : Style*) {
-  val asJsAny : js.Any = js.Dictionary[String](s.map(style => style.name -> style.value):_*)
+  val asJsAny : js.Any = {
+    js.Dictionary[String](s.map(style => style.name -> style.value):_*)
+  }
 }

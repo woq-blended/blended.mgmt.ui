@@ -42,6 +42,7 @@ trait ReactTree[NodeData] {
   val nodeRenderer : NodeRenderer = nd => _ => selected =>
     Paper(
       NodeSelectedStyle.when(selected),
+      NodeHoverStyle,
       withStyles(NodeLabelTextStyle())(Typography(
         Text(s"$nd")
       ))
