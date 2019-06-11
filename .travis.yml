@@ -5,7 +5,7 @@ addons:
   chrome: stable
 
 install:
-  - wget -N http://chromedriver.storage.googleapis.com/2.40/chromedriver_linux64.zip -P ~/
+  - wget -N https://chromedriver.storage.googleapis.com/75.0.3770.8/chromedriver_linux64.zip -P ~/
   - unzip ~/chromedriver_linux64.zip -d ~/
   - sudo mkdir -p /opt
   - sudo mv -f ~/chromedriver /opt
