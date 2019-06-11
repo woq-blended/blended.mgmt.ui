@@ -50,14 +50,14 @@ trait ReactTable[TableData] {
     *
     * @see [[CellRenderer]]
     */
-  case class ColumnConfig(
+  final case class ColumnConfig(
     name : String,
     renderer : CellRenderer[_],
     numeric : Boolean = false,
     width : Option[String] = None
   )
 
-  case class TableProperties(
+  final case class TableProperties(
     // The configuration of the table columns
     columns: Seq[ColumnConfig] = Seq.empty,
     searchExtractor : TableData => String = { _.toString() },
@@ -68,7 +68,7 @@ trait ReactTable[TableData] {
     * @param row is the instance of TableData to be displayed in this row
     * @param props are the table properties determining the display parameters
     */
-  case class ReactTableRow(row: P[TableData], props: P[TableProperties]) extends Component[NoEmit] {
+  final case class ReactTableRow(row: P[TableData], props: P[TableProperties]) extends Component[NoEmit] {
     override def render(get: Get): Node = {
 
       // determine the sequence of Tags to be displayed in this row
@@ -87,7 +87,7 @@ trait ReactTable[TableData] {
     * Defines the table header
     * @param props are the table properties defining the table display
     */
-  case class ReactTableHeader(
+  final case class ReactTableHeader(
     props: P[TableProperties]
   ) extends Component[NoEmit] {
 
@@ -104,7 +104,7 @@ trait ReactTable[TableData] {
     }
   }
 
-  case class ReactTable(data: P[Seq[TableData]], props: P[TableProperties]) extends Component[NoEmit] {
+  final case class ReactTable(data: P[Seq[TableData]], props: P[TableProperties]) extends Component[NoEmit] {
 
     override def render(get: Get): Node = {
 

@@ -12,7 +12,10 @@ object SamplesLoader {
 
     val main = E.div(
       CssBaseline(),
-      Styles.MuiThemeProvider(J("theme", Theme.theme), Component(SampleMainComponent))
+      Styles.MuiThemeProvider(
+        J("theme", Theme.theme),
+        Component(SampleMainComponent)
+      )
     )
 
     ReactBridge.renderToDomById(main, "content")

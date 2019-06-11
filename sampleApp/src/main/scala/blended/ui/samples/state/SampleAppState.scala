@@ -1,7 +1,6 @@
 package blended.ui.samples.state
 
 import blended.jmx.JmxObjectName
-import blended.ui.samples.{HomePage, SamplePage}
 
 case class Person(
   first: String,
@@ -11,7 +10,7 @@ case class Person(
 )
 
 sealed trait SampleAppEvent
-final case class PageSelected(p: Option[SamplePage]) extends SampleAppEvent
+final case class PageSelected(p: Option[String]) extends SampleAppEvent
 
 object SampleAppState {
 
@@ -21,9 +20,9 @@ object SampleAppState {
   }
 }
 
-case class SampleAppState(
+final case class SampleAppState(
 
-  currentPage : Option[SamplePage] = Some(HomePage),
+  currentPage : Option[String] = None,
 
   persons : Seq[Person] = Seq(
     // scalastyle:off magic.number

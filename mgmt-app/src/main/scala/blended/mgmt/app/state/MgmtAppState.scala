@@ -9,7 +9,7 @@ import blended.updater.config.ContainerInfo
 import prickle._
 import blended.updater.config.json.PrickleProtocol._
 import blended.jmx.json.PrickleProtocol._
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -92,7 +92,7 @@ case class MgmtAppState(
   serverPublicKey : Option[String] = None
 ) {
 
-  lazy val conf = ConfigFactory
+  lazy val conf : Config = ConfigFactory
     .parseString(
       """akka {
          loglevel = "DEBUG"

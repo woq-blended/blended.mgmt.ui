@@ -1,6 +1,5 @@
 package blended.ui.components.reacttree
 
-import blended.material.ui.Colors
 import blended.mgmt.ui.theme.Theme
 import com.github.ahnfelt.react4s._
 

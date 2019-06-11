@@ -10,10 +10,10 @@ object Theme {
   val palette : js.Dynamic  = js.Dynamic.literal(
     "palette" -> js.Dynamic.literal (
       "primary" -> js.Dynamic.literal (
-        "main" -> Colors.brown("700")
+        "main" -> Colors.blue("700")
       ),
       "secondary" -> js.Dynamic.literal (
-        "main" -> Colors.deepOrange("200")
+        "main" -> Colors.blueGrey("200")
       ),
       "background" -> js.Dynamic.literal (
         "default" -> Colors.grey("200").asInstanceOf[String]
@@ -28,7 +28,6 @@ object Theme {
   val error : PaletteIntention = PaletteIntention(theme.palette.error)
 
   val background : String = theme.palette.background.default.asInstanceOf[String]
-
   val spacingUnit : Int = theme.spacing.unit.asInstanceOf[Int]
 
   // Applied to the Browser window as a hole

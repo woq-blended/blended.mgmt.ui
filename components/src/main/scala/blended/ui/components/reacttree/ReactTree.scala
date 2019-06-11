@@ -36,34 +36,34 @@ trait ReactTree[NodeData] {
     val isLeaf : Boolean = children.isEmpty
   }
 
+  val nodeLabel : NodeData => String = nd => s"$nd"
+
   /**
     * A convenience renderer to render node values as Strings.
     */
-  val nodeRenderer : NodeRenderer = nd => _ => selected =>
+  val defaultNodeRenderer : NodeRenderer = nd => _ => selected =>
     Paper(
+      NodeLabelDivStyle,
       NodeSelectedStyle.when(selected),
       NodeHoverStyle,
       withStyles(NodeLabelTextStyle())(Typography(
-        Text(s"$nd")
+        Text(s"${nodeLabel(nd)}")
       ))
     )
 
-
-  val keyExtractor : NodeData => String = { _.hashCode().toString() }
-
-  val showRoot : Boolean = true
+  val defaultKeyExtractor : NodeData => String = { _.hashCode().toString() }
 
   /**
     * A class holding the configuration for the tree, such as a custom renderer and a key
     * extractor.
     */
-  case class TreeProperties(
-    renderer : NodeRenderer = nodeRenderer,
-    keyExtractor : NodeData => String = keyExtractor,
-    showRootNode : Boolean = showRoot
+  final case class TreeProperties(
+    renderer : NodeRenderer = defaultNodeRenderer,
+    keyExtractor : NodeData => String = defaultKeyExtractor,
+    showRootNode : Boolean = true
   )
 
-  private case class TreeNodeComponent(
+  private final case class TreeNodeComponent(
     data : P[TreeNode],
     selected : P[Option[NodeData]],
     level: P[Int],

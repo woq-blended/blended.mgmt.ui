@@ -1,22 +1,24 @@
 package blended.ui.samples.components
 
 import blended.ui.common.Logger
+import blended.ui.components.pagecontainer.PageContainer
 import blended.ui.components.reacttree._
 import blended.ui.samples.state.{SampleAppEvent, SampleAppState}
 import com.github.ahnfelt.react4s._
 
-case class SampleTreePage(state : P[SampleAppState]) extends Component[SampleAppEvent] {
+object SampleTreePage extends PageContainer[SampleAppState, SampleAppEvent] {
 
-  private val log : Logger = Logger[SampleTreePage]
+  override def pageName: String = "ReactTree"
 
-  override def render(get: Get): Node = {
+  private val log : Logger = Logger[SampleTreePage.type]
 
+  override def renderPage(state: SampleAppState, props: SampleTreePage.PageProperties): Node =  {
     E.div(
       Tags(
         Component(
           JmxTree.ReactTree,
-          JmxTreeHelper.treeModel(get(state).names),
-          JmxTree.TreeProperties()
+          JmxTreeHelper.treeModel(state.names),
+          JmxTree.treeConfiguration
         ).withHandler{
           case JmxTree.NodeSelected(node) =>
             val objName = node match {
@@ -24,7 +26,6 @@ case class SampleTreePage(state : P[SampleAppState]) extends Component[SampleApp
               case DomainNode(domain) => domain
               case ObjNameNode(name, _) => name.toString
             }
-
             log.info(s"Selected node [$objName]")
         }
       )
