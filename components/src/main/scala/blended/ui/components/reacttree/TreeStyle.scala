@@ -7,10 +7,10 @@ object TreeStyle {
 
   private val indent : Int = Theme.spacingUnit * 2
 
-  val indentStyle : Int => Seq[Tag] = level => Seq(
+  val indentStyle : Int => Tag = level => Tags(Seq(
     S.width.pt(indent * level),
     S.height.px(1)
-  )
+  ))
 
   object NodeLabelDivStyle extends CssClass(
     S.marginTop.auto(),

@@ -13,5 +13,4 @@ object HomePage extends PageContainer[SampleAppState, SampleAppEvent] {
       Component(PersonTable.ReactTable, state.persons, PersonTable.props)
     )
   )
-
 }

@@ -127,7 +127,7 @@ trait ReactTree[NodeData] {
 
         E.div(
           S.display("flex"), S.flexFlow("row"),
-          E.div(indentStyle(indent):_*).when(l > 0),
+          E.div(indentStyle(indent)).when(l > 0),
           toggleIcon(get),
           withChildren(
             A.onClick { _ =>
