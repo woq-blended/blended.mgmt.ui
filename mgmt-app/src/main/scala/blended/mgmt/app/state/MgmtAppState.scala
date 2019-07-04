@@ -51,10 +51,10 @@ object MgmtAppState {
                   case Failure(exception) =>
                 }
 
-                Unpickle[List[JmxObjectName]].fromString(s) match {
+                Unpickle[Seq[JmxObjectName]].fromString(s) match {
                   case Success(names) =>
                     log.info(s"Got new object name list: $names")
-                  case Failure(t) =>
+                  case Failure(_) =>
                 }
             }
 

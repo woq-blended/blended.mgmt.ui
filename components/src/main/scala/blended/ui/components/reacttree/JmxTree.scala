@@ -47,7 +47,7 @@ object JmxTree extends ReactTree[JmxNodeType] {
     keyExtractor = {
       case RootNode => "JmxRoot"
       case DomainNode(d) => d
-      case ObjNameNode(n, _) => n.objectName
+      case ObjNameNode(n, _) => n.objectName.toString()
     },
     showRootNode = false
   )
