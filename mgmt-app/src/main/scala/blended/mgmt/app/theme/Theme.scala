@@ -10,10 +10,10 @@ object Theme extends LoginStyles {
   val palette : js.Dynamic  = js.Dynamic.literal(
     "palette" -> js.Dynamic.literal (
       "primary" -> js.Dynamic.literal (
-        "main" -> Colors.teal("500")
+        "main" -> Colors.blue("500")
       ),
       "secondary" -> js.Dynamic.literal (
-        "main" -> Colors.amber("A400")
+        "main" -> Colors.lightBlue("A400")
       ),
       "background" -> js.Dynamic.literal (
         "default" -> "#fafafa"
