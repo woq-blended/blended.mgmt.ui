@@ -10,6 +10,7 @@ object RootSettings extends ProjectConfig with NoPublish {
   override def projectName: String = "blended.mgmt.ui"
 
   override def settings: Seq[sbt.Setting[_]] = super.settings ++ Seq(
+    scalaVersion := "2.12.8",
     Global/scalariformAutoformat := false,
     Global/scalariformWithBaseDirectory := true,
 
