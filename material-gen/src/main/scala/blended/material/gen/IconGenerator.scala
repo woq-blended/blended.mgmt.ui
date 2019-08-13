@@ -4,7 +4,9 @@ import java.util.regex.Pattern
 
 class IconGenerator(sourceFile: String, targetFile: String) extends AbstractGenerator(sourceFile, targetFile) {
 
-  private[this] val usedIcons : Seq[String] = Seq("AddCircle", "RemoveCircle")
+  private[this] val usedIcons : Seq[String] = Seq(
+    "AddCircle", "RemoveCircle",
+  )
 
   private[this] val iconNames = {
 
