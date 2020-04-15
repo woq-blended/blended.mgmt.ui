@@ -49,9 +49,13 @@ trait BlendedJSModule extends BlendedModule with ScalaJSModule { jsBase =>
   override def scalaJSVersion : T[String]  = T {"0.6.32"}
 
   trait Tests extends super.Tests {
+    def blendedTestModule : String = jsBase.blendedModule + ".test"
+    override def artifactName = blendedTestModule
+
+    override def millSourcePath = jsBase.millSourcePath / "src" / "test"
+
     override def sources: Sources = T.sources(
-      jsBase.millSourcePath / "src" / "test" / "scala",
-      jsBase.millSourcePath / os.up / "shared" / "src" / "test" / "scala"
+      millSourcePath / "scala",
     )
     override def ivyDeps = T{ super.ivyDeps() ++ Agg(
       ivy"org.scalatest::scalatest::3.0.8"
