@@ -1,7 +1,9 @@
 import coursier.Repository
 import coursier.maven.MavenRepository
 import mill._
+import mill.define._
 import mill.scalajslib.ScalaJSModule
+import mill.scalajslib.api.ModuleKind
 import mill.scalalib._
 import mill.scalalib.publish._
 
@@ -43,8 +45,20 @@ trait BlendedModule extends SbtModule with ScalaModule with BlendedPublishModule
   override def millSourcePath : os.Path = baseDir / millModuleSegments.parts.last
 }
 
-trait BlendedJSModule extends BlendedModule with ScalaJSModule {
+trait BlendedJSModule extends BlendedModule with ScalaJSModule { jsBase =>
   override def scalaJSVersion : T[String]  = T {"0.6.32"}
+
+  trait Tests extends super.Tests {
+    override def sources: Sources = T.sources(
+      jsBase.millSourcePath / "src" / "test" / "scala",
+      jsBase.millSourcePath / os.up / "shared" / "src" / "test" / "scala"
+    )
+    override def ivyDeps = T{ super.ivyDeps() ++ Agg(
+      ivy"org.scalatest::scalatest::3.0.8"
+    )}
+    override def testFrameworks = Seq("org.scalatest.tools.Framework")
+    override def moduleKind: T[ModuleKind] = T{ ModuleKind.CommonJSModule }
+  }
 }
 
 /** Project directory. */
@@ -68,6 +82,7 @@ object blended extends Module {
         override def moduleDeps = super.moduleDeps ++ Seq(router)
       }
       object router extends BlendedJSModule {
+        object test extends super.Tests
       }
     }
   }
