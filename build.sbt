@@ -4,7 +4,7 @@ inThisBuild(
   Seq(
     organization := ProjectDeprecated.organization,
     scalaVersion := crossScalaVersions.value.head,
-    crossScalaVersions := Seq("2.12.8"),
+    crossScalaVersions := Seq("2.12.11"),
     scalacOptions in Compile ++= Seq(
       "-deprecation",
       "-feature"

@@ -1,6 +1,6 @@
 //noinspection Annotator,Annotator,Annotator
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.28")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.32")
 addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.15.0-0.6")
 // Scala source code formatter (also used by Scala-IDE/Eclipse)
 addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2")
