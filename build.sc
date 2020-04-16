@@ -6,6 +6,9 @@ import mill.scalajslib.ScalaJSModule
 import mill.scalajslib.api.ModuleKind
 import mill.scalalib._
 import mill.scalalib.publish._
+import $file.build_util
+import build_util.{FilterUtil, ZipUtil}
+import mill.modules.Jvm
 
 object Deps {
   val scalaVersion = "2.12.11"
@@ -25,6 +28,9 @@ object Deps {
     val scalatest = ivy"org.scalatest::scalatest::3.0.8"
   }
 }
+
+/** Project directory. */
+val baseDir: os.Path = build.millSourcePath
 
 trait BlendedCoursierModule extends CoursierModule {
   private def zincWorker: ZincWorkerModule = mill.scalalib.ZincWorkerModule
@@ -79,8 +85,14 @@ trait BlendedJSModule extends BlendedModule with ScalaJSModule { jsBase =>
   }
 }
 
-/** Project directory. */
-val baseDir: os.Path = build.millSourcePath
+trait YarnUtils extends Module {
+  def yarnInstall : T[PathRef] = T {
+    val log = T.ctx().log
+    val result = os.proc("yarn", "install").call(cwd = baseDir)
+    log.info(new String(result.out.bytes))
+    PathRef(baseDir / ".yarn" / "cache")
+  }
+}
 
 object blended extends Module {
 
@@ -113,6 +125,44 @@ object blended extends Module {
           Deps.slf4j,
           Deps.logbackCore,
           Deps.logbackClassic
+        )}
+      }
+
+      object material extends BlendedJSModule with YarnUtils {
+
+        def unpackMaterial : T[PathRef] = T {
+
+          val yarnDeps = os.list(yarnInstall().path)
+
+          val matDest = T.ctx().dest / "material"
+          os.makeDir.all(matDest)
+
+          val matCore = yarnDeps.find(_.last.startsWith("@material-ui-core"))
+          val matIcons = yarnDeps.find(_.last.startsWith("@material-ui-icons"))
+
+          ZipUtil.unpackZip(src = matCore.get, dest = matDest)
+          ZipUtil.unpackZip(src = matIcons.get, dest = matDest)
+          PathRef(matDest)
+        }
+
+        override def generatedSources = T {
+
+          val genTarget = T.ctx().dest / "generated"
+
+          val generate = Jvm.runSubprocess(
+            mainClass = "blended.material.gen.MaterialGenerator",
+            classPath = materialGen.runClasspath().map(_.path),
+            mainArgs = Seq(
+              "-d", (unpackMaterial().path / "node_modules" / "@material-ui").toIO.getAbsolutePath(),
+              "-o", genTarget.toIO.getAbsolutePath()
+            )
+          )
+
+          super.generatedSources() ++ Seq(PathRef(genTarget))
+        }
+
+        override def ivyDeps = T { super.ivyDeps() ++ Agg(
+          Deps.Js.react4s
         )}
       }
     }
