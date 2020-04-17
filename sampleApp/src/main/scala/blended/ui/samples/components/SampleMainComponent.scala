@@ -2,7 +2,7 @@ package blended.ui.samples.components
 
 import blended.mgmt.ui.theme.Theme
 import blended.ui.components.pagecontainer.PageRegistry
-import blended.ui.material.MaterialUI.Typography
+import blended.material.ui.MaterialUI.Typography
 import blended.ui.samples.components.SampleMenuDrawer.MenuItemSelected
 import blended.ui.samples.state._
 import com.github.ahnfelt.react4s._

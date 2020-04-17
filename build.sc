@@ -71,6 +71,8 @@ trait BlendedModule extends SbtModule with ScalaModule with BlendedPublishModule
 trait BlendedJSModule extends BlendedModule with ScalaJSModule { jsBase =>
   override def scalaJSVersion : T[String]  = Deps.scalaJSVersion
 
+  override def moduleKind: T[ModuleKind] = T{ ModuleKind.CommonJSModule }
+
   trait Tests extends super.Tests {
     def blendedTestModule : String = jsBase.blendedModule + ".test"
     override def artifactName = blendedTestModule
@@ -84,7 +86,6 @@ trait BlendedJSModule extends BlendedModule with ScalaJSModule { jsBase =>
       Deps.Js.scalatest
     )}
     override def testFrameworks = Seq("org.scalatest.tools.Framework")
-    override def moduleKind: T[ModuleKind] = T{ ModuleKind.CommonJSModule }
   }
 }
 
@@ -137,7 +138,7 @@ object blended extends Module {
         )}
       }
 
-      object material extends BlendedJSModule with YarnUtils {
+      object material extends YarnUtils with BlendedJSModule {
 
         override def generatedSources = T {
 
@@ -171,6 +172,18 @@ object blended extends Module {
 
         override def ivyDeps = T { super.ivyDeps() ++ Agg(
           Deps.Js.blendedJmx
+        )}
+      }
+
+      object sampleApp extends BlendedJSModule {
+
+        override def mainClass = Option("blended.ui.samples.SampleApp")
+
+        override def moduleDeps = super.moduleDeps ++ Seq(common, components)
+
+        override def ivyDeps = T { super.ivyDeps() ++ Agg(
+          Deps.Js.react4s,
+          Deps.Js.scalaJsDom
         )}
       }
     }

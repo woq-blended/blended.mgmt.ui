@@ -1,7 +1,7 @@
 package blended.ui.samples.components
 
 import blended.mgmt.ui.theme.Theme
-import blended.ui.material.MaterialUI
+import blended.material.ui.MaterialUI
 import com.github.ahnfelt.react4s._
 
 object SampleMenuDrawer {
