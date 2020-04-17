@@ -177,8 +177,6 @@ object blended extends Module {
 
       object sampleApp extends BlendedJSModule {
 
-        override def mainClass = Option("blended.ui.samples.SampleApp")
-
         override def moduleDeps = super.moduleDeps ++ Seq(common, components)
 
         override def ivyDeps = T { super.ivyDeps() ++ Agg(
