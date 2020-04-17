@@ -24,7 +24,7 @@ object Deps {
   val slf4j = ivy"org.slf4j:slf4j-api:${slf4jVersion}"
 
   object Js {
-    val react4s = ivy"com.github.ahnfelt::react4s::0.9.27-SNAPSHOT"
+    val react4s = ivy"com.github.ahnfelt::react4s::0.9.28-SNAPSHOT"
     val scalaJsDom = ivy"org.scala-js::scalajs-dom::0.9.5"
     val scalatest = ivy"org.scalatest::scalatest::3.0.8"
 

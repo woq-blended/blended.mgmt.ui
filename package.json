@@ -1,8 +1,13 @@
 {
   "dependencies": {
-    "@material-ui/core": "3.9.3",
+    "@material-ui/core": "3.9.4",
     "@material-ui/icons": "3.0.2",
     "react": "16.13.1",
     "react-dom": "16.13.1"
+  },
+  "devDependencies": {
+    "source-map-loader": "^0.2.4",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
   }
 }
