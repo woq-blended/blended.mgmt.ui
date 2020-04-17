@@ -19,7 +19,7 @@ class ComponentGenerator(sourceFile : String, targetFile: String) extends Abstra
   }
 
   private[this] val prelude : String =
-    s"""package blended.ui.material
+    s"""package ${MaterialGenerator.pkgName}
        |
        |import com.github.ahnfelt.react4s._
        |import scala.scalajs.js

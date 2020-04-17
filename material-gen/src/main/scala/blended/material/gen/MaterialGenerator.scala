@@ -12,6 +12,8 @@ object MaterialGenerator {
 
   private[this] val log = LoggerFactory.getLogger(classOf[MaterialGenerator])
 
+  val pkgName : String = "blended.material.ui"
+
   class CmdLine {
 
     @CmdOption(names = Array("--help", "-h"), description = "Show this help", isHelp = true)

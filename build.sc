@@ -11,6 +11,7 @@ import build_util.{FilterUtil, ZipUtil}
 import mill.modules.Jvm
 
 object Deps {
+  val blendedCoreVersion = "3.2-SNAPSHOT"
   val scalaVersion = "2.12.11"
   val scalaJSVersion = "0.6.32"
 
@@ -26,6 +27,8 @@ object Deps {
     val react4s = ivy"com.github.ahnfelt::react4s::0.9.27-SNAPSHOT"
     val scalaJsDom = ivy"org.scala-js::scalajs-dom::0.9.5"
     val scalatest = ivy"org.scalatest::scalatest::3.0.8"
+
+    val blendedJmx = ivy"de.wayofquality.blended::blended.jmx::$blendedCoreVersion"
   }
 }
 
@@ -86,11 +89,15 @@ trait BlendedJSModule extends BlendedModule with ScalaJSModule { jsBase =>
 }
 
 trait YarnUtils extends Module {
+
+  def npmModulesDir : String = "node-modules"
+
   def yarnInstall : T[PathRef] = T {
     val log = T.ctx().log
-    val result = os.proc("yarn", "install").call(cwd = baseDir)
+    val modules = T.ctx().dest / npmModulesDir
+    val result = os.proc("yarn", "install", "--modules-folder", modules.toIO.getAbsolutePath()).call(cwd = baseDir)
     log.info(new String(result.out.bytes))
-    PathRef(baseDir / ".yarn" / "cache")
+    PathRef(modules)
   }
 }
 
@@ -120,6 +127,8 @@ object blended extends Module {
 
         override def millSourcePath = baseDir / "material-gen"
 
+        override def mainClass = Some("blended.material.gen.MaterialGenerator")
+
         override def ivyDeps = T { super.ivyDeps() ++ Agg(
           Deps.cmdOption,
           Deps.slf4j,
@@ -130,30 +139,17 @@ object blended extends Module {
 
       object material extends BlendedJSModule with YarnUtils {
 
-        def unpackMaterial : T[PathRef] = T {
-
-          val yarnDeps = os.list(yarnInstall().path)
-
-          val matDest = T.ctx().dest / "material"
-          os.makeDir.all(matDest)
-
-          val matCore = yarnDeps.find(_.last.startsWith("@material-ui-core"))
-          val matIcons = yarnDeps.find(_.last.startsWith("@material-ui-icons"))
-
-          ZipUtil.unpackZip(src = matCore.get, dest = matDest)
-          ZipUtil.unpackZip(src = matIcons.get, dest = matDest)
-          PathRef(matDest)
-        }
-
         override def generatedSources = T {
 
-          val genTarget = T.ctx().dest / "generated"
+          val npmModules = yarnInstall()
+
+          val genTarget = T.ctx().dest / "generatedSources"
 
           val generate = Jvm.runSubprocess(
-            mainClass = "blended.material.gen.MaterialGenerator",
+            mainClass = materialGen.mainClass().get,
             classPath = materialGen.runClasspath().map(_.path),
             mainArgs = Seq(
-              "-d", (unpackMaterial().path / "node_modules" / "@material-ui").toIO.getAbsolutePath(),
+              "-d", (npmModules.path / "@material-ui").toIO.getAbsolutePath(),
               "-o", genTarget.toIO.getAbsolutePath()
             )
           )
@@ -163,6 +159,18 @@ object blended extends Module {
 
         override def ivyDeps = T { super.ivyDeps() ++ Agg(
           Deps.Js.react4s
+        )}
+      }
+
+      object theme extends BlendedJSModule {
+        override def moduleDeps = super.moduleDeps ++ Seq(material)
+      }
+
+      object components extends BlendedJSModule {
+        override def moduleDeps = super.moduleDeps ++ Seq(material, theme)
+
+        override def ivyDeps = T { super.ivyDeps() ++ Agg(
+          Deps.Js.blendedJmx
         )}
       }
     }

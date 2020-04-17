@@ -1,6 +1,6 @@
 package blended.ui.components.reacttable
 
-import blended.ui.material.MaterialUI._
+import blended.material.ui.MaterialUI._
 import com.github.ahnfelt.react4s._
 
 import scala.reflect.ClassTag

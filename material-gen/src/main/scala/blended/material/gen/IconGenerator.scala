@@ -23,7 +23,7 @@ class IconGenerator(sourceFile: String, targetFile: String) extends AbstractGene
   }.filter(usedIcons.contains)
 
   private[this] val prelude =
-    s"""package blended.material.ui
+    s"""package ${MaterialGenerator.pkgName}
        |
        |import com.github.ahnfelt.react4s._
        |import scala.scalajs.js

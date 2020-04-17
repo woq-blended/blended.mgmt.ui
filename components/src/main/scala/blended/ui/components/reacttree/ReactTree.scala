@@ -4,7 +4,7 @@ import blended.material.ui.MatIcons.{AddCircleIcon, RemoveCircleIcon}
 import blended.material.ui.Styles._
 import blended.mgmt.ui.theme.Theme.IconStyles
 import blended.ui.components.reacttree.TreeStyle._
-import blended.ui.material.MaterialUI.{IconButton, Paper, Typography}
+import blended.material.ui.MaterialUI.{IconButton, Paper, Typography}
 import com.github.ahnfelt.react4s._
 
 trait ReactTree[NodeData] {
