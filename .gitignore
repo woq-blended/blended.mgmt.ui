@@ -7,3 +7,5 @@ target
 out/
 mill.B0aZ
 .yarn
+node_modules
+dist/

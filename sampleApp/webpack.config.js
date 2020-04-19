@@ -1,9 +1,6 @@
 const path = require('path');
 
 module.exports = {
-  resolve: {
-    modules: ['/home/andreas/projects/blended/blended.mgmt.ui/out/blended/mgmt/ui/material/yarnInstall/dest/node-modules']
-  },
   entry: '/home/andreas/projects/blended/blended.mgmt.ui/out/blended/mgmt/ui/sampleApp/fastOpt/dest/out.js',
   output: {
     filename: 'main.js',

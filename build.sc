@@ -91,12 +91,12 @@ trait BlendedJSModule extends BlendedModule with ScalaJSModule { jsBase =>
 
 trait YarnUtils extends Module {
 
-  def npmModulesDir : String = "node-modules"
+  def npmModulesDir : String = "node_modules"
 
   def yarnInstall : T[PathRef] = T {
     val log = T.ctx().log
-    val modules = T.ctx().dest / npmModulesDir
-    val result = os.proc("yarn", "install", "--modules-folder", modules.toIO.getAbsolutePath()).call(cwd = baseDir)
+    val modules = baseDir / npmModulesDir
+    val result = os.proc("yarn", "install").call(cwd = baseDir)
     log.info(new String(result.out.bytes))
     PathRef(modules)
   }
