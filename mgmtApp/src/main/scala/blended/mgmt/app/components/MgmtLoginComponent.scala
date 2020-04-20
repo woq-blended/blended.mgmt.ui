@@ -5,7 +5,7 @@ import blended.mgmt.app.state.{AppEvent, LoggedIn, MgmtAppState}
 import blended.mgmt.app.theme.Theme
 import blended.security.BlendedPermissions
 import blended.ui.common.Logger
-import blended.ui.material.MaterialUI._
+import blended.material.ui.MaterialUI._
 import com.github.ahnfelt.react4s._
 import org.scalajs.dom.ext.Ajax
 import org.scalajs.dom.window

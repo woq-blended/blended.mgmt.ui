@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "jsonwebtoken": "8.5.1",
     "@material-ui/core": "3.9.4",
     "@material-ui/icons": "3.0.2",
     "react": "16.13.1",

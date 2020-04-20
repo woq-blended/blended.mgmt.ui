@@ -13,6 +13,7 @@ import mill.modules.Jvm
 import os.RelPath
 
 object Deps {
+  val akkaJsActorVersion = "1.2.5.13"
   val blendedCoreVersion = "3.2-SNAPSHOT"
   val scalaVersion = "2.12.11"
   val scalaJSVersion = "0.6.32"
@@ -26,11 +27,14 @@ object Deps {
   val slf4j = ivy"org.slf4j:slf4j-api:${slf4jVersion}"
 
   object Js {
+    val akkaJsActor = ivy"org.akka-js::akkajsactor::$akkaJsActorVersion"
     val react4s = ivy"com.github.ahnfelt::react4s::0.9.28-SNAPSHOT"
     val scalaJsDom = ivy"org.scala-js::scalajs-dom::0.9.5"
     val scalatest = ivy"org.scalatest::scalatest::3.0.8"
 
     val blendedJmx = ivy"de.wayofquality.blended::blended.jmx::$blendedCoreVersion"
+    val blendedSecurity = ivy"de.wayofquality.blended::blended.security::$blendedCoreVersion"
+    val blendedUpdaterConfig = ivy"de.wayofquality.blended::blended.updater.config::$blendedCoreVersion"
   }
 }
 
@@ -87,7 +91,10 @@ trait BlendedJSModule extends BlendedModule with ScalaJSModule { jsBase =>
     override def ivyDeps = T{ super.ivyDeps() ++ Agg(
       Deps.Js.scalatest
     )}
+
     override def testFrameworks = Seq("org.scalatest.tools.Framework")
+
+    override def moduleKind = jsBase.moduleKind
   }
 }
 
@@ -190,7 +197,7 @@ trait WebUtils extends Module {
       generatedCfg
     }
 
-    val rc = os.proc("webpack-cli", "--config", usedCfg.toIO.getAbsolutePath()).call(cwd = millSourcePath)
+    val rc = os.proc(s"$baseDir/$npmModulesDir/webpack-cli/bin/cli.js", "--config", usedCfg.toIO.getAbsolutePath()).call(cwd = millSourcePath)
     T.log.info(new String(rc.out.bytes))
     PathRef(dist)
   }
@@ -230,7 +237,7 @@ trait WebUtils extends Module {
 
   def devServer : T[PathRef] = T {
     val distDir = packageHtml().path.toIO.getAbsolutePath()
-    val rc = os.proc("./node_modules/webpack-dev-server/bin/webpack-dev-server.js",  "--content-base", distDir,  "--port", s"$webPackDevServerPort").call(cwd = baseDir)
+    val rc = os.proc(s"$baseDir/$npmModulesDir/webpack-dev-server/bin/webpack-dev-server.js",  "--content-base", distDir,  "--port", s"$webPackDevServerPort").call(cwd = baseDir)
     PathRef(T.dest)
   }
 }
@@ -331,6 +338,35 @@ object blended extends Module {
           Deps.Js.react4s,
           Deps.Js.scalaJsDom
         )}
+      }
+
+      object mgmtApp extends WebUtils with BlendedJSModule {
+
+        override def appName = blendedModule
+
+        override def appTitle = Some("Blended Management Console")
+
+        override def packagedJsLibs = Seq(
+          "react/umd/react.development.js",
+          "react-dom/umd/react-dom.development.js"
+        )
+
+        override def packagedWebApp = T {
+          Some(fastOpt())
+        }
+
+        override def moduleDeps = super.moduleDeps ++ Seq(common, components)
+
+        override def ivyDeps = T { super.ivyDeps() ++ Agg(
+          Deps.Js.blendedUpdaterConfig,
+          Deps.Js.blendedJmx,
+          Deps.Js.blendedSecurity,
+          Deps.Js.akkaJsActor,
+          Deps.Js.react4s,
+          Deps.Js.scalaJsDom
+        )}
+
+        object test extends super.Tests
       }
     }
   }

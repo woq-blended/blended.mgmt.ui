@@ -2,7 +2,7 @@ package blended.mgmt.app.components
 
 import blended.mgmt.app.Page
 import blended.mgmt.app.theme.Theme
-import blended.ui.material.MaterialUI
+import blended.material.ui.MaterialUI
 import com.github.ahnfelt.react4s._
 
 object MgmtMenuDrawer {
