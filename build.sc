@@ -173,10 +173,6 @@ trait WebUtils extends Module {
              |    filename: '$appName.js',
              |    path: '$dist',
              |  },
-             |  devServer: {
-             |    contentBase: '$dist',
-             |    port : $webPackDevServerPort
-             |  },
              |  devtool: "source-map",
              |  "module": {
              |    "rules": [{
@@ -207,7 +203,7 @@ trait WebUtils extends Module {
 
     os.copy(from = bundledApp, to = dist)
 
-    htmlSources().foreach{ref =>
+    htmlSources().foreach{ ref =>
       if (ref.path.toIO.exists()) {
         os.list(ref.path).iterator.foreach { p =>
           os.copy.into(p, dist)
@@ -230,6 +226,12 @@ trait WebUtils extends Module {
       T.log.info("Using index.html from sources")
     }
     PathRef(dist)
+  }
+
+  def devServer : T[PathRef] = T {
+    val distDir = packageHtml().path.toIO.getAbsolutePath()
+    val rc = os.proc("./node_modules/webpack-dev-server/bin/webpack-dev-server.js",  "--content-base", distDir,  "--port", s"$webPackDevServerPort").call(cwd = baseDir)
+    PathRef(T.dest)
   }
 }
 
@@ -277,7 +279,7 @@ object blended extends Module {
 
           val npmModules = yarnInstall()
 
-          val genTarget = T.ctx().dest / "generatedSources"
+          val genTarget = T.dest / "generatedSources"
 
           val generate = Jvm.runSubprocess(
             mainClass = materialGen.mainClass().get,
@@ -311,6 +313,8 @@ object blended extends Module {
       object sampleApp extends WebUtils with BlendedJSModule {
 
         override def appName = blendedModule
+
+        override def appTitle = Some("Blended Sample Application")
 
         override def packagedJsLibs = Seq(
           "react/umd/react.development.js",
