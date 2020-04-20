@@ -7,8 +7,10 @@ import mill.scalajslib.api.ModuleKind
 import mill.scalalib._
 import mill.scalalib.publish._
 import $file.build_util
+import ammonite.ops.Path
 import build_util.{FilterUtil, ZipUtil}
 import mill.modules.Jvm
+import os.RelPath
 
 object Deps {
   val blendedCoreVersion = "3.2-SNAPSHOT"
@@ -89,16 +91,145 @@ trait BlendedJSModule extends BlendedModule with ScalaJSModule { jsBase =>
   }
 }
 
-trait YarnUtils extends Module {
+trait WebUtils extends Module {
 
+  // The node modules directory to be used - This should be "node_modules" located in the base directory
+  // because normally webpack operations search the node_modules in parent directories as well, So all
+  // mill modules would find the npm modules
   def npmModulesDir : String = "node_modules"
 
+  // If the mill module should be packaged as a web application, we need to point the module to the output
+  // of a fastOptJS or fullOptJS step
+  def packagedWebApp : T[Option[PathRef]] = None
+
+  // The appname that is used in various generator steps
+  def appName : String
+
+  // The App title that will appear in a generated html if required
+  def appTitle : Option[String] = None
+
+  // The port a webpack dev server starts on
+  def webPackDevServerPort : Int = 9000
+
+  // Html sources that will be copied into the packaged web app folder
+  def htmlSources = T.sources(millSourcePath / "src" / "html")
+
+  def packagedJsLibs : Seq[String] = Seq()
+
+  // run yarn install and download all resources that are defined in the
+  // package.json of the project root
   def yarnInstall : T[PathRef] = T {
-    val log = T.ctx().log
     val modules = baseDir / npmModulesDir
     val result = os.proc("yarn", "install").call(cwd = baseDir)
-    log.info(new String(result.out.bytes))
+    T.log.info(new String(result.out.bytes))
     PathRef(modules)
+  }
+
+  // A simple index page that will reference the web app that has been run through webpack
+  // and additional libs
+  def simpleIndexPage : String = {
+    val packagedLibs : String = packagedJsLibs.map { lib =>
+      val libName = RelPath(lib).last
+      s"""<script type="text/javascript" src="./$libName"></script>"""
+    }.mkString("\n")
+
+    s"""<!DOCTYPE html>
+       |<!--suppress ALL -->
+       |<html>
+       |<head>
+       |  <meta charset="UTF-8">
+       |  <title>${appTitle.getOrElse(appName)}</title>
+       |</head>
+       |<body>
+       |
+       |<div id="content"></div>
+    """.stripMargin + packagedLibs +
+      s"""
+         |<script type="text/javascript" src="./$appName.js"></script>
+         |
+         |</body>
+         |</html>
+         |""".stripMargin
+  }
+
+  // Run webpack with a generated config (to cover the simplest case of running some fastOptJS or fullOptJS output
+  // thorugh webpack)
+  def webpack : T[PathRef] = T {
+
+    val cfgFromSource : Path = millSourcePath / "webpack.config.js"
+    val dist : Path = T.dest / "webpack"
+
+    val usedCfg : Path = if (cfgFromSource.toIO.exists()) {
+      cfgFromSource
+    } else {
+      val webpackConfig : String = packagedWebApp() match {
+        case None => throw new Exception("a packaged application must be defined to generate a webpack configuration")
+        case Some(app) =>
+          s"""const path = require('path');
+             |
+             |module.exports = {
+             |  entry: '${app.path.toIO.getAbsolutePath()}',
+             |  output: {
+             |    filename: '$appName.js',
+             |    path: '$dist',
+             |  },
+             |  devServer: {
+             |    contentBase: '$dist',
+             |    port : $webPackDevServerPort
+             |  },
+             |  devtool: "source-map",
+             |  "module": {
+             |    "rules": [{
+             |      "test": new RegExp("\\.js$$"),
+             |      "enforce": "pre",
+             |      "use": ["source-map-loader"]
+             |    }]
+             |  }
+             |};
+             |""".stripMargin
+
+      }
+      val generatedCfg : Path = T.dest / "webpack.config.js"
+      os.write(generatedCfg, webpackConfig)
+      generatedCfg
+    }
+
+    val rc = os.proc("webpack-cli", "--config", usedCfg.toIO.getAbsolutePath()).call(cwd = millSourcePath)
+    T.log.info(new String(rc.out.bytes))
+    PathRef(dist)
+  }
+
+  // create a directory that has everuthing to serve a webapp
+  def packageHtml : T[PathRef] = T {
+
+    val dist : Path = T.dest / "dist"
+    val bundledApp : Path = webpack().path
+
+    os.copy(from = bundledApp, to = dist)
+
+    htmlSources().foreach{ref =>
+      if (ref.path.toIO.exists()) {
+        os.list(ref.path).iterator.foreach { p =>
+          os.copy.into(p, dist)
+        }
+      }
+    }
+
+    val modules : Path = baseDir / npmModulesDir
+
+    packagedJsLibs.foreach{ lib =>
+      val file : Path = modules / RelPath(lib)
+      os.copy.into(file, dist)
+    }
+
+    val index : Path = dist / "index.html"
+    if (!index.toIO.exists()) {
+      T.log.info(s"Generating simple index.html to [$dist]")
+      os.write(index, simpleIndexPage)
+    } else {
+      T.log.info("Using index.html from sources")
+    }
+    PathRef(dist)
   }
 }
 
@@ -138,7 +269,9 @@ object blended extends Module {
         )}
       }
 
-      object material extends YarnUtils with BlendedJSModule {
+      object material extends WebUtils with BlendedJSModule {
+
+        override def appName = blendedModule
 
         override def generatedSources = T {
 
@@ -175,7 +308,18 @@ object blended extends Module {
         )}
       }
 
-      object sampleApp extends BlendedJSModule {
+      object sampleApp extends WebUtils with BlendedJSModule {
+
+        override def appName = blendedModule
+
+        override def packagedJsLibs = Seq(
+          "react/umd/react.development.js",
+          "react-dom/umd/react-dom.development.js"
+        )
+
+        override def packagedWebApp = T {
+          Some(fastOpt())
+        }
 
         override def moduleDeps = super.moduleDeps ++ Seq(common, components)
 
