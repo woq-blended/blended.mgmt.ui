@@ -349,7 +349,7 @@ object blended extends Module {
       object materialGen extends BlendedModule {
         override def blendedModule = "blended.mgmt.ui.material.gen"
 
-        override def millSourcePath = baseDir / "material-gen"
+        override def millSourcePath = baseDir / "materialGn"
 
         override def mainClass = Some("blended.material.gen.MaterialGenerator")
 
