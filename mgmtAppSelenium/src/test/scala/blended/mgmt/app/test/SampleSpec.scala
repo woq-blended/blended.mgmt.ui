@@ -48,7 +48,7 @@ class SampleSpec extends TestKit(ActorSystem("uitest"))
   "The Mgmt App should" - {
 
     "show up" in {
-      val url = s"http://localhost:${port()}/index-dev.html"
+      val url = s"http://localhost:${port()}/index.html"
 
       go.to(url)
       assert(pageTitle == "Blended Management Console")

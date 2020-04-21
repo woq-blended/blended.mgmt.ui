@@ -13,24 +13,40 @@ import mill.modules.Jvm
 import os.RelPath
 
 object Deps {
+  val akkaVersion = "2.5.26"
+  val akkaHttpVersion = "10.1.11"
   val akkaJsActorVersion = "1.2.5.13"
   val blendedCoreVersion = "3.2-SNAPSHOT"
+
   val scalaVersion = "2.12.11"
   val scalaJSVersion = "0.6.32"
-
+  val scalatestVersion = "3.0.8"
+  val seleniumVersion = "3.13.0"
   val logbackVersion = "1.2.3"
   val slf4jVersion = "1.7.25"
+
+  protected def akka(m: String) = ivy"com.typesafe.akka::akka-${m}:${akkaVersion}"
+  protected def akkaHttpModule(m: String) = ivy"com.typesafe.akka::akka-${m}:${akkaHttpVersion}"
+
+  val akkaActor = akka("actor")
+  val akkaHttp = akkaHttpModule("http")
+  val akkaHttpCore = akkaHttpModule("http-core")
+  val akkaStream = akka("stream")
+  val akkaTestkit = akka("testkit")
 
   val cmdOption = ivy"de.tototec:de.tototec.cmdoption:0.6.0"
   val logbackCore = ivy"ch.qos.logback:logback-core:${logbackVersion}"
   val logbackClassic = ivy"ch.qos.logback:logback-classic:${logbackVersion}"
+
+  val scalatest = ivy"org.scalatest::scalatest:$scalatestVersion"
+  val selenium = ivy"org.seleniumhq.selenium:selenium-java:$seleniumVersion"
   val slf4j = ivy"org.slf4j:slf4j-api:${slf4jVersion}"
 
   object Js {
     val akkaJsActor = ivy"org.akka-js::akkajsactor::$akkaJsActorVersion"
     val react4s = ivy"com.github.ahnfelt::react4s::0.9.28-SNAPSHOT"
     val scalaJsDom = ivy"org.scala-js::scalajs-dom::0.9.5"
-    val scalatest = ivy"org.scalatest::scalatest::3.0.8"
+    val scalatest = ivy"org.scalatest::scalatest::$scalatestVersion"
 
     val blendedJmx = ivy"de.wayofquality.blended::blended.jmx::$blendedCoreVersion"
     val blendedSecurity = ivy"de.wayofquality.blended::blended.security::$blendedCoreVersion"
@@ -72,6 +88,13 @@ trait BlendedModule extends SbtModule with ScalaModule with BlendedPublishModule
   override def scalaVersion : T[String] = Deps.scalaVersion
 
   override def millSourcePath : os.Path = baseDir / millModuleSegments.parts.last
+
+  trait Tests extends super.Tests {
+    override def ivyDeps = T{ super.ivyDeps() ++ Agg(
+      Deps.scalatest
+    )}
+    override def testFrameworks = Seq("org.scalatest.tools.Framework")
+  }
 }
 
 trait BlendedJSModule extends BlendedModule with ScalaJSModule { jsBase =>
@@ -134,11 +157,15 @@ trait WebUtils extends Module {
 
   // A simple index page that will reference the web app that has been run through webpack
   // and additional libs
-  def simpleIndexPage : String = {
-    val packagedLibs : String = packagedJsLibs.map { lib =>
-      val libName = RelPath(lib).last
-      s"""<script type="text/javascript" src="./$libName"></script>"""
-    }.mkString("\n")
+  def simpleIndexPage(dir : Path) : String = {
+
+    val scriptLine : String => String = libName => s"""<script type="text/javascript" src="./$libName"></script>"""
+
+    val packagedLibs : String = os.walk(dir)
+      .filter(_.last.endsWith(".js"))
+      .map(_.relativeTo(dir))
+      .map(lib => scriptLine(lib.toString()))
+      .mkString("\n")
 
     s"""<!DOCTYPE html>
        |<!--suppress ALL -->
@@ -152,8 +179,6 @@ trait WebUtils extends Module {
        |<div id="content"></div>
     """.stripMargin + packagedLibs +
       s"""
-         |<script type="text/javascript" src="./$appName.js"></script>
-         |
          |</body>
          |</html>
          |""".stripMargin
@@ -173,12 +198,36 @@ trait WebUtils extends Module {
         case None => throw new Exception("a packaged application must be defined to generate a webpack configuration")
         case Some(app) =>
           s"""const path = require('path');
+             |const webpack = require('webpack');
              |
              |module.exports = {
              |  entry: '${app.path.toIO.getAbsolutePath()}',
+             |  plugins: [
+             |    new webpack.HashedModuleIdsPlugin(), // so that file hashes don't change unexpectedly
+             |  ],
              |  output: {
-             |    filename: '$appName.js',
              |    path: '$dist',
+             |    filename: '[name].[contenthash].js',
+             |  },
+             |  optimization: {
+             |    runtimeChunk: 'single',
+             |    splitChunks: {
+             |      chunks: 'all',
+             |      maxInitialRequests: Infinity,
+             |      minSize: 0,
+             |      cacheGroups: {
+             |        vendor: {
+             |          test: /[\\/]node_modules[\\/]/,
+             |          name(module) {
+             |            // get the name. E.g. node_modules/packageName/not/this/part.js
+             |            // or node_modules/packageName
+             |            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$$)/)[1];
+             |            // npm package names are URL-safe, but some servers don't like @ symbols
+             |            return `npm.$${packageName.replace('@', '')}`;
+             |          },
+             |        },
+             |      },
+             |    },
              |  },
              |  devtool: "source-map",
              |  "module": {
@@ -228,7 +277,7 @@ trait WebUtils extends Module {
     val index : Path = dist / "index.html"
     if (!index.toIO.exists()) {
       T.log.info(s"Generating simple index.html to [$dist]")
-      os.write(index, simpleIndexPage)
+      os.write(index, simpleIndexPage(dist))
     } else {
       T.log.info("Using index.html from sources")
     }
@@ -321,7 +370,7 @@ object blended extends Module {
 
         override def appName = blendedModule
 
-        override def appTitle = Some("Blended Sample Application")
+        override def appTitle = Some("Blended Component Playground")
 
         override def packagedJsLibs = Seq(
           "react/umd/react.development.js",
@@ -367,6 +416,27 @@ object blended extends Module {
         )}
 
         object test extends super.Tests
+      }
+
+      object mgmtAppSelenium extends BlendedModule {
+
+        object test extends Tests {
+
+          override def ivyDeps = T { super.ivyDeps() ++ Agg(
+            Deps.akkaActor,
+            Deps.akkaStream,
+            Deps.akkaHttp,
+            Deps.akkaHttpCore,
+            Deps.akkaTestkit,
+            Deps.selenium
+          )}
+
+          override def forkArgs = T {
+            val appDir = mgmtApp.packageHtml().path
+            super.forkArgs() ++ Seq(
+              s"-DappUnderTest=$appDir"
+          )}
+        }
       }
     }
   }
