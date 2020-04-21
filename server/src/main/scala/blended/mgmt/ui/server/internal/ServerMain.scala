@@ -28,5 +28,4 @@ object ServerMain {
     println("Server Port = " + port())
     Thread.sleep(1.hour.toMillis)
   }
-
 }

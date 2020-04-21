@@ -13,9 +13,9 @@ class UiRoute(cl: ClassLoader) {
   // All resources will be served from the classpath
   val route : Route = extractUnmatchedPath { path =>
     val resourcePath = if (path.toString().endsWith("/"))  {
-      s"webapp${path.toString()}index.html"
+      s"content${path.toString()}index.html"
     } else {
-      s"webapp${path.toString()}"
+      s"content${path.toString()}"
     }
 
     val contentType = if (resourcePath.endsWith("html")) ContentTypes.`text/html(UTF-8)` else ContentTypes.`application/octet-stream`

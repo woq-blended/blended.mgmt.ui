@@ -11,48 +11,12 @@ import ammonite.ops.Path
 import build_util.{FilterUtil, ZipUtil}
 import mill.modules.Jvm
 import os.RelPath
+import $ivy.`de.tototec::de.tobiasroeser.mill.osgi:0.2.0`
+import de.tobiasroeser.mill.osgi._
+import $file.build_deps
+import build_deps.Deps
+import mill.api.Loose
 
-object Deps {
-  val akkaVersion = "2.5.26"
-  val akkaHttpVersion = "10.1.11"
-  val akkaJsActorVersion = "1.2.5.13"
-  val blendedCoreVersion = "3.2-SNAPSHOT"
-
-  val scalaVersion = "2.12.11"
-  val scalaJSVersion = "0.6.32"
-  val scalatestVersion = "3.0.8"
-  val seleniumVersion = "3.13.0"
-  val logbackVersion = "1.2.3"
-  val slf4jVersion = "1.7.25"
-
-  protected def akka(m: String) = ivy"com.typesafe.akka::akka-${m}:${akkaVersion}"
-  protected def akkaHttpModule(m: String) = ivy"com.typesafe.akka::akka-${m}:${akkaHttpVersion}"
-
-  val akkaActor = akka("actor")
-  val akkaHttp = akkaHttpModule("http")
-  val akkaHttpCore = akkaHttpModule("http-core")
-  val akkaStream = akka("stream")
-  val akkaTestkit = akka("testkit")
-
-  val cmdOption = ivy"de.tototec:de.tototec.cmdoption:0.6.0"
-  val logbackCore = ivy"ch.qos.logback:logback-core:${logbackVersion}"
-  val logbackClassic = ivy"ch.qos.logback:logback-classic:${logbackVersion}"
-
-  val scalatest = ivy"org.scalatest::scalatest:$scalatestVersion"
-  val selenium = ivy"org.seleniumhq.selenium:selenium-java:$seleniumVersion"
-  val slf4j = ivy"org.slf4j:slf4j-api:${slf4jVersion}"
-
-  object Js {
-    val akkaJsActor = ivy"org.akka-js::akkajsactor::$akkaJsActorVersion"
-    val react4s = ivy"com.github.ahnfelt::react4s::0.9.28-SNAPSHOT"
-    val scalaJsDom = ivy"org.scala-js::scalajs-dom::0.9.5"
-    val scalatest = ivy"org.scalatest::scalatest::$scalatestVersion"
-
-    val blendedJmx = ivy"de.wayofquality.blended::blended.jmx::$blendedCoreVersion"
-    val blendedSecurity = ivy"de.wayofquality.blended::blended.security::$blendedCoreVersion"
-    val blendedUpdaterConfig = ivy"de.wayofquality.blended::blended.updater.config::$blendedCoreVersion"
-  }
-}
 
 /** Project directory. */
 val baseDir: os.Path = build.millSourcePath
@@ -94,6 +58,76 @@ trait BlendedModule extends SbtModule with ScalaModule with BlendedPublishModule
       Deps.scalatest
     )}
     override def testFrameworks = Seq("org.scalatest.tools.Framework")
+  }
+}
+
+trait BlendedWebBundle extends BlendedModule with OsgiBundleModule {
+
+  // This is usually produced by a packageHtml Step
+  def webContent : T[PathRef]
+  // The directory within the bundle that has all the content
+  def contentDir : String = "webapp"
+  def webContext : String
+
+  def bundleActivator : String
+
+  def activatorPackage : String = {
+    assert(bundleActivator.contains("."))
+    bundleActivator.substring(0, bundleActivator.lastIndexOf("."))
+  }
+
+  def activatorClass : String = {
+    bundleActivator.substring(bundleActivator.lastIndexOf(".") + 1)
+  }
+
+  def generatedActivator =
+    s"""package $activatorPackage
+       |
+       |import blended.akka.http._
+       |
+       |class $activatorClass extends WebBundleActivator {
+       |  val contentDir = "$contentDir"
+       |  val contextName = "$webContext"
+       |}
+       |""".stripMargin
+
+
+  override def bundleSymbolicName = artifactName
+
+
+  override def description = "Generated bundle for web application"
+
+  override def osgiHeaders = T {
+    val scalaBinVersion = scalaVersion().split("[.]").take(2).mkString(".")
+    super.osgiHeaders().copy(
+    `Import-Package` =
+      Seq(s"""scala.*;version="[${scalaBinVersion}.0,${scalaBinVersion}.50]"""") ++
+      Seq("*"),
+    `Bundle-Activator` = Some(bundleActivator)
+    )
+  }
+
+  override def ivyDeps: Target[Loose.Agg[Dep]] = T { super.ivyDeps() ++ Agg(
+    Deps.blendedAkkaHttp
+  )}
+
+  override def generatedSources = T {
+
+    val generated = T.dest / "generatedSources"
+    os.makeDir.all(generated)
+    os.write(generated / s"$activatorClass.scala", generatedActivator)
+    super.generatedSources() ++ Seq(PathRef(generated))
+  }
+
+  def webResources : T[PathRef] = T {
+    val content = T.dest / "content"
+    os.makeDir.all(content)
+    os.copy(webContent().path, content / contentDir)
+    PathRef(content)
+  }
+
+  override def resources : Sources = T.sources {
+    super.resources() ++ Seq(webResources())
   }
 }
 
@@ -387,6 +421,13 @@ object blended extends Module {
           Deps.Js.react4s,
           Deps.Js.scalaJsDom
         )}
+
+        object webBundle extends BlendedWebBundle {
+          override def webContext = "sample"
+          override def bundleActivator = "blended.mgmt.ui.SampleActivator"
+
+          override def webContent = T { sampleApp.packageHtml() }
+        }
       }
 
       object mgmtApp extends WebUtils with BlendedJSModule {
@@ -416,6 +457,13 @@ object blended extends Module {
         )}
 
         object test extends super.Tests
+
+        object webBundle extends BlendedWebBundle {
+          override def webContext = "management"
+          override def bundleActivator = "blended.mgmt.ui.MgmtAvtivator"
+
+          override def webContent = T { mgmtApp.packageHtml() }
+        }
       }
 
       object mgmtAppSelenium extends BlendedModule {
