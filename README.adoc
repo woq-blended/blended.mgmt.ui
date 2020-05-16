@@ -16,47 +16,39 @@ The overall project contains several subprojects:
 
 * ```components``` contains reusable higher level React components, such as a ReactTable.
 
-* ```material-gen``` contains a simple generator which reads the ```index.js``` files of Material-UI React and generates simple Scala.js wrappers to use those components in Scala.js / react4s.
+* ```materialGen``` contains a simple generator which reads the ```index.js``` files of Material-UI React and generates simple Scala.js wrappers to use those components in Scala.js / react4s.
 
 * ```material``` uses the generated components and is the place to enrich the Material-API manually to make it more Scala-ish. For now the manual code is around customizing the styles used in Material-Ui-React-Components.
 
 * ```router``` is essentially taken from https://github.com/werk/router4s with some more options for variable paths and some test cases. Once the management console reaches it's final stages the changes will be contributed back to the original project.
 
-* ```mgmt-app``` contains the actual management console.
+* ```mgmtApp``` contains the actual management console.
 
 * ```sampleApp``` contains a sample application that can be used as a playground to test out React Components without breaking the management console. Over time this subproject will become obsolete.
 
-* ```mgmt-app-test``` contains the setup for testing the management console with Selenium. For now it just has a very simple test and the setup. The test performs tests on the management console built wih ```app/fastOptJS/webpack``` and requires the http://chromedriver.chromium.org/getting-started[SeleniumDriver for Chrome] to be set up correctly. Test can be executed with ```uitest/test```
-
-* ```server``` contains a simple server based on Akka-HTTP which will serve the management console resources via Akka-HTTP. The resulting jar can be deployed into a container which is hosting the blended Akka-HTTP-Server bundle.
+* ```mgmtAppSeleniumest``` contains the setup for testing the management console with Selenium. For now it just has a very simple test and the setup. The test performs tests on the management console built wih ```app/fastOptJS/webpack``` and requires the http://chromedriver.chromium.org/getting-started[SeleniumDriver for Chrome] to be set up correctly. Test can be executed from the command line with ```./millw blended.mgmt.ui.mgmtAppSelenium.test```
 
 === Building
 
 ==== Management console
 
-The fastest way to build the management console ist to start sbt and run ```blendedMgmtUiApp/fastOptJS/webpack```. This will build everything into the directory ```./mgmt-app/target/scala-2.12/scalajs-bundler/main```.
+The fastest way to build the management console ist to  run ```./millw blended.mgmt.ui.mgmtApp.packageHtml```. This will build everything into the directory ```./out/blended/mgmt/ui/mgmtApp/packageHtml/dest/dis```.
 
+The console can be displayed in a browser by opening ```index.html``` from that directory within a browser.
 
-The build process will copy the file ```index-dev.html``` into that directory as well, so the management console can be started by loading the ```index-dev.html``` file in a browser.
+Alternatively, a webpack dev server can be started with ```./millw blended.mgmt.ui.mgmtApp.devServer```. This will run a node server on port 9000 hosting the management console.
 
-[NOTE]
-====
-In IntelliJ, simply navigate to the ```index-dev.html``` in the directory above and select any of the browser buttons in the top right corner of the editor.
-====
-
-The management console requires a running managemen container hosting the REST- and WebSocket API to connect to.
-
-During development you can use sbt in file watching mode with ```~blendedMgmtUiApp/fastOptJS/webpack```, so that the management console is rebuilt and repackaged whenever code changes are saved to disk. After the rebuild ,simply refresh the browser page to load the new version.
+The management console requires a running management container hosting the REST- and WebSocket API to connect to.
 
 ==== Server bundle
 
-The server bundle can be built simply with ```blendedMgmtUiServer/packageBin``` to produce the OSGi deployable bundle.
+All web ui projects implicitly define a bundle that can be hosted by a blended container with Akka HTTP support. For example, the web bundle for the ```mgmtApp``` can be publish to the local ivy directory with ```./millw blended.mgmt.ui.mgmtApp.webBundle.publishLocal```. This will run webpack on the web application, generate an ```index.html```, generate an activator compatible with blended's Akka HTTP suport and finally publish everything as an OSGi bundle.
 
 ==== Tests
 
-Run ```test``` to execute all Unit- and Selenium-Tests.
+Run ```./millw __.test``` to execute all Unit- and Selenium-Tests.
 
 === Publishing locally
 
-Run ```publishLocal``` to publish all relevant artifacts in the local Ivy repository. This is required to use the server bundle in a management container packaging.
+Run ```./millw __.publishLocal``` to publish all relevant artifacts in the local Ivy repository. This is required to use the server bundle in a management container packaging.
 
