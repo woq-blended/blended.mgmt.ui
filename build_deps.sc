@@ -4,7 +4,7 @@ object Deps {
   val akkaVersion = "2.5.26"
   val akkaHttpVersion = "10.1.11"
   val akkaJsActorVersion = "1.2.5.13"
-  val blendedCoreVersion = "3.2-SNAPSHOT"
+  val blendedCoreVersion = "3.1-RC6-194-a67aa0"
 
   val scalaVersion = "2.12.11"
   val scalaJSVersion = "0.6.32"

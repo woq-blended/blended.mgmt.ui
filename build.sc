@@ -9,9 +9,10 @@ import mill.scalalib.publish._
 import $file.build_util
 import ammonite.ops.Path
 import build_util.{FilterUtil, ZipUtil}
+import coursier.core.Authentication
 import mill.modules.Jvm
 import os.RelPath
-import $ivy.`de.tototec::de.tobiasroeser.mill.osgi:0.2.0`
+import $ivy.`de.tototec::de.tobiasroeser.mill.osgi:0.3.0`
 import de.tobiasroeser.mill.osgi._
 import $file.build_deps
 import build_deps.Deps
@@ -24,7 +25,11 @@ val baseDir: os.Path = build.millSourcePath
 trait BlendedCoursierModule extends CoursierModule {
   private def zincWorker: ZincWorkerModule = mill.scalalib.ZincWorkerModule
   override def repositories: Seq[Repository] = zincWorker.repositories ++ Seq(
-    MavenRepository("https://oss.sonatype.org/content/repositories/snapshots/")
+    MavenRepository("https://oss.sonatype.org/content/repositories/snapshots/"),
+    MavenRepository(
+      s"https://u233308-sub2.your-storagebox.de/${Deps.blendedCoreVersion}",
+      Some(Authentication("u233308-sub2", "px8Kumv98zIzSF7k"))
+    )
   )
 }
 
@@ -136,7 +141,7 @@ trait BlendedJSModule extends BlendedModule with ScalaJSModule { jsBase =>
 
   override def moduleKind: T[ModuleKind] = T{ ModuleKind.CommonJSModule }
 
-  trait Tests extends super.Tests {
+  trait Tests extends super.Tests with BlendedCoursierModule {
     def blendedTestModule : String = jsBase.blendedModule + ".test"
     override def artifactName = blendedTestModule
 
@@ -447,14 +452,15 @@ object blended extends Module {
 
         override def moduleDeps = super.moduleDeps ++ Seq(common, components)
 
-        override def ivyDeps = T { super.ivyDeps() ++ Agg(
-          Deps.Js.blendedUpdaterConfig,
-          Deps.Js.blendedJmx,
-          Deps.Js.blendedSecurity,
-          Deps.Js.akkaJsActor,
-          Deps.Js.react4s,
-          Deps.Js.scalaJsDom
-        )}
+        override def ivyDeps = T {
+          super.ivyDeps() ++ Agg(
+            Deps.Js.blendedUpdaterConfig,
+            Deps.Js.blendedJmx,
+            Deps.Js.blendedSecurity,
+            Deps.Js.akkaJsActor,
+            Deps.Js.react4s,
+            Deps.Js.scalaJsDom
+          )}
 
         object test extends super.Tests
 
