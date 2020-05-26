@@ -165,7 +165,7 @@ trait WebUtils extends Module {
   // The node modules directory to be used - This should be "node_modules" located in the base directory
   // because normally webpack operations search the node_modules in parent directories as well, So all
   // mill modules would find the npm modules
-  def npmModulesDir : String = "node_modules"
+  def npmModulesDir : Path = baseDir / "node_modules"
 
   // If the mill module should be packaged as a web application, we need to point the module to the output
   // of a fastOptJS or fullOptJS step
@@ -188,7 +188,7 @@ trait WebUtils extends Module {
   // run yarn install and download all resources that are defined in the
   // package.json of the project root
   def yarnInstall : T[PathRef] = T {
-    val modules = baseDir / npmModulesDir
+    val modules = npmModulesDir
     val result = os.proc("yarn", "install").call(cwd = baseDir)
     T.log.info(new String(result.out.bytes))
     PathRef(modules)
@@ -285,7 +285,7 @@ trait WebUtils extends Module {
       generatedCfg
     }
 
-    val rc = os.proc(s"$baseDir/$npmModulesDir/webpack-cli/bin/cli.js", "--progress", "--config", usedCfg.toIO.getAbsolutePath()).call(cwd = millSourcePath)
+    val rc = os.proc(s"$npmModulesDir/webpack-cli/bin/cli.js", "--progress", "--config", usedCfg.toIO.getAbsolutePath()).call(cwd = millSourcePath)
     T.log.info(new String(rc.out.bytes))
     PathRef(dist)
   }
@@ -306,7 +306,7 @@ trait WebUtils extends Module {
       }
     }
 
-    val modules : Path = baseDir / npmModulesDir
+    val modules : Path = npmModulesDir
 
     packagedJsLibs.foreach{ lib =>
       val file : Path = modules / RelPath(lib)
@@ -325,7 +325,7 @@ trait WebUtils extends Module {
 
   def devServer : T[PathRef] = T {
     val distDir = packageHtml().path.toIO.getAbsolutePath()
-    val rc = os.proc(s"$baseDir/$npmModulesDir/webpack-dev-server/bin/webpack-dev-server.js",  "--content-base", distDir,  "--port", s"$webPackDevServerPort").call(cwd = baseDir)
+    val rc = os.proc(s"$npmModulesDir/webpack-dev-server/bin/webpack-dev-server.js",  "--content-base", distDir,  "--port", s"$webPackDevServerPort").call(cwd = baseDir)
     PathRef(T.dest)
   }
 }

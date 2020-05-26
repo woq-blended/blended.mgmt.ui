@@ -3,12 +3,12 @@ import mill.scalalib._
 object Deps {
   val akkaVersion = "2.5.26"
   val akkaHttpVersion = "10.1.11"
-  val akkaJsActorVersion = "1.2.5.13"
+  val akkaJsActorVersion = "2.2.6.5"
   val blendedCoreVersion = "3.1-RC6-194-a67aa0"
 
-  val scalaVersion = "2.12.11"
-  val scalaJSVersion = "0.6.32"
-  val scalatestVersion = "3.0.8"
+  val scalaVersion = "2.13.2"
+  val scalaJSVersion = "1.0.1"
+  val scalatestVersion = "3.1.2"
   val seleniumVersion = "3.13.0"
   val logbackVersion = "1.2.3"
   val slf4jVersion = "1.7.25"
@@ -35,8 +35,8 @@ object Deps {
 
   object Js {
     val akkaJsActor = ivy"org.akka-js::akkajsactor::$akkaJsActorVersion"
-    val react4s = ivy"com.github.ahnfelt::react4s::0.9.29-SNAPSHOT"
-    val scalaJsDom = ivy"org.scala-js::scalajs-dom::0.9.5"
+    val react4s = ivy"com.github.ahnfelt::react4s::0.10.0-SNAPSHOT"
+    val scalaJsDom = ivy"org.scala-js::scalajs-dom::1.0.0"
     val scalatest = ivy"org.scalatest::scalatest::$scalatestVersion"
 
     val blendedJmx = ivy"de.wayofquality.blended::blended.jmx::$blendedCoreVersion"

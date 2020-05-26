@@ -32,7 +32,7 @@ object MgmtAppState {
     event match {
       case UpdateContainerInfo(info) =>
         old.copy(
-          containerInfo = old.containerInfo.filterKeys(_ != info.containerId) + (info.containerId -> info)
+          containerInfo = old.containerInfo.filterKeys(_ != info.containerId).toMap + (info.containerId -> info)
         )
 
       case LoggedIn(host: String, port: Int, user: UserInfo) =>

@@ -75,7 +75,7 @@ object JmxTreeHelper {
 
     differentiatingKey(objName, names.filterNot(_.equals(objName))) match {
       case None => objName
-      case Some(k) => JmxObjectName(objName.domain, objName.properties.filterKeys(_ != k))
+      case Some(k) => JmxObjectName(objName.domain, objName.properties.filterKeys(_ != k).toMap)
     }
   }
 
