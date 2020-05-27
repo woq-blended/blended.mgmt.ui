@@ -9,7 +9,7 @@ object Deps {
   val scalaVersion = "2.13.2"
   val scalaJSVersion = "1.0.1"
   val scalatestVersion = "3.1.2"
-  val seleniumVersion = "3.13.0"
+  val seleniumVersion = "3.141.59"
   val logbackVersion = "1.2.3"
   val slf4jVersion = "1.7.25"
 
@@ -30,6 +30,7 @@ object Deps {
   val logbackClassic = ivy"ch.qos.logback:logback-classic:${logbackVersion}"
 
   val scalatest = ivy"org.scalatest::scalatest:$scalatestVersion"
+  val scalatestSelenium = ivy"org.scalatestplus::selenium-3-141:3.1.2.0"
   val selenium = ivy"org.seleniumhq.selenium:selenium-java:$seleniumVersion"
   val slf4j = ivy"org.slf4j:slf4j-api:${slf4jVersion}"
 

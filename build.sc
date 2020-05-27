@@ -482,7 +482,8 @@ object blended extends Module {
             Deps.akkaHttp,
             Deps.akkaHttpCore,
             Deps.akkaTestkit,
-            Deps.selenium
+            Deps.selenium,
+            Deps.scalatestSelenium
           )}
 
           override def forkArgs = T {
