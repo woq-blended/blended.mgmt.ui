@@ -167,6 +167,10 @@ trait WebUtils extends Module {
   // mill modules would find the npm modules
   def npmModulesDir : Path = baseDir / "node_modules"
 
+  def nodeVersion() = T.command {
+    os.proc("node", "-v").call().out.text()
+  }
+
   // If the mill module should be packaged as a web application, we need to point the module to the output
   // of a fastOptJS or fullOptJS step
   def packagedWebApp : T[Option[PathRef]] = None
@@ -226,6 +230,10 @@ trait WebUtils extends Module {
   // Run webpack with a generated config (to cover the simplest case of running some fastOptJS or fullOptJS output
   // thorugh webpack)
   def webpack : T[PathRef] = T {
+
+    if (!nodeVersion()().startsWith("v12")) {
+      sys.error("Please install Node version 12 according to node install instructions for your environment.")
+    }
 
     val cfgFromSource : Path = millSourcePath / "webpack.config.js"
     val dist : Path = T.dest / "webpack"
