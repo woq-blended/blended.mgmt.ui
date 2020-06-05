@@ -70,7 +70,7 @@ trait Publish extends ProjectConfig {
 trait NpmSettings extends ProjectConfig {
 
   override def settings: Seq[sbt.Setting[_]] = super.settings ++ Seq(
-    useYarn := true,
+    useYarn := false,
     npmDependencies.in(Compile) := Seq(
       NpmDependencies.babel,
       NpmDependencies.react,
