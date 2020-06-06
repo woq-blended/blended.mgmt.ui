@@ -21,7 +21,6 @@ class ColorGenerator(sourceFile : String, targetFile: String) extends AbstractGe
   private[this] val prelude =
     s"""package ${MaterialGenerator.pkgName}
        |
-       |import com.github.ahnfelt.react4s._
        |import scala.scalajs.js
        |
        |import scala.scalajs.js.annotation.JSImport

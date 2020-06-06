@@ -1,171 +1,61 @@
+import coursierapi.{Credentials, MavenRepository}
+import os.Path
+
+val blendedMillVersion : String = "v0.1-11-6268dc"
+
+interp.repositories() ++= Seq(
+  MavenRepository.of(s"https://u233308-sub2.your-storagebox.de/blended-mill/$blendedMillVersion")
+    .withCredentials(Credentials.of("u233308-sub2", "px8Kumv98zIzSF7k"))
+)
+
+interp.load.ivy("de.wayofquality.blended" %% "blended-mill" % blendedMillVersion)
+
+@
+
 import coursier.Repository
 import coursier.maven.MavenRepository
 import mill._
-import mill.define._
+import mill.define.{Sources, Task, Target}
 import mill.scalajslib.ScalaJSModule
 import mill.scalajslib.api.ModuleKind
 import mill.scalalib._
 import mill.scalalib.publish._
-import $file.build_util
 import ammonite.ops.Path
-import build_util.{FilterUtil, ZipUtil}
 import coursier.core.Authentication
 import mill.modules.Jvm
 import os.RelPath
-import $ivy.`de.tototec::de.tobiasroeser.mill.osgi:0.3.0`
-import de.tobiasroeser.mill.osgi._
+
 import $file.build_deps
-import build_deps.Deps
+import build_deps.UiDeps
+
 import mill.api.Loose
 
+// This import the mill-osgi plugin
+import $ivy.`de.tototec::de.tobiasroeser.mill.osgi:0.3.0`
+import de.tobiasroeser.mill.osgi._
+
+// imports from the blended-mill plugin
+import de.wayofquality.blended.mill.versioning.GitModule
+import de.wayofquality.blended.mill.publish.BlendedPublishModule
+import de.wayofquality.blended.mill.webtools.WebTools
+import de.wayofquality.blended.mill.modules._
+import de.wayofquality.blended.mill.utils._
 
 /** Project directory. */
-val baseDir: os.Path = build.millSourcePath
+val projectDir: os.Path = build.millSourcePath
 
-trait BlendedCoursierModule extends CoursierModule {
-  private def zincWorker: ZincWorkerModule = mill.scalalib.ZincWorkerModule
-  override def repositories: Seq[Repository] = zincWorker.repositories ++ Seq(
-    MavenRepository("https://oss.sonatype.org/content/repositories/snapshots/"),
-    MavenRepository(
-      s"https://u233308-sub2.your-storagebox.de/${Deps.blendedCoreVersion}",
-      Some(Authentication("u233308-sub2", "px8Kumv98zIzSF7k"))
-    )
-  )
+object GitSupport extends GitModule {
+  override def millSourcePath: Path = projectDir
 }
 
-trait BlendedPublishModule extends PublishModule {
-  def description: String = "Blended module ${blendedModule}"
-  override def publishVersion = T { blended.version() }
-  override def pomSettings: T[PomSettings] = T {
-    PomSettings(
-      description = description,
-      organization = "de.wayofquality.blended",
-      url = "https://github.com/woq-blended",
-      licenses = Seq(License.`Apache-2.0`),
-      versionControl = VersionControl.github("woq-blended", "blended.mgmt.ui"),
-      developers = Seq(
-        Developer("atooni", "Andreas Gies", "https://github.com/atooni"),
-        Developer("lefou", "Tobias Roeser", "https://github.com/lefou")
-      )
-    )
-  }
-}
-
-trait BlendedModule extends SbtModule with ScalaModule with BlendedPublishModule with BlendedCoursierModule {
-  def blendedModule: String = millModuleSegments.parts.mkString(".")
-  override def artifactName: T[String] = blendedModule
-  override def scalaVersion : T[String] = Deps.scalaVersion
-
-  override def millSourcePath : os.Path = baseDir / millModuleSegments.parts.last
-
-  trait Tests extends super.Tests {
-    override def ivyDeps = T{ super.ivyDeps() ++ Agg(
-      Deps.scalatest
-    )}
-    override def testFrameworks = Seq("org.scalatest.tools.Framework")
-  }
-}
-
-trait BlendedWebBundle extends BlendedModule with OsgiBundleModule {
-
-  // This is usually produced by a packageHtml Step
-  def webContent : T[PathRef]
-  // The directory within the bundle that has all the content
-  def contentDir : String = "webapp"
-  def webContext : String
-
-  def bundleActivator : String
-
-  def activatorPackage : String = {
-    assert(bundleActivator.contains("."))
-    bundleActivator.substring(0, bundleActivator.lastIndexOf("."))
-  }
-
-  def activatorClass : String = {
-    bundleActivator.substring(bundleActivator.lastIndexOf(".") + 1)
-  }
-
-  def generatedActivator =
-    s"""package $activatorPackage
-       |
-       |import blended.akka.http._
-       |
-       |class $activatorClass extends WebBundleActivator {
-       |  val contentDir = "$contentDir"
-       |  val contextName = "$webContext"
-       |}
-       |""".stripMargin
-
-
-  override def bundleSymbolicName = artifactName
-
-
-  override def description = "Generated bundle for web application"
-
-  override def osgiHeaders = T {
-    val scalaBinVersion = scalaVersion().split("[.]").take(2).mkString(".")
-    super.osgiHeaders().copy(
-    `Import-Package` =
-      Seq(s"""scala.*;version="[${scalaBinVersion}.0,${scalaBinVersion}.50]"""") ++
-      Seq("*"),
-    `Bundle-Activator` = Some(bundleActivator)
-    )
-  }
-
-  override def ivyDeps: Target[Loose.Agg[Dep]] = T { super.ivyDeps() ++ Agg(
-    Deps.blendedAkkaHttp
-  )}
-
-  override def generatedSources = T {
-
-    val generated = T.dest / "generatedSources"
-    os.makeDir.all(generated)
-    os.write(generated / s"$activatorClass.scala", generatedActivator)
-    super.generatedSources() ++ Seq(PathRef(generated))
-  }
-
-  def webResources : T[PathRef] = T {
-    val content = T.dest / "content"
-    os.makeDir.all(content)
-    os.copy(webContent().path, content / contentDir)
-    PathRef(content)
-  }
-
-  override def resources : Sources = T.sources {
-    super.resources() ++ Seq(webResources())
-  }
-}
-
-trait BlendedJSModule extends BlendedModule with ScalaJSModule { jsBase =>
-  override def scalaJSVersion : T[String]  = Deps.scalaJSVersion
-
-  override def moduleKind: T[ModuleKind] = T{ ModuleKind.CommonJSModule }
-
-  trait Tests extends super.Tests with BlendedCoursierModule {
-    def blendedTestModule : String = jsBase.blendedModule + ".test"
-    override def artifactName = blendedTestModule
-
-    override def millSourcePath = jsBase.millSourcePath / "src" / "test"
-
-    override def sources: Sources = T.sources(
-      millSourcePath / "scala"
-    )
-    override def ivyDeps = T{ super.ivyDeps() ++ Agg(
-      Deps.Js.scalatest
-    )}
-
-    override def testFrameworks = Seq("org.scalatest.tools.Framework")
-
-    override def moduleKind = jsBase.moduleKind
-  }
-}
+def blendedVersion = T { GitSupport.publishVersion() }
 
 trait WebUtils extends Module {
 
   // The node modules directory to be used - This should be "node_modules" located in the base directory
   // because normally webpack operations search the node_modules in parent directories as well, So all
   // mill modules would find the npm modules
-  def npmModulesDir : Path = baseDir / "node_modules"
+  def npmModulesDir : Path = projectDir / "node_modules"
 
   def nodeVersion() = T.command {
     os.proc("node", "-v").call().out.text()
@@ -193,7 +83,7 @@ trait WebUtils extends Module {
   // package.json of the project root
   def yarnInstall : T[PathRef] = T {
     val modules = npmModulesDir
-    val result = os.proc("yarn", "install").call(cwd = baseDir)
+    val result = os.proc("yarn", "install").call(cwd = projectDir)
     T.log.info(new String(result.out.bytes))
     PathRef(modules)
   }
@@ -333,49 +223,114 @@ trait WebUtils extends Module {
 
   def devServer : T[PathRef] = T {
     val distDir = packageHtml().path.toIO.getAbsolutePath()
-    val rc = os.proc(s"$npmModulesDir/webpack-dev-server/bin/webpack-dev-server.js",  "--content-base", distDir,  "--port", s"$webPackDevServerPort").call(cwd = baseDir)
+    val rc = os.proc(s"$npmModulesDir/webpack-dev-server/bin/webpack-dev-server.js",  "--content-base", distDir,  "--port", s"$webPackDevServerPort").call(cwd = projectDir)
     PathRef(T.dest)
   }
 }
 
-object blended extends Module {
+object blended extends Cross[BlendedUiCross](UiDeps.scalaVersions.keys.toSeq:_*)
+class BlendedUiCross(crossScalaVersion : String) extends GenIdeaModule { blended =>
+
+  val crossDeps = UiDeps.scalaVersions(crossScalaVersion)
 
   def version = T.input {
-    os.read(baseDir / "version.txt").trim()
+    os.read(projectDir / "version.txt").trim()
+  }
+
+  trait UiCoursierModule extends CoursierModule {
+    private def zincWorker: ZincWorkerModule = mill.scalalib.ZincWorkerModule
+    override def repositories: Seq[Repository] = zincWorker.repositories ++ Seq(
+      MavenRepository("https://oss.sonatype.org/content/repositories/snapshots/"),
+      MavenRepository(
+        s"https://u233308-sub2.your-storagebox.de/blended/${crossDeps.blendedCoreVersion}",
+        Some(Authentication("u233308-sub2", "px8Kumv98zIzSF7k"))
+      )
+    )
+  }
+
+  trait UiPublishModule extends BlendedPublishModule {
+    def githubRepo : String = "blended.mgmt.ui"
+    def scpTargetDir : String = "mgmt-ui"
+
+    override def publishVersion = T { blendedVersion() }
+  }
+
+  trait UiModule extends BlendedJvmModule
+    with UiCoursierModule
+    with UiPublishModule { uiModule =>
+
+    override def description = s"Blended Module $blendedModule"
+    override def baseDir : os.Path = projectDir
+    override def scalaVersion = crossDeps.scalaVersion
+
+    override def scalacOptions = T { super.scalacOptions().filter(_ != "-Werror") }
+
+    trait UiJs extends super.BlendedJs with UiPublishModule with UiCoursierModule {
+      override def millSourcePath = uiModule.millSourcePath
+    }
+
+    override type ProjectDeps = UiDeps
+    override def deps = crossDeps
+  }
+
+  trait UiJsModule extends BlendedJsModule
+    with UiCoursierModule
+    with UiPublishModule {
+
+    override def description = s"Blended Module $blendedModule"
+
+    override def baseDir : os.Path = projectDir
+
+    override type ProjectDeps = UiDeps
+    override def deps = crossDeps
+
+    override def scalacOptions = T { super.scalacOptions().filter(_ != "-Werror") }
+  }
+
+  trait UiWebBundle extends BlendedWebModule with UiModule {
+    override def blendedCoreVersion = crossDeps.blendedCoreVersion
   }
 
   object mgmt extends Module {
     object ui extends Module {
-      object common extends BlendedJSModule {
+      object common extends UiJsModule {
+
+        override def millSourcePath = projectDir / "common"
 
         override def ivyDeps = T { super.ivyDeps() ++ Agg(
-          Deps.Js.react4s,
-          Deps.Js.scalaJsDom
+          deps.Js.react4s,
+          deps.Js.scalaJsDom
         )}
 
         override def moduleDeps = super.moduleDeps ++ Seq(router)
       }
-      object router extends BlendedJSModule {
-        object test extends super.Tests
+
+      object router extends UiJsModule {
+        override def millSourcePath = projectDir / "router"
+
+        object test extends super.BlendedJsTests
       }
 
-      object materialGen extends BlendedModule {
+      object materialGen extends UiModule {
+        override def description = "Generator classes for Material UI"
+
         override def blendedModule = "blended.mgmt.ui.material.gen"
 
-        override def millSourcePath = baseDir / "materialGen"
+        override def millSourcePath = projectDir / "materialGen"
 
         override def mainClass = Some("blended.material.gen.MaterialGenerator")
 
         override def ivyDeps = T { super.ivyDeps() ++ Agg(
-          Deps.cmdOption,
-          Deps.slf4j,
-          Deps.logbackCore,
-          Deps.logbackClassic
+          deps.cmdOption,
+          deps.slf4j,
+          deps.logbackCore,
+          deps.logbackClassic
         )}
       }
 
-      object material extends WebUtils with BlendedJSModule {
+      object material extends UiJsModule with WebUtils {
 
+        override def millSourcePath = projectDir / "material"
         override def appName = blendedModule
 
         override def generatedSources = T {
@@ -396,24 +351,33 @@ object blended extends Module {
           super.generatedSources() ++ Seq(PathRef(genTarget))
         }
 
-        override def ivyDeps = T { super.ivyDeps() ++ Agg(
-          Deps.Js.react4s
-        )}
+        override def ivyDeps = T {
+          super.ivyDeps() ++ Agg(
+            deps.Js.react4s
+          )
+        }
       }
 
-      object theme extends BlendedJSModule {
+      object theme extends UiJsModule {
+        override def millSourcePath = baseDir / "theme"
         override def moduleDeps = super.moduleDeps ++ Seq(material)
       }
 
-      object components extends BlendedJSModule {
+      object components extends UiJsModule {
+
+        override def millSourcePath = baseDir / "components"
         override def moduleDeps = super.moduleDeps ++ Seq(material, theme)
 
-        override def ivyDeps = T { super.ivyDeps() ++ Agg(
-          Deps.Js.blendedJmx
-        )}
+        override def ivyDeps = T {
+          super.ivyDeps() ++ Agg(
+            deps.Js.blendedJmx
+          )
+        }
       }
 
-      object sampleApp extends WebUtils with BlendedJSModule {
+      object sampleApp extends UiJsModule with WebUtils {
+
+        override def millSourcePath = baseDir / "sampleApp"
 
         override def appName = blendedModule
 
@@ -430,20 +394,28 @@ object blended extends Module {
 
         override def moduleDeps = super.moduleDeps ++ Seq(common, components)
 
-        override def ivyDeps = T { super.ivyDeps() ++ Agg(
-          Deps.Js.react4s,
-          Deps.Js.scalaJsDom
-        )}
+        override def ivyDeps = T {
+          super.ivyDeps() ++ Agg(
+            deps.Js.react4s,
+            deps.Js.scalaJsDom
+          )
+        }
 
-        object webBundle extends BlendedWebBundle {
+        object webBundle extends UiWebBundle {
           override def webContext = "sample"
+          override def exportPackages = Seq.empty
+          override def bundleSymbolicName = millModuleSegments.parts.filter(_ != crossDeps.scalaVersion).mkString(".")
           override def bundleActivator = "blended.mgmt.ui.SampleActivator"
 
-          override def webContent = T { sampleApp.packageHtml() }
+          override def webContent = T {
+            sampleApp.packageHtml()
+          }
         }
       }
 
-      object mgmtApp extends WebUtils with BlendedJSModule {
+      object mgmtApp extends UiJsModule with WebUtils {
+
+        override def millSourcePath = baseDir / "mgmt-app"
 
         override def appName = blendedModule
 
@@ -462,36 +434,44 @@ object blended extends Module {
 
         override def ivyDeps = T {
           super.ivyDeps() ++ Agg(
-            Deps.Js.blendedUpdaterConfig,
-            Deps.Js.blendedJmx,
-            Deps.Js.blendedSecurity,
-            Deps.Js.akkaJsActor,
-            Deps.Js.react4s,
-            Deps.Js.scalaJsDom
-          )}
-
-        object test extends super.Tests
-
-        object webBundle extends BlendedWebBundle {
-          override def webContext = "management"
-          override def bundleActivator = "blended.mgmt.ui.MgmtAvtivator"
-
-          override def webContent = T { mgmtApp.packageHtml() }
+            deps.Js.blendedUpdaterConfig,
+            deps.Js.blendedJmx,
+            deps.Js.blendedSecurity,
+            deps.Js.akkaJsActor,
+            deps.Js.react4s,
+            deps.Js.scalaJsDom
+          )
         }
+
+        object webBundle extends UiWebBundle {
+          override def webContext = "management"
+          override def exportPackages = Seq.empty
+          override def bundleActivator = "blended.mgmt.ui.MgmtActivator"
+          override def bundleSymbolicName = millModuleSegments.parts.filter(_ != crossDeps.scalaVersion).mkString(".")
+
+          override def webContent = T {
+            mgmtApp.packageHtml()
+          }
+        }
+
       }
 
-      object mgmtAppSelenium extends BlendedModule {
+      object mgmtAppSelenium extends UiModule {
 
-        object test extends Tests {
+        override def description = "Selenium tests for the Management UI"
+
+        override def millSourcePath = baseDir / "mgmtAppSelenium"
+
+        object test extends super.BlendedJvmTests {
 
           override def ivyDeps = T { super.ivyDeps() ++ Agg(
-            Deps.akkaActor,
-            Deps.akkaStream,
-            Deps.akkaHttp,
-            Deps.akkaHttpCore,
-            Deps.akkaTestkit,
-            Deps.selenium,
-            Deps.scalatestSelenium
+            deps.akkaActor,
+            deps.akkaStream,
+            deps.akkaHttp,
+            deps.akkaHttpCore,
+            deps.akkaTestkit,
+            deps.selenium,
+            deps.scalatestSelenium
           )}
 
           override def forkArgs = T {

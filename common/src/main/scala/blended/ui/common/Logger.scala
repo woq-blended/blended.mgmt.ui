@@ -15,11 +15,11 @@ trait Logger extends Serializable {
   def debug(msg: => String) : Unit = debug(None)(msg)
   def trace(msg: => String) : Unit = trace(None)(msg)
 
-  def error(t: Option[Throwable])(msg: => String)
-  def warn(t: Option[Throwable])(msg: => String)
-  def info(t: Option[Throwable])(msg: => String)
-  def debug(t: Option[Throwable])(msg: => String)
-  def trace(t: Option[Throwable])(msg: => String)
+  def error(t: Option[Throwable])(msg: => String) : Unit
+  def warn(t: Option[Throwable])(msg: => String) : Unit
+  def info(t: Option[Throwable])(msg: => String) : Unit
+  def debug(t: Option[Throwable])(msg: => String) : Unit
+  def trace(t: Option[Throwable])(msg: => String) : Unit
 }
 
 class PrintlnLogger(className: String) extends Logger {
