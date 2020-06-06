@@ -2,7 +2,7 @@ import mill.scalalib._
 import de.wayofquality.blended.mill.modules.BlendedDependencies
 
 trait UiDeps extends BlendedDependencies { deps =>
-  val blendedCoreVersion : String = "3.2-SNAPSHOT"
+  val blendedCoreVersion : String = "3.2-alpha1-25-04adc1"
 
   val akkaJsActorVersion = "2.2.6.5"
   val seleniumVersion = "3.141.59"
