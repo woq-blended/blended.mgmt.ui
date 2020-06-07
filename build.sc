@@ -42,7 +42,9 @@ import de.wayofquality.blended.mill.modules._
 import de.wayofquality.blended.mill.utils._
 
 /** Project directory. */
-val projectDir: os.Path = build.millSourcePath
+val projectDir: os.Path = {
+  build.millSourcePath
+}
 
 object GitSupport extends GitModule {
   override def millSourcePath: Path = projectDir
@@ -83,7 +85,7 @@ trait WebUtils extends Module {
   // package.json of the project root
   def yarnInstall : T[PathRef] = T {
     val modules = npmModulesDir
-    val result = os.proc("yarn", "install").call(cwd = projectDir)
+    val result = os.proc("yarn", "install", "--modules-folder", modules).call(cwd = projectDir)
     T.log.info(new String(result.out.bytes))
     PathRef(modules)
   }
@@ -183,10 +185,9 @@ trait WebUtils extends Module {
       generatedCfg
     }
 
-    val ls = os.proc("ls", "-al", npmModulesDir).call(cwd = millSourcePath)
-    T.log.info(new String(ls.out.bytes))
+    val modules = yarnInstall().path
 
-    val rc = os.proc("node", s"$npmModulesDir/webpack-cli/bin/cli.js", "--progress", "--config", usedCfg.toIO.getAbsolutePath()).call(cwd = millSourcePath)
+    val rc = os.proc("node", s"$modules/webpack-cli/bin/cli.js", "--progress", "--config", usedCfg.toIO.getAbsolutePath()).call(cwd = millSourcePath)
     T.log.info(new String(rc.out.bytes))
     PathRef(dist)
   }
