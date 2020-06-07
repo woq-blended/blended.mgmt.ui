@@ -196,8 +196,9 @@ trait WebUtils extends Module {
     }
 
     val modules = yarnInstall().path
+    T.log.info(s"Using webpack info [${usedCfg}]")
 
-    val rc = os.proc(s"$modules/webpack-cli/bin/cli.js", "--progress", "--config", usedCfg.toIO.getAbsolutePath()).call(cwd = millSourcePath)
+    val rc = os.proc(s"$modules/webpack-cli/bin/cli.js", "--progress", "--config", usedCfg.toIO.getAbsolutePath()).call(cwd = projectDir)
     T.log.info(new String(rc.out.bytes))
     PathRef(dist)
   }
