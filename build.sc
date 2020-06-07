@@ -60,7 +60,9 @@ trait WebUtils extends Module {
   def npmModulesDir : Path = projectDir / "node_modules"
 
   def nodeVersion() = T.command {
-    os.proc("node", "-v").call().out.text()
+    val result = os.proc("node", "-v").call().out.text().filter(_ >= ' ')
+    println(s"Using Node.js version [$result]")
+    result
   }
 
   // If the mill module should be packaged as a web application, we need to point the module to the output
@@ -195,7 +197,7 @@ trait WebUtils extends Module {
 
     val modules = yarnInstall().path
 
-    val rc = os.proc("node", s"$modules/webpack-cli/bin/cli.js", "--progress", "--config", usedCfg.toIO.getAbsolutePath()).call(cwd = millSourcePath)
+    val rc = os.proc(s"$modules/webpack-cli/bin/cli.js", "--progress", "--config", usedCfg.toIO.getAbsolutePath()).call(cwd = millSourcePath)
     T.log.info(new String(rc.out.bytes))
     PathRef(dist)
   }
