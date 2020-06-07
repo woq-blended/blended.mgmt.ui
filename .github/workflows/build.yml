@@ -40,8 +40,8 @@ jobs:
     - run: |
         pwd
         yarn install
-        ls -al node_modules
         ./node_modules/webpack-cli/bin/cli.js --version
+        set
 
     - run: ./millw -i -j 0 -k blended[${{ matrix.scala-version }}].__.testCached
 
