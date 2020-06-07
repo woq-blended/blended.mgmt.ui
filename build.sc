@@ -90,7 +90,9 @@ trait WebUtils extends Module {
 
     val yarnErrors : os.Path = projectDir / "yarn-error.log"
     if ( (yarnErrors.toIO.exists()) ) {
+      T.log.info("----- Yarn Error log -----")
       T.log.info(new String(os.read.bytes(yarnErrors)))
+      T.log.info("----- Yarn Error log -----")
     }
 
     PathRef(modules)
