@@ -1,6 +1,8 @@
-image:https://www.travis-ci.org/woq-blended/blended.mgmt.ui.svg?branch=master["Build Status", link="https://www.travis-ci.org/woq-blended/blended.mgmt.ui"]
+ifdef::env-github[]
+image:https://github.com/woq-blended/blended.mgmt.ui/workflows/.github/workflows/build.yml/badge.svg[Building, link="https://github.com/woq-blended/blended.mgmt.ui/actions?query=workflow%3A.github%2Fworkflows%2Fbuild.yml"]
 image:https://api.codacy.com/project/badge/Grade/6b6fed51afb44d48a1ba2ccca66b6733["Codacy code quality", link="https://www.codacy.com/app/blended/blended.mgmt.ui?utm_source=github.com&utm_medium=referral&utm_content=woq-blended/blended.mgmt.ui&utm_campaign=Badge_Grade"]
 image:https://badges.gitter.im/Join%20Chat.svg[Join the chat at, link="https://gitter.im/woq-blended/blended?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"]
+endif::[]
 
 == Blended Management UI
 
