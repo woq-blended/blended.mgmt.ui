@@ -30,7 +30,10 @@ class SampleSpec extends TestKit(ActorSystem("uitest"))
     Await.result(binding, 10.seconds)
   }
 
-  System.setProperty("webdriver.chrome.driver", "/usr/lib/chromium/chromedriver")
+  System.setProperty(
+    "webdriver.chrome.driver",
+    Option(System.getProperty("CHROMEWEBDRIVER")).getOrElse("/usr/lib/chromium/chromedriver")
+  )
 
   val chromeOptions = new ChromeOptions()
   chromeOptions.addArguments("--headless", "--no-gpu", "--no-sandbox", "--disable-setuid-sandbox")
