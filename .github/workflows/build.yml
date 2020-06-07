@@ -37,11 +37,12 @@ jobs:
 
     - run: ./millw -i show blendedVersion ; echo "${{ github.ref }}"
 
-    - run: |
-        pwd
-        yarn install
-        ./node_modules/webpack-cli/bin/cli.js --version
-        set
+    -name: Install and Show environment
+     run: |
+       pwd
+       yarn install
+       ./node_modules/webpack-cli/bin/cli.js --version
+       set
 
     - run: ./millw -i -j 0 -k blended[${{ matrix.scala-version }}].__.testCached
 
