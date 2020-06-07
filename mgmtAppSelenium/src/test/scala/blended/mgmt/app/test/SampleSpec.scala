@@ -32,7 +32,7 @@ class SampleSpec extends TestKit(ActorSystem("uitest"))
 
   System.setProperty(
     "webdriver.chrome.driver",
-    Option(System.getProperty("CHROMEWEBDRIVER")).getOrElse("/usr/lib/chromium/chromedriver")
+    Option(System.getenv("CHROMEWEBDRIVER")).getOrElse("/usr/lib/chromium/chromedriver")
   )
 
   val chromeOptions = new ChromeOptions()
