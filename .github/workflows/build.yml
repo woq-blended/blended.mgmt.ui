@@ -37,6 +37,8 @@ jobs:
 
     - run: ./millw -i show blendedVersion ; echo "${{ github.ref }}"
 
+    - run: yarn install
+
     - run: ./millw -i -j 0 -k blended[${{ matrix.scala-version }}].__.testCached
 
     - name: Upload Testlogs
