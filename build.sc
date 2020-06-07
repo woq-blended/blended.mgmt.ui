@@ -87,6 +87,12 @@ trait WebUtils extends Module {
     val modules = npmModulesDir
     val result = os.proc("yarn", "install", "--modules-folder", modules).call(cwd = projectDir)
     T.log.info(new String(result.out.bytes))
+
+    val yarnErrors : os.Path = projectDir / "yarn-error.log"
+    if ( (yarnErrors.toIO.exists()) ) {
+      os.move(yarnErrors, projectDir / "out")
+    }
+
     PathRef(modules)
   }
 
