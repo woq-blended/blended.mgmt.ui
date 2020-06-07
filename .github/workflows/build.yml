@@ -30,9 +30,14 @@ jobs:
       with:
         java-version: ${{ matrix.java-version }}
 
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+
     - run: ./millw -i show blendedVersion ; echo "${{ github.ref }}"
 
-    - run: ./millw -i -j 0 -k blended[${{ matrix.scala-version }}].__.publishLocal
+    - run: ./millw -i -j 0 -k blended[${{ matrix.scala-version }}].__.testCached
 
     - name: Upload Testlogs
       uses: actions/upload-artifact@v2
