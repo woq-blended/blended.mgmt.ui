@@ -183,7 +183,10 @@ trait WebUtils extends Module {
       generatedCfg
     }
 
-    val rc = os.proc(s"$npmModulesDir/webpack-cli/bin/cli.js", "--progress", "--config", usedCfg.toIO.getAbsolutePath()).call(cwd = millSourcePath)
+    val ls = os.proc("ls", "-al", npmModulesDir).call(cwd = millSourcePath)
+    T.log.info(new String(ls.out.bytes))
+
+    val rc = os.proc("node", s"$npmModulesDir/webpack-cli/bin/cli.js", "--progress", "--config", usedCfg.toIO.getAbsolutePath()).call(cwd = millSourcePath)
     T.log.info(new String(rc.out.bytes))
     PathRef(dist)
   }
