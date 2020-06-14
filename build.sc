@@ -1,19 +1,7 @@
-import coursierapi.{Credentials, MavenRepository}
-import os.Path
-
-val blendedMillVersion : String = "v0.1-12-c862fa"
-
-interp.repositories() ++= Seq(
-  MavenRepository.of(s"https://u233308-sub2.your-storagebox.de/blended-mill/$blendedMillVersion")
-    .withCredentials(Credentials.of("u233308-sub2", "px8Kumv98zIzSF7k"))
-)
-
-interp.load.ivy("de.wayofquality.blended" %% "blended-mill" % blendedMillVersion)
-
-@
-
+import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
 import coursier.Repository
 import coursier.maven.MavenRepository
+import coursier.core.Authentication
 import mill._
 import mill.define.{Sources, Task, Target}
 import mill.scalajslib.ScalaJSModule
@@ -35,6 +23,7 @@ import $ivy.`de.tototec::de.tobiasroeser.mill.osgi:0.3.0`
 import de.tobiasroeser.mill.osgi._
 
 // imports from the blended-mill plugin
+import $ivy.`de.wayofquality.blended::blended-mill:0.3`
 import de.wayofquality.blended.mill.versioning.GitModule
 import de.wayofquality.blended.mill.publish.BlendedPublishModule
 import de.wayofquality.blended.mill.webtools.WebTools
@@ -50,6 +39,7 @@ object GitSupport extends GitModule {
   override def millSourcePath: Path = projectDir
 }
 
+def akkaBundleRevision : String = "f37f38e"
 def blendedVersion = T { GitSupport.publishVersion() }
 
 trait WebUtils extends Module {
@@ -258,6 +248,10 @@ class BlendedUiCross(crossScalaVersion : String) extends GenIdeaModule { blended
       MavenRepository("https://oss.sonatype.org/content/repositories/snapshots/"),
       MavenRepository(
         s"https://u233308-sub2.your-storagebox.de/blended-core/${crossDeps.blendedCoreVersion}",
+        Some(Authentication("u233308-sub2", "px8Kumv98zIzSF7k"))
+      ),
+      MavenRepository(
+        s"https://u233308-sub2.your-storagebox.de/akka-osgi/${akkaBundleRevision}",
         Some(Authentication("u233308-sub2", "px8Kumv98zIzSF7k"))
       )
     )
@@ -480,10 +474,10 @@ class BlendedUiCross(crossScalaVersion : String) extends GenIdeaModule { blended
         object test extends super.BlendedJvmTests {
 
           override def ivyDeps = T { super.ivyDeps() ++ Agg(
-            deps.akkaActor,
-            deps.akkaStream,
-            deps.akkaHttp,
-            deps.akkaHttpCore,
+            deps.akkaActor(akkaBundleRevision),
+            deps.akkaStream(akkaBundleRevision),
+            deps.akkaHttp(akkaBundleRevision),
+            deps.akkaHttpCore(akkaBundleRevision),
             deps.akkaTestkit,
             deps.selenium,
             deps.scalatestSelenium
