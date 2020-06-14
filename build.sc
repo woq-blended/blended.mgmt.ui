@@ -247,7 +247,7 @@ class BlendedUiCross(crossScalaVersion : String) extends GenIdeaModule { blended
     override def repositories: Seq[Repository] = zincWorker.repositories ++ Seq(
       MavenRepository("https://oss.sonatype.org/content/repositories/snapshots/"),
       MavenRepository(
-        s"https://u233308-sub2.your-storagebox.de/blended-core/${crossDeps.blendedCoreVersion}",
+        s"https://u233308-sub2.your-storagebox.de/blended/${crossDeps.blendedCoreVersion}",
         Some(Authentication("u233308-sub2", "px8Kumv98zIzSF7k"))
       ),
       MavenRepository(
