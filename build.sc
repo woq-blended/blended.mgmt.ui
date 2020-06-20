@@ -39,7 +39,7 @@ object GitSupport extends GitModule {
   override def millSourcePath: Path = projectDir
 }
 
-def akkaBundleRevision : String = "f37f38e"
+def akkaBundleRevision : String = "1"
 def blendedVersion = T { GitSupport.publishVersion() }
 
 trait WebUtils extends Module {

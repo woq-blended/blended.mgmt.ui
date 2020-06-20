@@ -4,7 +4,7 @@ import $ivy.`de.wayofquality.blended::blended-mill:0.3`
 import de.wayofquality.blended.mill.modules.BlendedDependencies
 
 trait UiDeps extends BlendedDependencies { deps =>
-  val blendedCoreVersion : String = "3.2-alpha1-41-g89bae49f7"
+  val blendedCoreVersion : String = "3.2-alpha1-77-gff7c9280c"
 
   val akkaJsActorVersion = "2.2.6.5"
   val seleniumVersion = "3.141.59"
